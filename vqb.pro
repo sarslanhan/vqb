@@ -4,7 +4,14 @@
 TARGET = vqb
 TEMPLATE = app
 SOURCES += main.cpp \
-    vqbform.cpp
-HEADERS += vqbform.h
+    vqbform.cpp \
+    vqbbackend.cpp \
+    querythread.cpp
+HEADERS += vqbform.h \
+    vqbbackend.h \
+    querythread.h
 FORMS += vqbform.ui
 OTHER_FILES += CMakeLists.txt
+CONFIG += qt \
+    link_pkgconfig
+PKGCONFIG += soprano

@@ -1,5 +1,6 @@
 #include "vqbform.h"
 #include "ui_vqbform.h"
+#include "vqbbackend.h"
 
 #include <QLayout>
 #include <QHBoxLayout>
@@ -9,39 +10,53 @@
 #include <QLineEdit>
 #include <QPushButton>
 
+#include <KDebug>
+
+class VqbForm::Private
+{
+public:
+    Ui::VqbFormClass *ui;
+    QPushButton *btnAdd;
+    QVBoxLayout *topLayout; //layout holding the constraint lines
+    VqbBackend *backend;
+};
 
 VqbForm::VqbForm(QWidget *parent)
-    : QWidget(parent), ui(new Ui::VqbFormClass)
+    : QWidget(parent), d(new Private)
 {
-    ui->setupUi(this);
+    d->ui = new Ui::VqbFormClass;
+    d->ui->setupUi(this);
     init();
     addConstraintLine();
 }
 
 void VqbForm::init()
 {
-    m_btnAdd = new QPushButton( "+" );
-    m_btnAdd->setBaseSize(100, 50);
-    connect( m_btnAdd, SIGNAL( clicked() ),
+    d->btnAdd = new QPushButton( "+" );
+    d->btnAdd->setBaseSize(100, 50);
+    connect( d->btnAdd, SIGNAL( clicked() ),
                this, SLOT( on_btnAdd_clicked() ) );
 
-    m_topLayout = new QVBoxLayout;
+    d->topLayout = new QVBoxLayout;
 
     QHBoxLayout *qhbl = new QHBoxLayout;
     qhbl->setDirection( QBoxLayout::RightToLeft );
-    qhbl->addWidget( m_btnAdd, 1 );
+    qhbl->addWidget( d->btnAdd, 1 );
     qhbl->addStretch( 5 );
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->addLayout( m_topLayout, 0 );//the top stack
+    mainLayout->addLayout( d->topLayout, 0 );//the top stack
     mainLayout->addLayout( qhbl, 1 );//the bottom layout (holding the button)
     mainLayout->addStretch( 1 );
     this->setLayout( mainLayout );
+
+    d->backend = new VqbBackend( this );
+    d->backend->findSubjectsWithLabels();//finds and feeds it to the GUI
 }
 
 VqbForm::~VqbForm()
 {
-    delete ui;
+    delete d->ui;
 }
 
 QHBoxLayout *VqbForm::createConstraintLine()
@@ -64,9 +79,14 @@ QHBoxLayout *VqbForm::createConstraintLine()
 void VqbForm::addConstraintLine()
 {
     //QVBoxLayout *layout = dynamic_cast<QVBoxLayout*>( this->layout() );
-    if( m_topLayout ) {
-        m_topLayout->addLayout( createConstraintLine() );
+    if( d->topLayout ) {
+        d->topLayout->addLayout( createConstraintLine() );
     }
+}
+
+void VqbForm::addSubjects( QStringList subjects )
+{
+    kDebug() << "*** Received them: " << subjects;
 }
 
 void VqbForm::on_btnAdd_clicked()
