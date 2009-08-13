@@ -20,14 +20,16 @@ public:
     VqbForm(QWidget *parent = 0);
     ~VqbForm();
 
+public slots:
+    void addSubjects( QStringList subjects );
+
 private:
     QHBoxLayout *createConstraintLine();
     void addConstraintLine();
     void init();
 
-    Ui::VqbFormClass *ui;
-    QPushButton *m_btnAdd;
-    QVBoxLayout *m_topLayout; //layout holding the constraint lines    
+    class Private;
+    Private * const d;
 
 private slots:
     void on_btnAdd_clicked();
