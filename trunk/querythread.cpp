@@ -51,6 +51,7 @@ void QueryThread::run()
               res << val;
     }
     //kDebug() << "\n\n Results: for " << query << ": \n" << res;
+    res << "Label1" << "Label2" << "Label3" << "Label4" << "Label5";
     emit queryDone( res );
 }
 
