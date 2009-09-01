@@ -1,6 +1,7 @@
 #include "vqbform.h"
 #include "ui_vqbform.h"
 #include "vqbbackend.h"
+#include "constraint.h"
 
 #include <QLayout>
 #include <QHBoxLayout>
@@ -27,7 +28,6 @@ VqbForm::VqbForm(QWidget *parent)
     d->ui = new Ui::VqbFormClass;
     d->ui->setupUi(this);
     init();
-    addConstraintLine();
 }
 
 void VqbForm::init()
@@ -50,6 +50,8 @@ void VqbForm::init()
     mainLayout->addStretch( 1 );
     this->setLayout( mainLayout );
 
+    addConstraintLine();
+
     d->backend = new VqbBackend( this );
     d->backend->findSubjectsWithLabels();//finds and feeds it to the GUI
 }
@@ -59,28 +61,11 @@ VqbForm::~VqbForm()
     delete d->ui;
 }
 
-QHBoxLayout *VqbForm::createConstraintLine()
-{
-    QHBoxLayout *layout = new QHBoxLayout();
-
-    QComboBox *cb1 = new QComboBox();
-    QComboBox *cb2 = new QComboBox();
-    QComboBox *cb3 = new QComboBox();
-    QLineEdit *le = new QLineEdit();
-
-    layout->addWidget( cb1, 1 );
-    layout->addWidget( cb2, 1 );
-    layout->addWidget( cb3, 1 );
-    layout->addWidget( le, 1 );
-
-    return layout;
-}
-
 void VqbForm::addConstraintLine()
 {
     //QVBoxLayout *layout = dynamic_cast<QVBoxLayout*>( this->layout() );
     if( d->topLayout ) {
-        d->topLayout->addLayout( createConstraintLine() );
+        d->topLayout->addWidget( new Constraint( "Constraint", this ) );
     }
 }
 

@@ -24,7 +24,6 @@ public slots:
     void addSubjects( QStringList subjects );
 
 private:
-    QHBoxLayout *createConstraintLine();
     void addConstraintLine();
     void init();
 
