@@ -27,7 +27,7 @@ public:
     */
     void setQuery( QString query, QString freeVar );
 
-Q_SIGNALS:
+signals:
     void queryDone( QStringList );
 
 private:

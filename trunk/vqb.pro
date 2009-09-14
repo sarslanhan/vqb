@@ -5,11 +5,9 @@ TARGET = vqb
 TEMPLATE = app
 SOURCES += main.cpp \
     vqbform.cpp \
-    vqbbackend.cpp \
     querythread.cpp \
     constraint.cpp
 HEADERS += vqbform.h \
-    vqbbackend.h \
     querythread.h \
     constraint.h
 FORMS += vqbform.ui

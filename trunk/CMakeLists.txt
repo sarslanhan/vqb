@@ -13,7 +13,6 @@ include_directories(
 set(vqb_SRCS
   main.cpp
   vqbform.cpp
-  vqbbackend.cpp
   querythread.cpp
   constraint.cpp
   )

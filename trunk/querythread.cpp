@@ -1,5 +1,4 @@
 #include "querythread.h"
-#include "vqbbackend.h"
 
 #include <QString>
 #include <QList>
@@ -11,6 +10,8 @@
 #include <Soprano/Client/DBusModel>
 #include <Soprano/Util/DummyModel>
 #include <Soprano/QueryResultIterator>
+
+#include <KDebug>
 
 class QueryThread::Private
 {
@@ -27,13 +28,16 @@ QueryThread::QueryThread(QObject *parent)
     d->query = "?s ?p ?o";
     d->freeVar = "s";
 }
+
 void QueryThread::run()
 {
     QString q =  "SELECT DISTINCT ?" + d->freeVar + " WHERE { " + d->query + " } LIMIT 50";
+    kDebug() << "\n\n *** Querying: " << q << ": \n";
 
     Soprano::Model* m = nepomukMainModel();
     Soprano::QueryResultIterator it = m->executeQuery( q, Soprano::Query::QueryLanguageSparql );
 
+    //QList<Soprano::Node> resNodes;
     QStringList res;
     QList<Soprano::BindingSet> allStatements = it.allBindings();
 
@@ -49,10 +53,12 @@ void QueryThread::run()
               }
               //kDebug() << "--- Found: " << val;
               res << val;
+              //resNodes << n;
     }
-    //kDebug() << "\n\n Results: for " << query << ": \n" << res;
-    res << "Label1" << "Label2" << "Label3" << "Label4" << "Label5";
+    kDebug() << "\n\n ===> Results: " << ": \n" << res;
+    //res << "Label1" << "Label2" << "Label3" << "Label4" << "Label5";
     emit queryDone( res );
+    //emit queryDoneNodes( resNodes );
 }
 
 void QueryThread::setQuery( QString query, QString freeVar )
