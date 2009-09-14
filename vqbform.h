@@ -20,9 +20,6 @@ public:
     VqbForm(QWidget *parent = 0);
     ~VqbForm();
 
-public slots:
-    void addSubjects( QStringList subjects );
-
 private:
     void addConstraintLine();
     void init();

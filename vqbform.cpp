@@ -1,6 +1,5 @@
 #include "vqbform.h"
 #include "ui_vqbform.h"
-#include "vqbbackend.h"
 #include "constraint.h"
 
 #include <QLayout>
@@ -19,7 +18,6 @@ public:
     Ui::VqbFormClass *ui;
     QPushButton *btnAdd;
     QVBoxLayout *topLayout; //layout holding the constraint lines
-    VqbBackend *backend;
 };
 
 VqbForm::VqbForm(QWidget *parent)
@@ -51,9 +49,6 @@ void VqbForm::init()
     this->setLayout( mainLayout );
 
     addConstraintLine();
-
-    d->backend = new VqbBackend( this );
-    d->backend->findSubjectsWithLabels();//finds and feeds it to the GUI
 }
 
 VqbForm::~VqbForm()
@@ -67,11 +62,6 @@ void VqbForm::addConstraintLine()
     if( d->topLayout ) {
         d->topLayout->addWidget( new Constraint( "Constraint", this ) );
     }
-}
-
-void VqbForm::addSubjects( QStringList subjects )
-{
-    kDebug() << "*** Received them: " << subjects;
 }
 
 void VqbForm::on_btnAdd_clicked()
