@@ -18,53 +18,68 @@ class QueryThread::Private
     public:
         Private() {}
         QString query;
-        QString freeVar;
 };
 
 QueryThread::QueryThread(QObject *parent)
         : QThread( parent ),
           d( new Private )
 {
-    d->query = "?s ?p ?o";
-    d->freeVar = "s";
+    qRegisterMetaType<QList<StringPair> >("QList<StringPair>");//user-defined types need to be registered to be used as signals
+    d->query = "SELECT DISTINCT ?s WHERE { ?s ?p ?o } LIMIT 50";
 }
 
 void QueryThread::run()
 {
-    QString q =  "SELECT DISTINCT ?" + d->freeVar + " WHERE { " + d->query + " } LIMIT 50";
-    kDebug() << "\n\n *** Querying: " << q << ": \n";
+    kDebug() << "\n\n *** Querying: " << d->query << ": \n";
 
     Soprano::Model* m = nepomukMainModel();
-    Soprano::QueryResultIterator it = m->executeQuery( q, Soprano::Query::QueryLanguageSparql );
+    Soprano::QueryResultIterator it = m->executeQuery( d->query, Soprano::Query::QueryLanguageSparql );
 
     //QList<Soprano::Node> resNodes;
-    QStringList res;
+    QList<StringPair> res;
     QList<Soprano::BindingSet> allStatements = it.allBindings();
 
-    QString val;
+    StringPair  val;
+    Soprano::Node n;
     foreach (Soprano::BindingSet s, allStatements ) {
-              Soprano::Node n = s.value(d->freeVar);
+
+              n = s.value( 0 );
               if ( n.isResource() ) {
-                  val = n.uri().toString();
+                  val.s1 = n.uri().toString();
                   //val = VisualQueryBuilderConsts::getPrefixForm( val );
               } else if ( n.isLiteral() ) {
                   //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
-                  val = n.literal().toString();
+                  val.s1 = n.literal().toString();
+                  kDebug() << "__||__ Datatype: " << n.dataType();
               }
+
+              n = s.value( 1 );
+              if ( n.isResource() ) {
+                  val.s2 = n.uri().toString();
+                  //val = VisualQueryBuilderConsts::getPrefixForm( val );
+              } else if ( n.isLiteral() ) {
+                  //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
+                  val.s2 = n.literal().toString();
+                  kDebug() << "__||__ Datatype: " << n.dataType();
+              }
+
               //kDebug() << "--- Found: " << val;
+              kDebug() << "Found: " << val.s1 << val.s2;
               res << val;
               //resNodes << n;
     }
-    kDebug() << "\n\n ===> Results: " << ": \n" << res;
-    //res << "Label1" << "Label2" << "Label3" << "Label4" << "Label5";
+
+    //kDebug() << "\n\n ===> Results: " << ": \n";
+    //foreach( StringPair s, res ) { kDebug() << s.s1 << s.s2 << endl; }
+
+
     emit queryDone( res );
     //emit queryDoneNodes( resNodes );
 }
 
-void QueryThread::setQuery( QString query, QString freeVar )
+void QueryThread::setQuery( QString query )
 {
     d->query = query;
-    d->freeVar = freeVar;
 }
 
 static Soprano::Model *s_model = 0;
