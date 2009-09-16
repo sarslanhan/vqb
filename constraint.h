@@ -6,6 +6,7 @@
 
 class QComboBox;
 class QLineEdit;
+class StringPair;
 
 struct ConstraintLine {
     QComboBox *s,*p,*rel;
@@ -20,27 +21,32 @@ public:
     Constraint ( const QString & title, QWidget * parent = 0 );
 
 public slots:
-    void addSubjects( QStringList subjects );
-    void addPredicates( QStringList predicates );
-    void addPredicateDomain( QStringList subjects );
+    void addSubjects( QList<StringPair> subjects );
+    void addPredicates( QList<StringPair> predicates );
+    void addPredicateDomain( QList<StringPair> subjects );
 
     void threadTerminated();
 
 private slots:
-    void findSubjectsWithLabels();
+    /** Finds subjects with labels.
+        filter specifies whether to filter based on the previous constraint line, or not
+      */
+    void findSubjectsWithLabels( bool filter);
     void findPredicatesForSubject( QString subject );
     void findDomainForPredicate( QString predicate );
 
 
-    void subjectSelected( QString subject );
-    void predicateSelected( QString predicate );
+    void subjectSelected( int index );
+    void predicateSelected( int index );
     void unblockPredicate();/*allows to delays unblocking with a singleShot*/
 
 private:
     void paintEvent ( QPaintEvent * event );
-
     void addConstraintLine();
+
+    //FIXME: add a Private class, or a different static class for constants
     QList<ConstraintLine> constraintLines;
+    QStringList m_relations;
 
 };
 
