@@ -17,29 +17,38 @@
 
 #include <KStandardAction>
 #include <KAction>
-
+#include <KRandom>
 #include <KDebug>
 
-Constraint::Constraint( const QString & title, QWidget * parent )
-        : QGroupBox(title, parent)
+Constraint::Constraint( int constraintNo, QWidget * parent )
+        : QGroupBox( QString("Constraint %1").arg(constraintNo+1), parent)
 {
     init();
 }
 
+// ************* INIT AND EVENTS ***************
+
 void Constraint::init()
 {
     setLayout( new QVBoxLayout () );
-    m_relations << "equals" << "contains";
+    m_relations << "equals";
 
     addConstraintLine();
     findSubjectsWithLabels( false );//finds and feeds it to the Subject ComboBox
 
-    QAction *removeAction = KStandardAction::clear( this, SLOT( slotOpenBlackBox() ), this );
-    removeAction->setText( tr("&Remove constraint") );
+    setAttribute( Qt::WA_DeleteOnClose  );//delete when closed
+
+    QAction *removeAction = KStandardAction::close( this, SLOT( close() ), this );
+    removeAction->setText( tr("Remove &constraint") );
     removeAction->setStatusTip(tr("Removes this constraint from the query and GUI"));
     removeAction->setShortcut( 0 );
 
+    QAction *action = KStandardAction::find( this, SLOT( findQuery() ), this );
+    action->setText( tr("&Refresh") );
+    action->setShortcut( 0 );
+
     this->addAction( removeAction );
+    this->addAction( action );
     this->setContextMenuPolicy( Qt::ActionsContextMenu );
 }
 
@@ -49,40 +58,48 @@ void Constraint::paintEvent ( QPaintEvent * event )
     QPainter painter( this );
 }
 
-void Constraint::addConstraintLine()
+// ************* UTILITIES ***************
+
+QString Constraint::getQueryConstraint()
 {
-    QHBoxLayout * layout = new QHBoxLayout();
+    QString s = constraintLines.first().s->itemData( constraintLines.first().s->currentIndex() ).toString();
+    if( s.isEmpty() ) {
+        return QString();
+    }
+    QString varS = "?v" +  KRandom::randomString(3);
+    QString q;
+    QString o;
+    QString p;
+    q.append( varS + " a <" + s + "> \n" );
 
-    QComboBox *cb1 = new QComboBox();
-    QComboBox *cb2 = new QComboBox();
-    QComboBox *cb3 = new QComboBox();
-    QLineEdit *le = new QLineEdit();
+    constraintLines.count();
+    kDebug() << ":::::::::::: count =" << constraintLines.count();;
+    int i = 0;
+    while( i < (constraintLines.count() - 1) ) {
+        kDebug() << ":::::::::::: processing constraint line " << i << ":" << q;
+        p = constraintLines[i].p->itemData( constraintLines[i].p->currentIndex()  ).toString();
+        q.append( ". " + varS + " <" + p + "> ");
+        varS = "?v" +  KRandom::randomString(3);
+        q.append( varS + "\n" );
+        //q.append( varS + " a <" + s + "> \n" ); //maybe needed, maybe not
 
-    cb1->setEditable( true );
-    cb2->setEditable( true );
+        i++;
+    }
 
-    layout->addWidget( cb1, 1 );
-    layout->addWidget( cb2, 1 );
-    layout->addWidget( cb3, 1 );
-    layout->addWidget( le, 1 );
+    kDebug() << ":::::::::::: final";
+    p = constraintLines[i].p->itemData( constraintLines[i].p->currentIndex()  ).toString();
+    s = constraintLines[i].s->itemData( constraintLines[i].s->currentIndex()  ).toString();
+    o = constraintLines[i].o->text();
+    if( !o.isEmpty() ) {
+        q.append( ". " + varS + " <" + p + "> \"" + o + "\"\n" );
+    }
+    else {
+        q.append( varS + " a <" + s + "> \n" );
+    }
 
-    ((QBoxLayout*)(this->layout()))->addLayout( layout );
-
-    ConstraintLine cl;
-    cl.s = cb1;
-    cl.p = cb2;
-    cl.rel = cb3;
-    cl.o = le;
-
-    constraintLines.append(cl);
-
-    connect( cl.s, SIGNAL(currentIndexChanged( int )),
-             this, SLOT(subjectSelected( int )) );
-
-    connect( cl.p, SIGNAL(currentIndexChanged( int )),
-             this, SLOT(predicateSelected( int )) );
+    kDebug() << ":::::::::::: final result:" << q;
+    return q;
 }
-
 
 // ************* ACTION SLOTS ***************
 
@@ -108,6 +125,13 @@ void Constraint::threadTerminated()
 void Constraint::unblockPredicate()
 {
     constraintLines.last().p->blockSignals( false );
+}
+
+void Constraint::findQuery()
+{
+    kDebug() << "hm1";
+    getQueryConstraint();
+    kDebug() << "hm2";
 }
 
 // ************* QUERYING SLOTS ***************
@@ -173,6 +197,41 @@ void Constraint::findDomainForPredicate( QString predicate )
 
 // ************* INSERTING SLOTS ***************
 
+
+void Constraint::addConstraintLine()
+{
+    QHBoxLayout * layout = new QHBoxLayout();
+
+    QComboBox *cb1 = new QComboBox();
+    QComboBox *cb2 = new QComboBox();
+    QComboBox *cb3 = new QComboBox();
+    QLineEdit *le = new QLineEdit();
+
+    cb1->setEditable( true );
+    cb2->setEditable( true );
+
+    layout->addWidget( cb1, 1 );
+    layout->addWidget( cb2, 1 );
+    layout->addWidget( cb3, 1 );
+    layout->addWidget( le, 1 );
+
+    ((QBoxLayout*)(this->layout()))->addLayout( layout );
+
+    ConstraintLine cl;
+    cl.s = cb1;
+    cl.p = cb2;
+    cl.rel = cb3;
+    cl.o = le;
+
+    constraintLines.append(cl);
+
+    connect( cl.s, SIGNAL(currentIndexChanged( int )),
+             this, SLOT(subjectSelected( int )) );
+
+    connect( cl.p, SIGNAL(currentIndexChanged( int )),
+             this, SLOT(predicateSelected( int )) );
+}
+
 //FIXME: get pairs of values: the label and the URI (??)
 void Constraint::addSubjects( QList<StringPair> subjects )
 {
@@ -182,7 +241,7 @@ void Constraint::addSubjects( QList<StringPair> subjects )
         constraintLines.last().s->addItem( sp.s1, sp.s2 );//add s2 as the data associated to the item
         kDebug() << "++**++ Added item" << sp.s1 << sp.s2;
     }
-    constraintLines.last().s->setCurrentIndex( -1 );
+    //constraintLines.last().s->setCurrentIndex( -1 );
 }
 
 //FIXME: get pairs of values: the label and the URI (??)
