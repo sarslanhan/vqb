@@ -27,6 +27,9 @@ public slots:
 
     void threadTerminated();
 
+signals:
+    void constraintChanged( QString queryConstraint );
+
 private slots:
     /** Finds subjects with labels.
         filter specifies whether to filter based on the previous constraint line, or not
@@ -43,10 +46,16 @@ private slots:
 private:
     void paintEvent ( QPaintEvent * event );
     void addConstraintLine();
+    void init();
+    /** Returns the query formed by the current constraint
+      */
+    QString getQueryConstraint();
 
     //FIXME: add a Private class, or a different static class for constants
     QList<ConstraintLine> constraintLines;
     QStringList m_relations;
+
+
 
 };
 

@@ -5,6 +5,8 @@
 #include <QList>
 #include <QPainter>
 #include <QTimer>
+#include <QPoint>
+#include <QAction>
 
 #include <QLayout>
 #include <QHBoxLayout>
@@ -13,16 +15,32 @@
 #include <QComboBox>
 #include <QLineEdit>
 
+#include <KStandardAction>
+#include <KAction>
+
 #include <KDebug>
 
 Constraint::Constraint( const QString & title, QWidget * parent )
         : QGroupBox(title, parent)
 {
-    //QPushButton *btnClose = new QPushButton( this );
+    init();
+}
+
+void Constraint::init()
+{
     setLayout( new QVBoxLayout () );
+    m_relations << "equals" << "contains";
+
     addConstraintLine();
     findSubjectsWithLabels( false );//finds and feeds it to the Subject ComboBox
-    m_relations << "equals" << "contains";
+
+    QAction *removeAction = KStandardAction::clear( this, SLOT( slotOpenBlackBox() ), this );
+    removeAction->setText( tr("&Remove constraint") );
+    removeAction->setStatusTip(tr("Removes this constraint from the query and GUI"));
+    removeAction->setShortcut( 0 );
+
+    this->addAction( removeAction );
+    this->setContextMenuPolicy( Qt::ActionsContextMenu );
 }
 
 void Constraint::paintEvent ( QPaintEvent * event )
@@ -131,8 +149,8 @@ void Constraint::findPredicatesForSubject( QString subject )
              this, SLOT(addPredicates( QList<StringPair> )));
 
     QString query = QString( "SELECT DISTINCT ?label ?property WHERE {"
-                    " ?property <http://www.w3.org/2000/01/rdf-schema#domain> <%1>;"
-                    "             <http://www.w3.org/2000/01/rdf-schema#label> ?label }" ).arg( subject );
+                    " ?property <http://www.w3.org/2000/01/rdf-schema#domain> <%1> "
+                    " OPTIONAL { ?property  <http://www.w3.org/2000/01/rdf-schema#label> ?label } }" ).arg( subject );
     qt->setQuery( query );
 
     qt->start();
@@ -144,9 +162,8 @@ void Constraint::findDomainForPredicate( QString predicate )
     connect( qt, SIGNAL(queryDone( QList<StringPair> )),
              this, SLOT(addPredicateDomain( QList<StringPair> )));
 
-    QString query =  QString("?resource a ?class"
-    " . ?property <http://www.w3.org/2000/01/rdf-schema#label> \"%1\"  "
-    " . ?property <http://www.w3.org/2000/01/rdf-schema#range> ?class ;").arg( predicate );
+    QString query =  QString("SELECT DISTINCT ?class WHERE {"
+    " <%1> <http://www.w3.org/2000/01/rdf-schema#range> ?class }").arg( predicate );
     //query.arg( predicate );
 
     qt->setQuery( query );
@@ -165,7 +182,7 @@ void Constraint::addSubjects( QList<StringPair> subjects )
         constraintLines.last().s->addItem( sp.s1, sp.s2 );//add s2 as the data associated to the item
         kDebug() << "++**++ Added item" << sp.s1 << sp.s2;
     }
-    //constraintLines.last().s->insertItem( 0, "?s" );
+    constraintLines.last().s->setCurrentIndex( -1 );
 }
 
 //FIXME: get pairs of values: the label and the URI (??)
@@ -174,7 +191,8 @@ void Constraint::addPredicates( QList<StringPair> predicates )
     constraintLines.last().p->blockSignals( true );//don't trigger predicate domain population
     constraintLines.last().p->clear();
     foreach( StringPair sp, predicates ) {
-        constraintLines.last().p->addItem( sp.s1, sp.s2 );//add s2 as the data associated to the item
+        //FIXME: if label is empty, parse
+        constraintLines.last().p->addItem( sp.s1.isEmpty() ? sp.s2 : sp.s1, sp.s2 );//add s2 as the data associated to the item
     }
     constraintLines.last().p->setCurrentIndex( -1 );//insertItem( 0, "?p" );
     constraintLines.last().p->blockSignals( false );
@@ -183,14 +201,16 @@ void Constraint::addPredicates( QList<StringPair> predicates )
 void Constraint::addPredicateDomain( QList<StringPair> subjects )
 {
     if( !subjects.isEmpty() ) {
-        if ( subjects.first().s2 == "<http://www.w3.org/2001/XMLSchema#string>" ) {
+        kDebug() << "Comparing " << subjects.first().s1 << " to " << "http://www.w3.org/2000/01/rdf-schema#Literal";
+        if ( subjects.first().s1 == "http://www.w3.org/2001/XMLSchema#string" ||
+             subjects.first().s1 == "http://www.w3.org/2000/01/rdf-schema#Literal" ) {
             constraintLines.last().rel->clear();
             constraintLines.last().rel->insertItems(0, m_relations);
         }
         else if ( !subjects.empty() ) {
         //disable editable part
         constraintLines.last().rel->setDisabled( true );
-        constraintLines.last().p->setDisabled( true );
+        constraintLines.last().o->setDisabled( true );
 
         //add new constraint line
         addConstraintLine();
