@@ -18,7 +18,7 @@ class Constraint : public QGroupBox
     Q_OBJECT
 
 public:
-    Constraint ( const QString & title, QWidget * parent = 0 );
+    Constraint ( int constraintNo, QWidget * parent = 0 );
 
 public slots:
     void addSubjects( QList<StringPair> subjects );
@@ -26,9 +26,13 @@ public slots:
     void addPredicateDomain( QList<StringPair> subjects );
 
     void threadTerminated();
+    void findQuery();
+
 
 signals:
-    void constraintChanged( QString queryConstraint );
+    /** Notifies a query changed, with the corresponding constraint number
+     */
+    void constraintChanged( int constraintNo, QString queryConstraint );
 
 private slots:
     /** Finds subjects with labels.
@@ -54,9 +58,7 @@ private:
     //FIXME: add a Private class, or a different static class for constants
     QList<ConstraintLine> constraintLines;
     QStringList m_relations;
-
-
-
+    int constraintNo;
 };
 
 #endif // CONSTRAINT_H
