@@ -20,6 +20,13 @@ public:
     VqbForm(QWidget *parent = 0);
     ~VqbForm();
 
+public slots:
+    void constraintChanged( int index, QString constraint );
+    void slotRefresh();
+
+signals:
+    void refresh();
+
 private:
     void addConstraintLine();
     void init();
