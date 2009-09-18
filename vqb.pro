@@ -11,7 +11,8 @@ HEADERS += vqbform.h \
     querythread.h \
     constraint.h
 FORMS += vqbform.ui
-OTHER_FILES += CMakeLists.txt
+OTHER_FILES += CMakeLists.txt \
+    notes.txt
 CONFIG += qt \
     link_pkgconfig
 PKGCONFIG += soprano

@@ -21,8 +21,9 @@
 #include <KDebug>
 
 Constraint::Constraint( int constraintNo, QWidget * parent )
-        : QGroupBox( QString("Constraint %1").arg(constraintNo+1), parent)
+        : QGroupBox( QString("Constraint %1").arg(constraintNo + 1), parent)
 {
+    m_constraintNo = constraintNo;
     init();
 }
 
@@ -70,34 +71,34 @@ QString Constraint::getQueryConstraint()
     QString q;
     QString o;
     QString p;
-    q.append( varS + " a <" + s + "> \n" );
+    q.append( varS + " a <" + s + "> . \n" );
 
     constraintLines.count();
-    kDebug() << ":::::::::::: count =" << constraintLines.count();;
+    //kDebug() << ":::::::::::: count =" << constraintLines.count();;
     int i = 0;
     while( i < (constraintLines.count() - 1) ) {
-        kDebug() << ":::::::::::: processing constraint line " << i << ":" << q;
+        //kDebug() << ":::::::::::: processing constraint line " << i << ":" << q;
         p = constraintLines[i].p->itemData( constraintLines[i].p->currentIndex()  ).toString();
-        q.append( ". " + varS + " <" + p + "> ");
+        q.append( varS + " <" + p + "> ");
         varS = "?v" +  KRandom::randomString(3);
-        q.append( varS + "\n" );
-        //q.append( varS + " a <" + s + "> \n" ); //maybe needed, maybe not
+        q.append( varS + ". \n" );
+        //q.append( varS + " a <" + s + "> .\n" ); //maybe needed, maybe not
 
         i++;
     }
 
-    kDebug() << ":::::::::::: final";
+    //kDebug() << ":::::::::::: final";
     p = constraintLines[i].p->itemData( constraintLines[i].p->currentIndex()  ).toString();
     s = constraintLines[i].s->itemData( constraintLines[i].s->currentIndex()  ).toString();
     o = constraintLines[i].o->text();
     if( !o.isEmpty() ) {
-        q.append( ". " + varS + " <" + p + "> \"" + o + "\"\n" );
+        q.append( ". " + varS + " <" + p + "> \"" + o + "\" .\n" );
     }
     else {
-        q.append( varS + " a <" + s + "> \n" );
+        q.append( varS + " a <" + s + "> .\n" );
     }
 
-    kDebug() << ":::::::::::: final result:" << q;
+    //kDebug() << ":::::::::::: final result:" << q;
     return q;
 }
 
@@ -127,11 +128,9 @@ void Constraint::unblockPredicate()
     constraintLines.last().p->blockSignals( false );
 }
 
-void Constraint::findQuery()
+void Constraint::returnConstraint()
 {
-    kDebug() << "hm1";
-    getQueryConstraint();
-    kDebug() << "hm2";
+    emit constraintChanged( m_constraintNo, getQueryConstraint() );
 }
 
 // ************* QUERYING SLOTS ***************

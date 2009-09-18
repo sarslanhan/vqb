@@ -26,8 +26,7 @@ public slots:
     void addPredicateDomain( QList<StringPair> subjects );
 
     void threadTerminated();
-    void findQuery();
-
+    void returnConstraint();
 
 signals:
     /** Notifies a query changed, with the corresponding constraint number
@@ -58,7 +57,7 @@ private:
     //FIXME: add a Private class, or a different static class for constants
     QList<ConstraintLine> constraintLines;
     QStringList m_relations;
-    int constraintNo;
+    int m_constraintNo;
 };
 
 #endif // CONSTRAINT_H
