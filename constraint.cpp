@@ -32,7 +32,7 @@ Constraint::Constraint( int constraintNo, QWidget * parent )
 void Constraint::init()
 {
     setLayout( new QVBoxLayout () );
-    m_relations << "equals";
+    m_relations << "contains" << "equals" ;
 
     addConstraintLine();
     findSubjectsWithLabels( false );//finds and feeds it to the Subject ComboBox
@@ -44,7 +44,7 @@ void Constraint::init()
     removeAction->setStatusTip(tr("Removes this constraint from the query and GUI"));
     removeAction->setShortcut( 0 );
 
-    QAction *action = KStandardAction::find( this, SLOT( findQuery() ), this );
+    QAction *action = KStandardAction::find( this, SLOT( returnQuery() ), this );
     action->setText( tr("&Refresh") );
     action->setShortcut( 0 );
 
@@ -67,38 +67,54 @@ QString Constraint::getQueryConstraint()
     if( s.isEmpty() ) {
         return QString();
     }
-    QString varS = "?v" +  KRandom::randomString(3);
+
+    //Definind the type of the instance
+    QString varS = "?v" +  QString::number(KRandom::random()%80 + 20) ;
     QString q;
     QString o;
     QString p;
     q.append( varS + " a <" + s + "> . \n" );
 
-    constraintLines.count();
-    //kDebug() << ":::::::::::: count =" << constraintLines.count();;
+    //adding the constraint lines
     int i = 0;
     while( i < (constraintLines.count() - 1) ) {
         //kDebug() << ":::::::::::: processing constraint line " << i << ":" << q;
         p = constraintLines[i].p->itemData( constraintLines[i].p->currentIndex()  ).toString();
         q.append( varS + " <" + p + "> ");
-        varS = "?v" +  KRandom::randomString(3);
+        varS = "?v" +  QString::number(KRandom::random()%80 + 20);
         q.append( varS + ". \n" );
         //q.append( varS + " a <" + s + "> .\n" ); //maybe needed, maybe not
 
         i++;
     }
 
-    //kDebug() << ":::::::::::: final";
+    //final (Literal) matching
     p = constraintLines[i].p->itemData( constraintLines[i].p->currentIndex()  ).toString();
-    s = constraintLines[i].s->itemData( constraintLines[i].s->currentIndex()  ).toString();
+    s = constraintLines[i].s->itemData( constraintLines[i].s->currentIndex()  ).toString();//FIXME: might result in a NULL pointer
+    QString rel = constraintLines[i].rel->currentText();
     o = constraintLines[i].o->text();
     if( !o.isEmpty() ) {
-        q.append( ". " + varS + " <" + p + "> \"" + o + "\" .\n" );
+        q.append( ". " + varS + " <" + p + "> ");
+        varS = "?v" +  QString::number(KRandom::random()%80 + 20);
+        q.append( varS );
+
+        QString filterStr;
+        if ( rel == "equals" ) {
+            filterStr = QString( " FILTER regex(" + varS + ", '^" + o + "$', 'i')" );
+        }
+        else if( rel == "contains" ) {
+            filterStr = QString( " FILTER regex(" + varS + ", '" + o + "', 'i') .\n" ) ;
+        }
+        kDebug() << " *** filter string: " << filterStr;
+        q.append( filterStr );
+
+
     }
     else {
         q.append( varS + " a <" + s + "> .\n" );
     }
 
-    //kDebug() << ":::::::::::: final result:" << q;
+    kDebug() << ":::::::::::: final result:" << q;
     return q;
 }
 
@@ -185,6 +201,7 @@ void Constraint::findDomainForPredicate( QString predicate )
     connect( qt, SIGNAL(queryDone( QList<StringPair> )),
              this, SLOT(addPredicateDomain( QList<StringPair> )));
 
+    //FIXME: check parent properties too? Or the foaf:Person is the subclass of owl:Thing, just Sorano doesn't know it?
     QString query =  QString("SELECT DISTINCT ?class WHERE {"
     " <%1> <http://www.w3.org/2000/01/rdf-schema#range> ?class }").arg( predicate );
     //query.arg( predicate );

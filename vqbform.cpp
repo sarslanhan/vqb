@@ -40,7 +40,7 @@ void VqbForm::init()
     d->btnAdd = new QPushButton( "+" ); // add button
     d->btnAdd->setBaseSize(100, 50);
     connect( d->btnAdd, SIGNAL( clicked() ),
-               this, SLOT( on_btnAdd_clicked() ) );
+               this, SLOT( btnAdd_clicked() ) );
 
     d->topLayout = new QVBoxLayout;
     //d->topLayout->setSizeConstraint( QLayout::SetMaximumSize );
@@ -112,7 +112,7 @@ void VqbForm::constraintChanged( int index, QString constraint )
     d->queryViewer->setText( query );
 }
 
-void VqbForm::on_btnAdd_clicked()
+void VqbForm::btnAdd_clicked()
 {
     addConstraintLine();
 }

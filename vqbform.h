@@ -35,7 +35,7 @@ private:
     Private * const d;
 
 private slots:
-    void on_btnAdd_clicked();
+    void btnAdd_clicked();
 };
 
 #endif // VQBFORM_H
