@@ -1,3 +1,15 @@
+name:
+    - domain = owl:Thing
+
+Person:
+    - subClassOf
+            foaf:Agent (not subclass of owl:Thing)
+            pim:Person (not subclass of owl:Thing)
+            geo:SpatiaThing (not subclass of owl:Thing)
+
+
+
+
 void VqbForm::init()
 {
     d->topLayout = new QVBoxLayout;//the top stack
