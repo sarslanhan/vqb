@@ -23,12 +23,18 @@ public:
 public slots:
     void constraintChanged( int index, QString constraint );
     void slotRefresh();
+    /** Attaches a constraint line to an existing one
+      */
+    void attachConstraint(int index, QString varName );
+    /** Adds a variable to the output list
+      */
+    void addVarToOutput( QString var );
 
 signals:
     void refresh();
 
 private:
-    void addConstraintLine();
+    void addConstraint(bool isAttached, QString parentVarName );
     void init();
 
     class Private;

@@ -6,10 +6,12 @@ TEMPLATE = app
 SOURCES += main.cpp \
     vqbform.cpp \
     querythread.cpp \
-    constraint.cpp
+    constraint.cpp \
+    combobox.cpp
 HEADERS += vqbform.h \
     querythread.h \
-    constraint.h
+    constraint.h \
+    combobox.h
 FORMS += vqbform.ui
 OTHER_FILES += CMakeLists.txt \
     notes.txt

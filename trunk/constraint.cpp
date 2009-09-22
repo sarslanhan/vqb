@@ -1,6 +1,7 @@
 #include "constraint.h"
 #include "querythread.h"
-
+#include "vqbform.h"
+#include "combobox.h"
 
 #include <QList>
 #include <QPainter>
@@ -20,12 +21,17 @@
 #include <KRandom>
 #include <KDebug>
 
-Constraint::Constraint( int constraintNo, QWidget * parent )
+Constraint::Constraint( int constraintNo, QWidget * parent, bool isAttached, QString parentVarName )
         : QGroupBox( QString("Constraint %1").arg(constraintNo + 1), parent)
 {
     m_constraintNo = constraintNo;
+    m_parent = (VqbForm *) parent;
+    m_parentVarName = parentVarName;
+    m_isAttached = isAttached;
     init();
 }
+
+
 
 // ************* INIT AND EVENTS ***************
 
@@ -34,7 +40,7 @@ void Constraint::init()
     setLayout( new QVBoxLayout () );
     m_relations << "contains" << "equals" ;
 
-    addConstraintLine();
+    addConstraintLine( true );
     findSubjectsWithLabels( false );//finds and feeds it to the Subject ComboBox
 
     setAttribute( Qt::WA_DeleteOnClose  );//delete when closed
@@ -44,12 +50,17 @@ void Constraint::init()
     removeAction->setStatusTip(tr("Removes this constraint from the query and GUI"));
     removeAction->setShortcut( 0 );
 
-    QAction *action = KStandardAction::find( this, SLOT( returnQuery() ), this );
-    action->setText( tr("&Refresh") );
-    action->setShortcut( 0 );
+    QAction *refresh = KStandardAction::findNext( this, SLOT( returnConstraint() ), this );
+    refresh->setText( tr("&Refresh") );
+    refresh->setShortcut( 0 );
+
+    QAction *attach = KStandardAction::forward( this, SLOT( attach() ), this );
+    attach->setText( tr("&Attach constraint") );
+    attach->setShortcut( 0 );
 
     this->addAction( removeAction );
-    this->addAction( action );
+    this->addAction( refresh );
+    this->addAction( attach );
     this->setContextMenuPolicy( Qt::ActionsContextMenu );
 }
 
@@ -68,20 +79,23 @@ QString Constraint::getQueryConstraint()
         return QString();
     }
 
-    //Definind the type of the instance
-    QString varS = "?v" +  QString::number(KRandom::random()%80 + 20) ;
+    //Defining the instance
+    QString varS = constraintLines.first().s->varName;
     QString q;
     QString o;
     QString p;
-    q.append( varS + " a <" + s + "> . \n" );
+
+
+    if( constraintLines.count() > 1 ) {//if there's only one line, it will be generated below
+        q.append( varS + " a <" + s + "> . \n" );
+    }
 
     //adding the constraint lines
     int i = 0;
     while( i < (constraintLines.count() - 1) ) {
-        //kDebug() << ":::::::::::: processing constraint line " << i << ":" << q;
         p = constraintLines[i].p->itemData( constraintLines[i].p->currentIndex()  ).toString();
         q.append( varS + " <" + p + "> ");
-        varS = "?v" +  QString::number(KRandom::random()%80 + 20);
+        varS = constraintLines[i+1].s->varName; //the subject variable of the next constraint line
         q.append( varS + ". \n" );
         //q.append( varS + " a <" + s + "> .\n" ); //maybe needed, maybe not
 
@@ -92,11 +106,11 @@ QString Constraint::getQueryConstraint()
     p = constraintLines[i].p->itemData( constraintLines[i].p->currentIndex()  ).toString();
     s = constraintLines[i].s->itemData( constraintLines[i].s->currentIndex()  ).toString();//FIXME: might result in a NULL pointer
     QString rel = constraintLines[i].rel->currentText();
-    o = constraintLines[i].o->text();
+    o = constraintLines[i].o->currentText();
     if( !o.isEmpty() ) {
-        q.append( ". " + varS + " <" + p + "> ");
-        varS = "?v" +  QString::number(KRandom::random()%80 + 20);
-        q.append( varS );
+        q.append( "" + varS + " <" + p + "> ");
+        varS = constraintLines[i].o->varName;
+        q.append( varS + " . ");
 
         QString filterStr;
         if ( rel == "equals" ) {
@@ -114,8 +128,13 @@ QString Constraint::getQueryConstraint()
         q.append( varS + " a <" + s + "> .\n" );
     }
 
-    kDebug() << ":::::::::::: final result:" << q;
+
     return q;
+}
+
+QString Constraint::getRandomVarName()
+{
+    return QString( "?v" +  QString::number(KRandom::random()%80 + 20) ) ;
 }
 
 // ************* ACTION SLOTS ***************
@@ -125,6 +144,7 @@ void Constraint::subjectSelected( int index )
     //FIXME: remove all constraint lines above this one
     QString classS = constraintLines.last().s->itemData( index ).toString();
     findPredicatesForSubject( classS );
+    addVariableToCB( constraintLines.last().s);
 }
 
 void Constraint::predicateSelected( int index )
@@ -132,6 +152,7 @@ void Constraint::predicateSelected( int index )
     //FIXME: remove all constraint lines above this one
     QString predicate = constraintLines.last().p->itemData( index ).toString();
     findDomainForPredicate( predicate );
+    addVariableToCB( constraintLines.last().p);
 }
 
 void Constraint::threadTerminated()
@@ -149,6 +170,18 @@ void Constraint::returnConstraint()
     emit constraintChanged( m_constraintNo, getQueryConstraint() );
 }
 
+void Constraint::attach()
+{
+    emit attachConstraint( m_constraintNo, constraintLines.first().s->itemData( constraintLines.first().s->currentIndex() ).toString() );
+}
+
+void Constraint::close()
+{
+    emit constraintChanged( m_constraintNo, QString() );
+    //FIXME: remove variables from the output list
+    QGroupBox::close();
+}
+
 // ************* QUERYING SLOTS ***************
 
 void Constraint::findSubjectsWithLabels( bool filter )
@@ -160,11 +193,10 @@ void Constraint::findSubjectsWithLabels( bool filter )
     connect( qt, SIGNAL(terminated()),
              this, SLOT(threadTerminated()));
 
-    if( filter && constraintLines.count() >= 2 ) {
-        //take previous subject and predicate
+    if( filter && constraintLines.count() >= 2 ) {        //filters on previous subject and predicate
+        //FIXME: replace with query below (don't use labels)
         QString p = constraintLines.at( constraintLines.count() - 2 ).p->currentText();
         QString s = constraintLines.at( constraintLines.count() - 2 ).s->currentText();
-
         QString q = QString("SELECT DISTINCT ?label ?classP WHERE {"
                             "  ?property <http://www.w3.org/2000/01/rdf-schema#label> \"%1\""
                             ". ?property <http://www.w3.org/2000/01/rdf-schema#domain> ?classS "
@@ -172,6 +204,18 @@ void Constraint::findSubjectsWithLabels( bool filter )
                             ". ?classS <http://www.w3.org/2000/01/rdf-schema#label> \"%2\""
                             ". ?classP <http://www.w3.org/2000/01/rdf-schema#label> ?label }")
                     .arg( p ).arg( s );
+
+        /*int indx = constraintLines.count() - 2;
+        p = constraintLines[indx].p->itemData( constraintLines[indx].p->currentIndex()  ).toString();
+        s = constraintLines[indx].s->itemData( constraintLines[indx].s->currentIndex()  ).toString();//FIXME: might result in a NULL pointer
+
+    QString q = QString("SELECT DISTINCT ?label ?classP WHERE {"
+                            "  ?property <http://www.w3.org/2000/01/rdf-schema#label> \"%1\""
+                            ". ?property <http://www.w3.org/2000/01/rdf-schema#domain> ?classS "
+                            ". ?property <http://www.w3.org/2000/01/rdf-schema#range> ?classP "
+                            ". ?classS <http://www.w3.org/2000/01/rdf-schema#label> \"%2\""
+                            ". ?classP <http://www.w3.org/2000/01/rdf-schema#label> ?label }")
+                    .arg( p ).arg( s );*/
         qt->setQuery( q );
     }
     else {
@@ -214,22 +258,30 @@ void Constraint::findDomainForPredicate( QString predicate )
 // ************* INSERTING SLOTS ***************
 
 
-void Constraint::addConstraintLine()
+void Constraint::addConstraintLine( bool isFirst )
 {
     QHBoxLayout * layout = new QHBoxLayout();
 
-    QComboBox *cb1 = new QComboBox();
-    QComboBox *cb2 = new QComboBox();
-    QComboBox *cb3 = new QComboBox();
-    QLineEdit *le = new QLineEdit();
+    ComboBox *cb1 = new ComboBox();
+    if (isFirst && m_isAttached) { //if this is the first line in an attached constraint
+        cb1->setEditText( m_parentVarName );
+        cb1->setEditable( false );
+    }
+    else {
+        cb1->setEditable( true );
+    }
 
-    cb1->setEditable( true );
+    ComboBox *cb2 = new ComboBox();
+    ComboBox *cb3 = new ComboBox();
+    ComboBox *cb4 = new ComboBox();
+
     cb2->setEditable( true );
+    cb4->setEditable( true );
 
     layout->addWidget( cb1, 1 );
     layout->addWidget( cb2, 1 );
     layout->addWidget( cb3, 1 );
-    layout->addWidget( le, 1 );
+    layout->addWidget( cb4, 1 );
 
     ((QBoxLayout*)(this->layout()))->addLayout( layout );
 
@@ -237,7 +289,7 @@ void Constraint::addConstraintLine()
     cl.s = cb1;
     cl.p = cb2;
     cl.rel = cb3;
-    cl.o = le;
+    cl.o = cb4;
 
     constraintLines.append(cl);
 
@@ -251,11 +303,15 @@ void Constraint::addConstraintLine()
 //FIXME: get pairs of values: the label and the URI (??)
 void Constraint::addSubjects( QList<StringPair> subjects )
 {
+    if( m_isAttached && constraintLines.count() == 1 ) {//if we are dealing with the varName of the previous constraint
+        constraintLines.last().s->addItem( m_parentVarName, m_parentClass );
+        return;
+    }
     constraintLines.last().s->clear();
     constraintLines.last().p->clear();
     foreach( StringPair sp, subjects ) {
         constraintLines.last().s->addItem( sp.s1, sp.s2 );//add s2 as the data associated to the item
-        kDebug() << "++**++ Added item" << sp.s1 << sp.s2;
+        //kDebug() << "++**++ Added item" << sp.s1 << sp.s2;
     }
     //constraintLines.last().s->setCurrentIndex( -1 );
 }
@@ -281,6 +337,7 @@ void Constraint::addPredicateDomain( QList<StringPair> subjects )
              subjects.first().s1 == "http://www.w3.org/2000/01/rdf-schema#Literal" ) {
             constraintLines.last().rel->clear();
             constraintLines.last().rel->insertItems(0, m_relations);
+            addVariableToCB( constraintLines.last().o);
         }
         else if ( !subjects.empty() ) {
         //disable editable part
@@ -294,6 +351,26 @@ void Constraint::addPredicateDomain( QList<StringPair> subjects )
     }
 }
 
+void Constraint::addVariableToCB( ComboBox *cb )
+{
+    QString v = getRandomVarName();
+    cb->setToolTip( v );
+    cb->varName = v;
+
+    QAction *add = KStandardAction::forward( cb, SLOT(addToOutput()), this );
+    add->setText( QString("Add *" + v + "* to output") );
+    add->setStatusTip(tr("Adds the variable to the output list"));
+    add->setShortcut( 0 );
+    cb->addAction( add );
+    //FIXME: check if DefaultContextMenu doesn't contain important options
+    cb->setContextMenuPolicy(Qt::ActionsContextMenu);
+
+    connect( cb, SIGNAL(addVarToOutput(QString)),
+            m_parent, SLOT(addVarToOutput(QString)) );
+
+
+    kDebug() << "added variable to CD";
+}
 
 
 #include "constraint.moc"
