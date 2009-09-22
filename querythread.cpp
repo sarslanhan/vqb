@@ -50,7 +50,7 @@ void QueryThread::run()
               } else if ( n.isLiteral() ) {
                   //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
                   val.s1 = n.literal().toString();
-                  kDebug() << "__||__ Datatype: " << n.dataType();
+                  //kDebug() << "__||__ Datatype: " << n.dataType();
               }
 
               n = s.value( 1 );
@@ -60,11 +60,10 @@ void QueryThread::run()
               } else if ( n.isLiteral() ) {
                   //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
                   val.s2 = n.literal().toString();
-                  kDebug() << "__||__ Datatype: " << n.dataType();
+                  //kDebug() << "__||__ Datatype: " << n.dataType();
               }
 
-              //kDebug() << "--- Found: " << val;
-              kDebug() << "Found: " << val.s1 << val.s2;
+              //kDebug() << "Found: " << val.s1 << val.s2;
               res << val;
               //resNodes << n;
     }

@@ -9,6 +9,9 @@ Person:
 
 
 
+When adding to Konduit: add it to a *different folder*
+
+
 
 void VqbForm::init()
 {

@@ -15,6 +15,7 @@ set(vqb_SRCS
   vqbform.cpp
   querythread.cpp
   constraint.cpp
+  combobox.cpp
   )
 
 kde4_add_ui_files(vqb_SRCS vqbform.ui)

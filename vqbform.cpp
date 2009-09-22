@@ -42,6 +42,7 @@ void VqbForm::init()
     connect( d->btnAdd, SIGNAL( clicked() ),
                this, SLOT( btnAdd_clicked() ) );
 
+    //FIXME: add scrolling
     d->topLayout = new QVBoxLayout;
     //d->topLayout->setSizeConstraint( QLayout::SetMaximumSize );
 
@@ -62,7 +63,7 @@ void VqbForm::init()
 
     this->setLayout( mainLayout );
 
-    addConstraintLine();
+    addConstraint( false, QString() );
 
     /* Menus and initializations */
 
@@ -81,11 +82,11 @@ VqbForm::~VqbForm()
     delete d->ui;
 }
 
-void VqbForm::addConstraintLine()
+void VqbForm::addConstraint( bool isAttached, QString parentVarName )
 {
     //QVBoxLayout *layout = dynamic_cast<QVBoxLayout*>( this->layout() );
     if( d->topLayout ) {
-        Constraint *c = new Constraint( d->constraintStrings.count(), this );
+        Constraint *c = new Constraint( d->constraintStrings.count(), this, isAttached, parentVarName );
         d->topLayout->addWidget( c  );
         d->constraintStrings.append("");
 
@@ -93,6 +94,9 @@ void VqbForm::addConstraintLine()
                  c, SLOT(returnConstraint()) );
         connect( c, SIGNAL( constraintChanged(int,QString) ),
                  this, SLOT( constraintChanged(int,QString) ));
+
+        connect( c, SIGNAL(attachConstraint(int,QString)),
+                 this, SLOT(attachConstraint(int,QString)) );
     }
 }
 
@@ -112,9 +116,20 @@ void VqbForm::constraintChanged( int index, QString constraint )
     d->queryViewer->setText( query );
 }
 
+void VqbForm::attachConstraint( int index, QString varName )
+{
+    //FIXME: handle index correctly
+    addConstraint( true, varName );
+}
+
+ void VqbForm::addVarToOutput( QString var )
+ {
+     kDebug() << "---- " << var;
+ }
+
 void VqbForm::btnAdd_clicked()
 {
-    addConstraintLine();
+    addConstraint( false, QString() );
 }
 
 void VqbForm::slotRefresh()
