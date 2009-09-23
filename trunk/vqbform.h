@@ -30,6 +30,7 @@ public slots:
       */
     void addVarToOutput( QString var );
     void refreshQuery();
+    void tabChanged(int index);
 
 signals:
     void refresh();

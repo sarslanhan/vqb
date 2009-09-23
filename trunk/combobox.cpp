@@ -1,5 +1,7 @@
 #include "combobox.h"
 
+#include <KDebug>
+
 ComboBox::ComboBox( QWidget* parent )
         : QComboBox( parent )
 {
