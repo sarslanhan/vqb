@@ -10,4 +10,10 @@ void ComboBox::addToOutput()
     emit addVarToOutput( varName );
 }
 
+void ComboBox::attach()
+{
+    //FIXME: use or remove index
+    emit attachConstraint( 0, varName, varClass );
+}
+
 

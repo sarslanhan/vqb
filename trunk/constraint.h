@@ -19,7 +19,7 @@ class Constraint : public QGroupBox
     Q_OBJECT
 
 public:
-    Constraint ( int constraintNo, QWidget * parent = 0, bool isAttached = false, QString parentVarName = QString() );
+    Constraint ( int constraintNo, QWidget * parent = 0, bool isAttached = false, QString parentVarName = QString(), QString parentClassName = QString());
 
 public slots:
     void addSubjects( QList<StringPair> subjects );
@@ -64,7 +64,7 @@ private:
     QString getQueryConstraint();
     void addVariableToCB( ComboBox *cb );
 
-    //FIXME: add a Private class, or a different static class for constants
+    //FIXME: add a Private class, and/or a different static class for constants
     QList<ConstraintLine> constraintLines;
     QStringList m_relations;
     int m_constraintNo;

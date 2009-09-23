@@ -30,7 +30,7 @@ QueryThread::QueryThread(QObject *parent)
 
 void QueryThread::run()
 {
-    kDebug() << "\n\n *** Querying: " << d->query << ": \n";
+    kDebug() << "\n\n *** Querying: " << d->query;
 
     Soprano::Model* m = nepomukMainModel();
     Soprano::QueryResultIterator it = m->executeQuery( d->query, Soprano::Query::QueryLanguageSparql );
@@ -71,7 +71,7 @@ void QueryThread::run()
     //kDebug() << "\n\n ===> Results: " << ": \n";
     //foreach( StringPair s, res ) { kDebug() << s.s1 << s.s2 << endl; }
 
-
+    kDebug() << "*** Found " << res.count() << " results";
     emit queryDone( res );
     //emit queryDoneNodes( resNodes );
 }
