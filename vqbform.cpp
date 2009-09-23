@@ -11,6 +11,8 @@
 #include <QTextEdit>
 #include <QPushButton>
 
+#include <QProcess>
+
 #include <KDebug>
 #include <KStandardAction>
 #include <KAction>
@@ -47,10 +49,22 @@ void VqbForm::init()
     QHBoxLayout *qhbl = new QHBoxLayout; //button's layout
     qhbl->setDirection( QBoxLayout::RightToLeft );
     qhbl->addWidget( d->btnAdd, 1 );
-    qhbl->addStretch( 5 );
+    qhbl->addStretch( 10 );
 
-    d->ui->verticalLayout->addLayout( d->topLayout, 0 );//the top stack
+    QFrame* frame = new QFrame();
+    QVBoxLayout* layout = new QVBoxLayout();
+    frame->setLayout(layout);
+    d->ui->scrollArea->setWidget(frame);
+
+/*
+    d->ui->verticalLayout->addLayout( d->topLayout, 1 );//the top stack
     d->ui->verticalLayout->addLayout( qhbl, 1 );//the bottom layout (holding the button)
+    d->ui->verticalLayout->addStretch( 5 );
+*/
+
+    layout->addLayout( d->topLayout, 1 );//the top stack
+    layout->addLayout( qhbl, 1 );//the bottom layout (holding the button)
+    layout->addStretch( 5 );
 
     addConstraint( false, QString(), QString() );
 
@@ -64,6 +78,8 @@ void VqbForm::init()
     this->addAction( refreshAction );
     this->setContextMenuPolicy( Qt::ActionsContextMenu );
 
+    connect( d->ui->tabWidget, SIGNAL(currentChanged(int)),
+             this, SLOT(tabChanged(int)) );
 }
 
 VqbForm::~VqbForm()
@@ -85,8 +101,9 @@ void VqbForm::addConstraint( bool isAttached, QString parentVarName, QString par
         connect( c, SIGNAL( constraintChanged(int,QString) ),
                  this, SLOT( constraintChanged(int,QString) ));
 
-        connect( c, SIGNAL(attachConstraint(int,QString)),
-                 this, SLOT(attachConstraint(int,QString)) );
+        /*connect( c, SIGNAL(attachConstraint(int,QString,QString)),
+                 this, SLOT(attachConstraint(int,QString,QString)) );
+                 */
     }
 }
 
@@ -101,7 +118,7 @@ void VqbForm::constraintChanged( int index, QString constraint )
 
 void VqbForm::refreshQuery()
 {
-    QString query = "SELECT ";
+    QString query = "SELECT DISTINCT ";
     QString output = d->ui->outputList->toPlainText();
     output.replace( "\n", " " );
     query.append( output );
@@ -118,12 +135,46 @@ void VqbForm::attachConstraint( int index, QString varName, QString varClass )
     //FIXME: correct or remove index
     Q_UNUSED( index );
     addConstraint( true, varName, varClass );
+    refreshQuery();
 }
 
  void VqbForm::addVarToOutput( QString var )
  {
      //kDebug() << "---- " << var;
-     d->ui->outputList->appendPlainText( var + "\n");
+     d->ui->outputList->appendPlainText( var );
+     refreshQuery();
+ }
+
+ void VqbForm::tabChanged(int index)
+ {
+    QString q;
+    if( index == 1 ) {
+        q = d->ui->queryViewer->toPlainText();
+        q.replace( "\n", " " );
+
+        QString cmd = "sopranocmd --dbus org.kde.NepomukStorage --model main --querylang SPARQL query \"";
+        cmd.append( q );
+
+        QProcess script(this);
+        script.start( cmd );
+
+        if (!script.waitForStarted()) {
+             qDebug() << "Query could not be started.";
+             //return;
+        }
+
+        if (!script.waitForFinished()){
+             qDebug() << "Query could not be finished.";
+             //return;
+        }
+
+    kDebug() << "Ran query: " << q;
+    QString result = QString(script.readAllStandardOutput().data()) + (QString) script.readAllStandardError().data();
+    d->ui->queryResults->setText( result );
+
+
+    }
+
  }
 
 void VqbForm::btnAdd_clicked()

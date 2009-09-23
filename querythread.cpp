@@ -71,7 +71,7 @@ void QueryThread::run()
     //kDebug() << "\n\n ===> Results: " << ": \n";
     //foreach( StringPair s, res ) { kDebug() << s.s1 << s.s2 << endl; }
 
-    kDebug() << "*** Found " << res.count() << " results";
+
     emit queryDone( res );
     //emit queryDoneNodes( resNodes );
 }
