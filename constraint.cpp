@@ -21,12 +21,13 @@
 #include <KRandom>
 #include <KDebug>
 
-Constraint::Constraint( int constraintNo, QWidget * parent, bool isAttached, QString parentVarName )
+Constraint::Constraint( int constraintNo, QWidget * parent, bool isAttached, QString parentVarName, QString parentClassName )
         : QGroupBox( QString("Constraint %1").arg(constraintNo + 1), parent)
 {
     m_constraintNo = constraintNo;
     m_parent = (VqbForm *) parent;
     m_parentVarName = parentVarName;
+    m_parentClass = parentClassName;
     m_isAttached = isAttached;
     init();
 }
@@ -37,6 +38,9 @@ Constraint::Constraint( int constraintNo, QWidget * parent, bool isAttached, QSt
 
 void Constraint::init()
 {
+    if ( m_isAttached ) {
+        setTitle( QString("Constraint %1 (attached to %2)").arg(m_constraintNo).arg(m_parentVarName) );
+    }
     setLayout( new QVBoxLayout () );
     m_relations << "contains" << "equals" ;
 
@@ -50,17 +54,17 @@ void Constraint::init()
     removeAction->setStatusTip(tr("Removes this constraint from the query and GUI"));
     removeAction->setShortcut( 0 );
 
-    QAction *refresh = KStandardAction::findNext( this, SLOT( returnConstraint() ), this );
-    refresh->setText( tr("&Refresh") );
+    QAction *refresh = KStandardAction::redisplay( this, SLOT( returnConstraint() ), this );
+    refresh->setText( tr("&Refresh constraint") );
     refresh->setShortcut( 0 );
 
-    QAction *attach = KStandardAction::forward( this, SLOT( attach() ), this );
+    /*QAction *attach = KStandardAction::forward( this, SLOT( attach() ), this );
     attach->setText( tr("&Attach constraint") );
     attach->setShortcut( 0 );
-
+    */
     this->addAction( removeAction );
     this->addAction( refresh );
-    this->addAction( attach );
+    //this->addAction( attach );
     this->setContextMenuPolicy( Qt::ActionsContextMenu );
 }
 
@@ -143,14 +147,15 @@ void Constraint::subjectSelected( int index )
 {
     //FIXME: remove all constraint lines above this one
     QString classS = constraintLines.last().s->itemData( index ).toString();
+    constraintLines.last().s->varClass = classS;//the combobox's class is the class of the selected item
     findPredicatesForSubject( classS );
-    addVariableToCB( constraintLines.last().s);
 }
 
 void Constraint::predicateSelected( int index )
 {
     //FIXME: remove all constraint lines above this one
     QString predicate = constraintLines.last().p->itemData( index ).toString();
+    constraintLines.last().p->varClass = predicate;//the combobox's class is the class of the selected item
     findDomainForPredicate( predicate );
     addVariableToCB( constraintLines.last().p);
 }
@@ -303,12 +308,22 @@ void Constraint::addConstraintLine( bool isFirst )
 //FIXME: get pairs of values: the label and the URI (??)
 void Constraint::addSubjects( QList<StringPair> subjects )
 {
+    constraintLines.last().s->clear();
+    constraintLines.last().p->clear();
+
+    //FIXME: might add variable action several times?
+    addVariableToCB( constraintLines.last().s);
+
+    QAction *attach = KStandardAction::redo( cb, SLOT( attach() ), this );
+    attach->setText( QString("&Attach constraint to " + v) );
+    attach->setShortcut( 0 );
+    cb->addAction( attach );
+
     if( m_isAttached && constraintLines.count() == 1 ) {//if we are dealing with the varName of the previous constraint
         constraintLines.last().s->addItem( m_parentVarName, m_parentClass );
         return;
     }
-    constraintLines.last().s->clear();
-    constraintLines.last().p->clear();
+
     foreach( StringPair sp, subjects ) {
         constraintLines.last().s->addItem( sp.s1, sp.s2 );//add s2 as the data associated to the item
         //kDebug() << "++**++ Added item" << sp.s1 << sp.s2;
@@ -332,7 +347,7 @@ void Constraint::addPredicates( QList<StringPair> predicates )
 void Constraint::addPredicateDomain( QList<StringPair> subjects )
 {
     if( !subjects.isEmpty() ) {
-        kDebug() << "Comparing " << subjects.first().s1 << " to " << "http://www.w3.org/2000/01/rdf-schema#Literal";
+        //kDebug() << "Comparing " << subjects.first().s1 << " to " << "http://www.w3.org/2000/01/rdf-schema#Literal";
         if ( subjects.first().s1 == "http://www.w3.org/2001/XMLSchema#string" ||
              subjects.first().s1 == "http://www.w3.org/2000/01/rdf-schema#Literal" ) {
             constraintLines.last().rel->clear();
@@ -357,16 +372,20 @@ void Constraint::addVariableToCB( ComboBox *cb )
     cb->setToolTip( v );
     cb->varName = v;
 
-    QAction *add = KStandardAction::forward( cb, SLOT(addToOutput()), this );
+    QAction *add = KStandardAction::findNext( cb, SLOT(addToOutput()), this );
     add->setText( QString("Add *" + v + "* to output") );
     add->setStatusTip(tr("Adds the variable to the output list"));
     add->setShortcut( 0 );
-    cb->addAction( add );
+
+    cb->addAction( add );    
     //FIXME: check if DefaultContextMenu doesn't contain important options
     cb->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     connect( cb, SIGNAL(addVarToOutput(QString)),
             m_parent, SLOT(addVarToOutput(QString)) );
+
+    connect( cb, SIGNAL(attachConstraint(int,QString,QString)),
+             m_parent, SLOT(attachConstraint(int,QString,QString)) );
 
 
     kDebug() << "added variable to CD";

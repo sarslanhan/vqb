@@ -22,7 +22,6 @@ public:
     QPushButton *btnAdd;
     QVBoxLayout *topLayout; //layout holding the constraint lines
     QStringList constraintStrings;
-    QTextEdit *queryViewer;
 };
 
 VqbForm::VqbForm(QWidget *parent)
@@ -42,7 +41,6 @@ void VqbForm::init()
     connect( d->btnAdd, SIGNAL( clicked() ),
                this, SLOT( btnAdd_clicked() ) );
 
-    //FIXME: add scrolling
     d->topLayout = new QVBoxLayout;
     //d->topLayout->setSizeConstraint( QLayout::SetMaximumSize );
 
@@ -51,19 +49,10 @@ void VqbForm::init()
     qhbl->addWidget( d->btnAdd, 1 );
     qhbl->addStretch( 5 );
 
-    d->queryViewer = new QTextEdit;
-    //d->queryViewer->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
+    d->ui->verticalLayout->addLayout( d->topLayout, 0 );//the top stack
+    d->ui->verticalLayout->addLayout( qhbl, 1 );//the bottom layout (holding the button)
 
-    QVBoxLayout *mainLayout = new QVBoxLayout;
-    mainLayout->setSizeConstraint( QLayout::SetMaximumSize );
-    mainLayout->addLayout( d->topLayout, 0 );//the top stack
-    mainLayout->addLayout( qhbl, 1 );//the bottom layout (holding the button)
-    mainLayout->addStretch( 1 );
-    mainLayout->addWidget( d->queryViewer, 0, Qt::AlignBottom );//the top stack
-
-    this->setLayout( mainLayout );
-
-    addConstraint( false, QString() );
+    addConstraint( false, QString(), QString() );
 
     /* Menus and initializations */
 
@@ -82,16 +71,17 @@ VqbForm::~VqbForm()
     delete d->ui;
 }
 
-void VqbForm::addConstraint( bool isAttached, QString parentVarName )
+void VqbForm::addConstraint( bool isAttached, QString parentVarName, QString parentClass )
 {
     //QVBoxLayout *layout = dynamic_cast<QVBoxLayout*>( this->layout() );
     if( d->topLayout ) {
-        Constraint *c = new Constraint( d->constraintStrings.count(), this, isAttached, parentVarName );
+        Constraint *c = new Constraint( d->constraintStrings.count(), this, isAttached, parentVarName, parentClass );
         d->topLayout->addWidget( c  );
         d->constraintStrings.append("");
 
         connect( this, SIGNAL(refresh()),
                  c, SLOT(returnConstraint()) );
+
         connect( c, SIGNAL( constraintChanged(int,QString) ),
                  this, SLOT( constraintChanged(int,QString) ));
 
@@ -106,30 +96,39 @@ void VqbForm::constraintChanged( int index, QString constraint )
     if( index < d->constraintStrings.count() ) {
         d->constraintStrings[index] = constraint;
     }
+    refreshQuery();
+}
 
-    QString query = "WHERE { ";
+void VqbForm::refreshQuery()
+{
+    QString query = "SELECT ";
+    QString output = d->ui->outputList->toPlainText();
+    output.replace( "\n", " " );
+    query.append( output );
+    query.append( " \n WHERE { \n");
     foreach( QString s, d->constraintStrings ) {
         query.append( s + "\n" );
     }
-
     query.append( "}\n" );
-    d->queryViewer->setText( query );
+    d->ui->queryViewer->setText( query );
 }
 
-void VqbForm::attachConstraint( int index, QString varName )
+void VqbForm::attachConstraint( int index, QString varName, QString varClass )
 {
-    //FIXME: handle index correctly
-    addConstraint( true, varName );
+    //FIXME: correct or remove index
+    Q_UNUSED( index );
+    addConstraint( true, varName, varClass );
 }
 
  void VqbForm::addVarToOutput( QString var )
  {
-     kDebug() << "---- " << var;
+     //kDebug() << "---- " << var;
+     d->ui->outputList->appendPlainText( var + "\n");
  }
 
 void VqbForm::btnAdd_clicked()
 {
-    addConstraint( false, QString() );
+    addConstraint( false, QString(), QString() );
 }
 
 void VqbForm::slotRefresh()

@@ -25,16 +25,17 @@ public slots:
     void slotRefresh();
     /** Attaches a constraint line to an existing one
       */
-    void attachConstraint(int index, QString varName );
+    void attachConstraint(int index, QString varName, QString varClass );
     /** Adds a variable to the output list
       */
     void addVarToOutput( QString var );
+    void refreshQuery();
 
 signals:
     void refresh();
 
 private:
-    void addConstraint(bool isAttached, QString parentVarName );
+    void addConstraint(bool isAttached, QString parentVarName, QString parentVarClass );
     void init();
 
     class Private;
