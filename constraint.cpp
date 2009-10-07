@@ -16,10 +16,10 @@
 #include <QComboBox>
 #include <QLineEdit>
 
-#include <KStandardAction>
-#include <KAction>
-#include <KRandom>
-#include <KDebug>
+#include <kdebug.h>
+#include <kstandardaction.h>
+#include <kaction.h>
+#include <krandom.h>
 
 Constraint::Constraint( int constraintNo, QWidget * parent, bool isAttached, QString parentVarName, QString parentClassName )
         : QGroupBox( QString("Constraint %1").arg(constraintNo + 1), parent)
@@ -124,7 +124,7 @@ QString Constraint::getQueryConstraint()
 
         QString filterStr;
         if ( rel == "equals" ) {
-            filterStr = QString( " FILTER regex(" + varS + ", '^" + o + "$', 'i')" );
+            filterStr = QString( " FILTER regex(" + varS + ", '^" + o + "$', 'i') .\n" );
         }
         else if( rel == "contains" ) {
             filterStr = QString( " FILTER regex(" + varS + ", '" + o + "', 'i') .\n" ) ;
@@ -166,7 +166,7 @@ void Constraint::predicateSelected( int index )
     constraintLines.last().p->varClass = predicate;//the combobox's class is the class of the selected item
     findDomainForPredicate( predicate );
     addVariableToCB( constraintLines.last().p);
-    returnConstraint();
+    //returnConstraint();
 }
 
 void Constraint::threadTerminated()
@@ -241,7 +241,7 @@ void Constraint::findPredicatesForSubject( QString subject )
              this, SLOT(addPredicates( QList<StringPair> )));
 
     QString query = QString( "SELECT DISTINCT ?label ?property WHERE {"
-                    " ?property <http://www.w3.org/2000/01/rdf-schema#domain> <%1> "
+                    " ?property <http://www.w3.org/2000/01/rdf-schema#domain> <%1> ."
                     " OPTIONAL { ?property  <http://www.w3.org/2000/01/rdf-schema#label> ?label } }" ).arg( subject );
     qt->setQuery( query );
 
@@ -309,6 +309,9 @@ void Constraint::addConstraintLine( bool isFirst )
 
     connect( cl.p, SIGNAL(currentIndexChanged( int )),
              this, SLOT(predicateSelected( int )) );
+
+    connect( cl.rel, SIGNAL(currentIndexChanged( int )),
+             this, SLOT(returnConstraint()) );
 
     connect( cl.o, SIGNAL(editTextChanged(QString)),
              this, SLOT(returnConstraint()) );
@@ -379,7 +382,7 @@ void Constraint::addVariableToCB( ComboBox *cb )
     cb->varName = v;
 
     QAction *add = KStandardAction::findNext( cb, SLOT(addToOutput()), this );
-    add->setText( QString("Add *" + cb->varName + "* to output") );
+    add->setText( QString("Add " + cb->varName + " to output") );
     add->setStatusTip(tr("Adds the variable to the output list"));
     add->setShortcut( 0 );
 
@@ -397,7 +400,7 @@ void Constraint::addVariableToCB( ComboBox *cb )
 void Constraint::addActionsToCB( ComboBox *cb )
 {
     QAction *add = KStandardAction::findNext( cb, SLOT(addToOutput()), this );
-    add->setText( QString("Add *" + cb->varName + "* to output") );
+    add->setText( QString("Add " + cb->varName + " to output") );
     add->setStatusTip(tr("Adds the variable to the output list"));
     add->setShortcut( 0 );
 

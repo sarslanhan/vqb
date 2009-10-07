@@ -10,8 +10,9 @@
 #include <Soprano/Client/DBusModel>
 #include <Soprano/Util/DummyModel>
 #include <Soprano/QueryResultIterator>
+#include <Soprano/Inference/InferenceModel>
 
-#include <KDebug>
+#include <kdebug.h>
 
 class QueryThread::Private
 {
@@ -82,6 +83,7 @@ void QueryThread::setQuery( QString query )
 }
 
 static Soprano::Model *s_model = 0;
+static Soprano::Inference::InferenceModel *s_im = 0;
 
 Soprano::Model* QueryThread::nepomukMainModel()
 {
@@ -95,7 +97,13 @@ Soprano::Model* QueryThread::nepomukMainModel()
         s_model = new Soprano::Util::DummyModel();
     }
 
-    return s_model;
+    //return s_model;
+    if( !s_im ) {
+        s_im = new Soprano::Inference::InferenceModel( s_model );
+//        s_im->addStatements( s_model->listStatements().allStatements() );
+        s_im->performInference();
+    }
+    return s_im;
 }
 
 #include "querythread.moc"

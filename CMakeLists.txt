@@ -16,6 +16,7 @@ set(vqb_SRCS
   querythread.cpp
   constraint.cpp
   combobox.cpp
+  sparqlhighlighter.cpp
   )
 
 kde4_add_ui_files(vqb_SRCS vqbform.ui)
