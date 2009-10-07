@@ -1,10 +1,10 @@
 #include <QtGui/QApplication>
 #include "vqbform.h"
 
-#include <KAboutData>
-#include <KApplication>
-#include <KCmdLineArgs>
-#include <KDebug>
+#include <kaboutdata.h>
+#include <kapplication.h>
+#include <kcmdlineargs.h>
+#include <kdebug.h>
 
 int main(int argc, char *argv[])
 {

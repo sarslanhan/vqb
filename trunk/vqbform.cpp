@@ -1,6 +1,8 @@
 #include "vqbform.h"
 #include "ui_vqbform.h"
 #include "constraint.h"
+#include "sparqlhighlighter.h"
+#include "subjecttree.h"
 
 #include <QLayout>
 #include <QHBoxLayout>
@@ -13,9 +15,9 @@
 
 #include <QProcess>
 
-#include <KDebug>
-#include <KStandardAction>
-#include <KAction>
+#include <kdebug.h>
+#include <kstandardaction.h>
+#include <kaction.h>
 
 class VqbForm::Private
 {
@@ -67,6 +69,8 @@ void VqbForm::init()
     layout->addStretch( 5 );
 
     addConstraint( false, QString(), QString() );
+
+     SparqlHighlighter *highlighter = new SparqlHighlighter(d->ui->queryViewer);
 
     /* Menus and initializations */
 

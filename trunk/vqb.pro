@@ -7,14 +7,21 @@ SOURCES += main.cpp \
     vqbform.cpp \
     querythread.cpp \
     constraint.cpp \
-    combobox.cpp
+    combobox.cpp \
+    sparqlhighlighter.cpp \
+    subjecttree.cpp \
+    subjectnode.cpp
 HEADERS += vqbform.h \
     querythread.h \
     constraint.h \
-    combobox.h
+    combobox.h \
+    sparqlhighlighter.h \
+    subjecttree.h \
+    subjectnode.h
 FORMS += vqbform.ui
 OTHER_FILES += CMakeLists.txt \
     notes.txt
 CONFIG += qt \
     link_pkgconfig
 PKGCONFIG += soprano
+INCLUDEPATH = /home/kde-devel/kde/include/

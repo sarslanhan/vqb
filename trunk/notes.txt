@@ -1,6 +1,4 @@
-Scenarios:
 
-1. I want the
 
 
 
@@ -20,41 +18,4 @@ Person:
 When adding to Konduit: add it to a *different folder*
 
 
-Knud: genid_11
-
-void VqbForm::init()
-{
-    d->topLayout = new QVBoxLayout;//the top stack
-    //d->topLayout->setSizeConstraint( QLayout::SetMaximumSize );
-
-    d->btnAdd = new QPushButton( "+" );
-    d->btnAdd->setBaseSize(100, 50);
-    connect( d->btnAdd, SIGNAL( clicked() ),
-             this, SLOT( on_btnAdd_clicked() ) );
-
-    QHBoxLayout *qhbl = new QHBoxLayout;//the bottom layout (holding the button)
-    qhbl->setDirection( QBoxLayout::RightToLeft );
-    qhbl->addWidget( d->btnAdd, 1 );
-    qhbl->addStretch( 5 );
-
-    QVBoxLayout *midLayout = new QVBoxLayout;//holds the two layouts
-    midLayout->addLayout( d->topLayout, 0 );
-    midLayout->addLayout( qhbl, 1 );
-
-    /*d->queryViewer = new QTextEdit;
-    //d->queryViewer->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Fixed );
-
-
-    QGridLayout *mainLayout = new QGridLayout;//holds midLayout and the queryViewer
-    mainLayout->setSizeConstraint( QLayout::SetMaximumSize );
-    mainLayout->addLayout( midLayout, 0, 0, 2, 1, Qt::AlignTop );//span it on two rows
-    mainLayout->addWidget( d->queryViewer, 2, 0, 1, 1, Qt::AlignBottom );
-    mainLayout->setRowStretch( 0, 1 );
-    mainLayout->setRowStretch( 1, 1 );
-    mainLayout->setRowStretch( 2, 1 );
-    */
-
-    this->setLayout( midLayout );
-
-    addConstraintLine();
-}
+Use a local numbering: start from 0
