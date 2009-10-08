@@ -9,7 +9,7 @@ class QTextEdit;
 class SparqlHighlighter : public QSyntaxHighlighter
 {
 public:
-    SparqlHighlighter( QTextEdit * parent );\
+    SparqlHighlighter(QTextEdit * parent);\
     void highlightBlock(const QString &text);
 };
 

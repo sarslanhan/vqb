@@ -3,6 +3,7 @@
 #include <QString>
 #include <QList>
 #include <QStringList>
+#include <QMutex>
 
 #include <Soprano/Soprano>
 #include <Soprano/Model>
@@ -16,14 +17,14 @@
 
 class QueryThread::Private
 {
-    public:
-        Private() {}
-        QString query;
+public:
+    Private() {}
+    QString query;
 };
 
 QueryThread::QueryThread(QObject *parent)
-        : QThread( parent ),
-          d( new Private )
+        : QThread(parent),
+        d(new Private)
 {
     qRegisterMetaType<QList<StringPair> >("QList<StringPair>");//user-defined types need to be registered to be used as signals
     d->query = "SELECT DISTINCT ?s WHERE { ?s ?p ?o } LIMIT 50";
@@ -33,8 +34,12 @@ void QueryThread::run()
 {
     kDebug() << "\n\n *** Querying: " << d->query;
 
+    QMutex mutex;//this might not be necessary
+    mutex.lock();
     Soprano::Model* m = nepomukMainModel();
-    Soprano::QueryResultIterator it = m->executeQuery( d->query, Soprano::Query::QueryLanguageSparql );
+    mutex.unlock();
+
+    Soprano::QueryResultIterator it = m->executeQuery(d->query, Soprano::Query::QueryLanguageSparql);
 
     //QList<Soprano::Node> resNodes;
     QList<StringPair> res;
@@ -42,42 +47,42 @@ void QueryThread::run()
 
     StringPair  val;
     Soprano::Node n;
-    foreach (Soprano::BindingSet s, allStatements ) {
+    foreach(Soprano::BindingSet s, allStatements) {
 
-              n = s.value( 0 );
-              if ( n.isResource() ) {
-                  val.s1 = n.uri().toString();
-                  //val = VisualQueryBuilderConsts::getPrefixForm( val );
-              } else if ( n.isLiteral() ) {
-                  //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
-                  val.s1 = n.literal().toString();
-                  //kDebug() << "__||__ Datatype: " << n.dataType();
-              }
+        n = s.value(0);
+        if (n.isResource()) {
+            val.s1 = n.uri().toString();
+            //val = VisualQueryBuilderConsts::getPrefixForm( val );
+        } else if (n.isLiteral()) {
+            //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
+            val.s1 = n.literal().toString();
+            //kDebug() << "__||__ Datatype: " << n.dataType();
+        }
 
-              n = s.value( 1 );
-              if ( n.isResource() ) {
-                  val.s2 = n.uri().toString();
-                  //val = VisualQueryBuilderConsts::getPrefixForm( val );
-              } else if ( n.isLiteral() ) {
-                  //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
-                  val.s2 = n.literal().toString();
-                  //kDebug() << "__||__ Datatype: " << n.dataType();
-              }
+        n = s.value(1);
+        if (n.isResource()) {
+            val.s2 = n.uri().toString();
+            //val = VisualQueryBuilderConsts::getPrefixForm( val );
+        } else if (n.isLiteral()) {
+            //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
+            val.s2 = n.literal().toString();
+            //kDebug() << "__||__ Datatype: " << n.dataType();
+        }
 
-              //kDebug() << "Found: " << val.s1 << val.s2;
-              res << val;
-              //resNodes << n;
+        //kDebug() << "Found: " << val.s1 << val.s2;
+        res << val;
+        //resNodes << n;
     }
 
     //kDebug() << "\n\n ===> Results: " << ": \n";
     //foreach( StringPair s, res ) { kDebug() << s.s1 << s.s2 << endl; }
 
 
-    emit queryDone( res );
+    emit queryDone(res);
     //emit queryDoneNodes( resNodes );
 }
 
-void QueryThread::setQuery( QString query )
+void QueryThread::setQuery(QString query)
 {
     d->query = query;
 }
@@ -88,18 +93,18 @@ static Soprano::Inference::InferenceModel *s_im = 0;
 Soprano::Model* QueryThread::nepomukMainModel()
 {
     // we use a dummy test model here
-    if ( !s_model ) {
-        static Soprano::Client::DBusClient client( "org.kde.NepomukServer" );
-        s_model = client.createModel( "main" );
+    if (!s_model) {
+        static Soprano::Client::DBusClient client("org.kde.NepomukServer");
+        s_model = client.createModel("main");
     }
 
-    if ( !s_model ) {
+    if (!s_model) {
         s_model = new Soprano::Util::DummyModel();
     }
 
     //return s_model;
-    if( !s_im ) {
-        s_im = new Soprano::Inference::InferenceModel( s_model );
+    if (!s_im) {
+        s_im = new Soprano::Inference::InferenceModel(s_model);
 //        s_im->addStatements( s_model->listStatements().allStatements() );
         s_im->performInference();
     }

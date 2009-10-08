@@ -9,7 +9,7 @@ class QPushButton;
 
 namespace Ui
 {
-    class VqbFormClass;
+class VqbFormClass;
 }
 
 class VqbForm : public QWidget
@@ -21,22 +21,19 @@ public:
     ~VqbForm();
 
 public slots:
-    void constraintChanged( int index, QString constraint );
-    void slotRefresh();
-    /** Attaches a constraint line to an existing one
-      */
-    void attachConstraint(int index, QString varName, QString varClass );
+    void attachConstraint(int index, QString varName, QString varClass); //DEPRECATED
     /** Adds a variable to the output list
       */
-    void addVarToOutput( QString var );
+    void queryPartChanged(int index, QString constraint);
     void refreshQuery();
+    void addVarToOutput(QString var);
     void tabChanged(int index);
 
 signals:
     void refresh();
 
 private:
-    void addConstraint(bool isAttached, QString parentVarName, QString parentVarClass );
+    void addSubjectTree();
     void init();
 
     class Private;
