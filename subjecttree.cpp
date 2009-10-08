@@ -1,28 +1,46 @@
 #include "subjecttree.h"
-#include "subjectnode.h"
+#include "querynode.h"
 
 #include <QVBoxLayout>
 
-SubjectTree::SubjectTree( int constraintNo, QWidget * parent = 0 )
-        : QGroupBox( parent )
+#include <KAction>
+#include <KStandardAction>
+
+
+
+SubjectTree::SubjectTree(int constraintNo, QWidget * parent)
+        : QGroupBox(parent)
 {
-    d->constraintNo = constraintNo;
-    this->setTitle( "Subject " + QString::number( constraintNo ) );
-
-    d->root = new SubjectNode();
-
-    this->setLayout( new QVBoxLayout() );
-
-    //add root's subjectCB and restrictionLayout to this->layout()
-
+    m_constraintNo = constraintNo;
+    init();
 }
 
-class SubjectTree::Private
+void SubjectTree::init()
 {
-public:
-    int constraintNo;
+    setTitle("Subject " + QString::number(m_constraintNo + 1));
 
-    SubjectNode *root;
-};
+    m_root = new QueryNode();
+    QVBoxLayout *l = new QVBoxLayout();
+    this->setLayout(l);
+    l->addLayout( m_root );
+
+    QAction *removeAction = KStandardAction::close(this, SLOT(close()), this);
+    removeAction->setText(tr("Remove &subject tree"));
+    removeAction->setStatusTip(tr("Removes this constraint from the query and GUI"));
+    removeAction->setShortcut(0);
+    QAction *refresh = KStandardAction::redisplay(this, SLOT(rebuildQueryPart()), this);
+    refresh->setText(tr("&Refresh query"));
+    refresh->setShortcut(0);
+
+    this->addAction(removeAction);
+    this->addAction(refresh);
+    this->setContextMenuPolicy(Qt::ActionsContextMenu);
+    setAttribute(Qt::WA_DeleteOnClose);   //delete when closed
+}
+
+void SubjectTree::rebuildQueryPart()
+{
+    emit queryPartChanged(m_constraintNo, "Oszkar a Human");
+}
 
 #include "subjecttree.moc"

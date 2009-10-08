@@ -5,13 +5,14 @@
 class QString;
 class QStringList;
 
-namespace Soprano {
-    class Model;
+namespace Soprano
+{
+class Model;
 }
 
 struct StringPair {
 public:
-    QString s1, s2;  
+    QString s1, s2;
 };
 
 /*! Thread class that executes queries (and performs some utility functions)
@@ -31,10 +32,10 @@ public:
 
     /** Sets the query to be run on the RDF repository
     */
-    void setQuery( QString query );
+    void setQuery(QString query);
 
 signals:
-    void queryDone( QList<StringPair> );
+    void queryDone(QList<StringPair>);
 
 private:
     class Private;

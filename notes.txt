@@ -1,3 +1,6 @@
+New idea for VQB:
+   - something like using WordNet for similar words, and searching based on that
+
 
 
 
@@ -14,8 +17,43 @@ Person:
             geo:SpatiaThing (not subclass of owl:Thing)
 
 
+FUTURE:
+- When adding to Konduit: add it to a *different folder*
 
-When adding to Konduit: add it to a *different folder*
+
+NOW:
+- Use a local numbering: start from 0 ??
+- cache tree results, and only recompute the part that has changed ?
 
 
-Use a local numbering: start from 0
+
+
+
+void VqbForm::addConstraint( bool isAttached, QString parentVarName, QString parentClass )
+{
+    //QVBoxLayout *layout = dynamic_cast<QVBoxLayout*>( this->layout() );
+    if( d->topLayout ) {
+        Constraint *c = new Constraint( d->constraintStrings.count(), this, isAttached, parentVarName, parentClass );
+        d->topLayout->addWidget( c  );
+        d->constraintStrings.append("");
+
+        connect( this, SIGNAL(refresh()),
+                 c, SLOT(returnConstraint()) );
+
+        connect( c, SIGNAL( constraintChanged(int,QString) ),
+                 this, SLOT( constraintChanged(int,QString) ));
+
+        /*connect( c, SIGNAL(attachConstraint(int,QString,QString)),
+                 this, SLOT(attachConstraint(int,QString,QString)) );
+                 */
+    }
+}
+
+void VqbForm::constraintChanged( int index, QString constraint )
+{
+    kDebug() << "Constraint " << index << " has changed:" << constraint;
+    if( index < d->constraintStrings.count() ) {
+        d->constraintStrings[index] = constraint;
+    }
+    refreshQuery();
+}
