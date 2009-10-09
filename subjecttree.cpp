@@ -24,6 +24,8 @@ void SubjectTree::init()
     this->setLayout(l);
     l->addLayout( m_root );
 
+    connect(m_root, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryPart(QString)));
+
     QAction *removeAction = KStandardAction::close(this, SLOT(close()), this);
     removeAction->setText(tr("Remove &subject tree"));
     removeAction->setStatusTip(tr("Removes this constraint from the query and GUI"));
@@ -38,9 +40,9 @@ void SubjectTree::init()
     setAttribute(Qt::WA_DeleteOnClose);   //delete when closed
 }
 
-void SubjectTree::rebuildQueryPart()
+void SubjectTree::updateQueryPart(QString queryPart)
 {
-    emit queryPartChanged(m_constraintNo, "Oszkar a Human");
+    emit queryPartChanged(m_constraintNo, queryPart);
 }
 
 #include "subjecttree.moc"
