@@ -78,7 +78,6 @@ void VqbForm::init()
     layout->addLayout(qhbl, 1);  //the bottom layout (holding the button)
     layout->addStretch(5);
 
-    //addConstraint( false, QString(), QString() );
     addSubjectTree();
 
     SparqlHighlighter *highlighter = new SparqlHighlighter(d->ui->queryViewer);

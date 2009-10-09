@@ -8,8 +8,10 @@
 #include <QPushButton>
 
 #include <KDebug>
+#include <KRandom>
 
-static const QSize GlobalSize( 80, 20 );
+static const QSize GlobalSize(100, 20);//global size for most screen elements
+static const int IndentSize = 30;
 static const QStringList RelationList( QStringList() << "contains" << "equals" );
 
 class QueryNode::Private
@@ -25,7 +27,6 @@ public:
 
     QString objectVariable;//variable representing the object
     QString parentClass;//URI of parent predicate
-  
 };
 
 QueryNode::QueryNode(QString parentClass)
@@ -44,18 +45,23 @@ void QueryNode::init()
     if( d->parentClass.isEmpty() ) { //root node
         addObjectToLayout();
     }
-    else {
+    else { //child node
         d->predicateCB = new QComboBox();
         findPredicates();//FIXME: get predicates from parent
 
         d->subjectLayout->addWidget( d->predicateCB );
         connect(d->predicateCB, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(addObjectToLayout()));
+        connect(d->predicateCB, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(updateQueryPart()));
     }    
     //Restriction Layout 
     d->restrictionLayout = new QVBoxLayout();
-    this->addLayout( d->subjectLayout );
-    this->addLayout( d->restrictionLayout );
+    QHBoxLayout *container = new QHBoxLayout();//to indent restrictionLayout
+    container->addSpacing(IndentSize);
+    container->addLayout(d->restrictionLayout);
+    this->addLayout(d->subjectLayout);
+    this->addLayout(container);
 }
 
 void QueryNode::findObjects()
@@ -112,9 +118,13 @@ void QueryNode::addSubjects(QList<StringPair> subjects)
     if (object == "http://www.w3.org/2001/XMLSchema#string" ||
         object == "http://www.w3.org/2000/01/rdf-schema#Literal") { //Literal
         d->relationCB = new ComboBox();
+        connect(d->relationCB, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(updateQueryPart()));
         d->relationCB->resize( GlobalSize );
         d->relationCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        d->relationCB->insertItems(0, RelationList);
         d->subjectLayout->insertWidget(1, d->relationCB );
+
         d->objectCB->clear();
         d->objectCB->setEditable( true );
     }
@@ -143,17 +153,77 @@ void QueryNode::addRestriction()
     QueryNode *qn = new QueryNode(d->objectCB->itemData(d->objectCB->currentIndex()).toString());
     d->restrictions.append(qn);
     d->restrictionLayout->addLayout(qn);
+    connect(qn, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryPart()));
 }
 
 void QueryNode::addObjectToLayout()
 {
+    //add the objectCB to the layout
+
     d->objectCB = new ComboBox();
     d->objectCB->resize( GlobalSize );
     d->objectCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+    connect(d->objectCB, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(updateQueryPart()));
+    connect(d->objectCB, SIGNAL(editTextChanged(QString)),
+                this, SLOT(updateQueryPart()));
 
     findObjects();
 
     d->subjectLayout->addWidget(d->objectCB);
 }
+
+QString QueryNode::randomVarName()
+{
+    return QString("?v" +  QString::number(KRandom::random() % 80 + 20)) ;
+}
+
+QString QueryNode::queryPart()
+{
+    //FIXME: assign var names at creation
+    //FIXME: the only changed query part returns its query string:
+    //       use this, and don't recompute anything
+    QString var = randomVarName();
+
+    if(d->parentClass.isEmpty()) { //root node    
+        QString var = randomVarName();
+        QString classUri = d->objectCB->itemData(d->objectCB->currentIndex()).toString();
+        QString childrenQueryParts;
+        foreach(QueryNode *node, d->restrictions) {
+            kDebug() << "Child query part:" << node->queryPart();
+            childrenQueryParts.append(var + " " + node->queryPart());
+        }
+        return QString(var + " a <" + classUri + "> . " + childrenQueryParts);
+    }    
+    if(d->objectCB->isEditable()) { //Literal node //FIXME: segmentation fault if objectCB doesn't exist?
+        QString predUri = d->predicateCB->itemData(d->predicateCB->currentIndex()).toString();
+        QString filterStr;
+        QString object = d->objectCB->currentText();
+        if (d->relationCB->currentText() == "equals") {
+            filterStr = QString(". FILTER regex(" + var + ", '^" + object + "$', 'i') . ");
+        } else if (d->relationCB->currentText() == "contains") {
+            filterStr = QString(". FILTER regex(" + var + ", '" + object + "', 'i') . ") ;
+        }
+        return QString("<" + predUri + "> " + var + filterStr);
+    }
+    else { //Resource node
+        QString predUri = d->predicateCB->itemData(d->predicateCB->currentIndex()).toString();
+        QString classUri = d->objectCB->itemData(d->objectCB->currentIndex()).toString();
+        QString childrenQueryParts;
+        foreach(QueryNode *node, d->restrictions) {
+            childrenQueryParts.append(var + " " + node->queryPart());
+        }
+        return QString("<" + predUri + "> " + var + " . "
+                       + var + " a " + classUri +
+                       + " . " + childrenQueryParts);
+    }
+}
+
+void QueryNode::updateQueryPart()
+{
+    emit queryPartChanged(queryPart());
+}
+
 
 #include "querynode.moc"

@@ -11,7 +11,7 @@ public:
     SubjectTree(int constraintNo, QWidget * parent = 0);
 
 public slots:
-    void rebuildQueryPart();
+    void updateQueryPart(QString queryPart);
 
 signals:
     void queryPartChanged(int, QString);
