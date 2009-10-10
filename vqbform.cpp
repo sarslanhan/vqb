@@ -80,7 +80,7 @@ void VqbForm::init()
 
     addSubjectTree();
 
-    SparqlHighlighter *highlighter = new SparqlHighlighter(d->ui->queryViewer);
+    new SparqlHighlighter(d->ui->queryViewer);
 
     /* Menus and initializations */
 
@@ -97,7 +97,7 @@ void VqbForm::init()
 }
 
 /*************      PUBLIC SLOTS      ****************/
-
+/*
 void VqbForm::attachConstraint(int index, QString varName, QString varClass)
 {
     //FIXME: correct or remove index
@@ -105,6 +105,7 @@ void VqbForm::attachConstraint(int index, QString varName, QString varClass)
     //addConstraint(true, varName, varClass);
     refreshQuery();
 }
+*/
 
 void VqbForm::queryPartChanged(int index, QString queryPart)
 {
@@ -174,12 +175,11 @@ void VqbForm::tabChanged(int index)
 void VqbForm::addSubjectTree()
 {
     if (d->topLayout) {
-        SubjectTree *st = new SubjectTree(d->queryParts.count());
+        SubjectTree *st = new SubjectTree(d->queryParts.count(), this);
         d->topLayout->addWidget(st);
         d->queryParts.append("");
 
-        connect(this, SIGNAL(refresh()),
-                st, SLOT(rebuildQueryPart()));
+        //connect(this, SIGNAL(refresh()), st, SLOT(rebuildQueryPart()));
 
         connect(st, SIGNAL(queryPartChanged(int, QString)),
                 this, SLOT(queryPartChanged(int, QString)));

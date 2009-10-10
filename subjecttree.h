@@ -8,7 +8,7 @@ class SubjectTree : public QGroupBox
 {
     Q_OBJECT
 public:
-    SubjectTree(int constraintNo, QWidget * parent = 0);
+    SubjectTree(int constraintNo, QWidget* parent = 0);
 
 public slots:
     void updateQueryPart(QString queryPart);
