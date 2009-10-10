@@ -14,7 +14,6 @@ set(vqb_SRCS
   main.cpp
   vqbform.cpp
   querythread.cpp
-  constraint.cpp
   combobox.cpp
   sparqlhighlighter.cpp
   subjecttree.cpp

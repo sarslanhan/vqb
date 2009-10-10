@@ -11,7 +11,7 @@
 #include <KRandom>
 
 static const QSize GlobalSize(100, 20);//global size for most screen elements
-static const int IndentSize = 30;
+static const int IndentSize = 20;
 static const QStringList RelationList( QStringList() << "contains" << "equals" );
 
 class QueryNode::Private
@@ -154,6 +154,7 @@ void QueryNode::addRestriction()
     d->restrictions.append(qn);
     d->restrictionLayout->addLayout(qn);
     connect(qn, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryPart()));
+    connect(qn, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
 }
 
 void QueryNode::addObjectToLayout()
@@ -168,15 +169,12 @@ void QueryNode::addObjectToLayout()
                 this, SLOT(updateQueryPart()));
     connect(d->objectCB, SIGNAL(editTextChanged(QString)),
                 this, SLOT(updateQueryPart()));
+    connect(d->objectCB, SIGNAL(addVarToOutput(QString)),
+            this, SIGNAL(addVarToOutput(QString)));
 
     findObjects();
 
     d->subjectLayout->addWidget(d->objectCB);
-}
-
-QString QueryNode::randomVarName()
-{
-    return QString("?v" +  QString::number(KRandom::random() % 80 + 20)) ;
 }
 
 QString QueryNode::queryPart()
@@ -184,19 +182,18 @@ QString QueryNode::queryPart()
     //FIXME: assign var names at creation
     //FIXME: the only changed query part returns its query string:
     //       use this, and don't recompute anything
-    QString var = randomVarName();
+    QString var = d->objectCB->varName();
 
     if(d->parentClass.isEmpty()) { //root node    
-        QString var = randomVarName();
         QString classUri = d->objectCB->itemData(d->objectCB->currentIndex()).toString();
         QString childrenQueryParts;
         foreach(QueryNode *node, d->restrictions) {
-            kDebug() << "Child query part:" << node->queryPart();
             childrenQueryParts.append(var + " " + node->queryPart());
         }
         return QString(var + " a <" + classUri + "> . " + childrenQueryParts);
     }    
     if(d->objectCB->isEditable()) { //Literal node //FIXME: segmentation fault if objectCB doesn't exist?
+        //FIXME: wrong output if no value is entered
         QString predUri = d->predicateCB->itemData(d->predicateCB->currentIndex()).toString();
         QString filterStr;
         QString object = d->objectCB->currentText();
@@ -215,8 +212,8 @@ QString QueryNode::queryPart()
             childrenQueryParts.append(var + " " + node->queryPart());
         }
         return QString("<" + predUri + "> " + var + " . "
-                       + var + " a " + classUri +
-                       + " . " + childrenQueryParts);
+                       + var + " a <" + classUri +
+                       + "> . " + childrenQueryParts);
     }
 }
 

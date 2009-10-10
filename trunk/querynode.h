@@ -21,10 +21,10 @@ public slots:
 
 signals:
     void queryPartChanged(QString queryPart);
+    void addVarToOutput(QString varName);
 
 private:
     void init();
-    QString randomVarName();
 
     class Private;
     Private * const d;

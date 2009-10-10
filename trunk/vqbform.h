@@ -21,7 +21,7 @@ public:
     ~VqbForm();
 
 public slots:
-    void attachConstraint(int index, QString varName, QString varClass); //DEPRECATED
+    //void attachConstraint(int index, QString varName, QString varClass); //DEPRECATED
     /** Adds a variable to the output list
       */
     void queryPartChanged(int index, QString constraint);
