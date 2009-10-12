@@ -9,7 +9,7 @@ class ComboBox : public QComboBox
 
 public:
     ComboBox(QWidget * parent = 0);
-    QString varName() const;
+    QString varName();
 
 public slots:
     void addToOutput();

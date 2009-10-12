@@ -10,29 +10,46 @@
 #include <KDebug>
 #include <KRandom>
 
-static const QSize GlobalSize(100, 20);//global size for most screen elements
+static const QSize GlobalSize(120, 20);//global size for most screen elements
 static const int IndentSize = 20;
 static const QStringList RelationList( QStringList() << "contains" << "equals" );
 
 class QueryNode::Private
 {
 public:
+    Private(QString _parentClass)
+            : predicateCB(0), relationCB(0), objectCB(0), addBtn(0), subjectLayout(0),  restrictionLayout(0)
+    {
+        parentClass  = _parentClass;
+    }
+    ~Private()
+    {
+        QList<QObject*> objects;
+        objects << predicateCB << relationCB << objectCB << restrictionLayout << subjectLayout << addBtn;
+        foreach(QObject *o, objects) {
+            if(o != 0) {
+                o->deleteLater();
+            }
+        }
+    }
     QComboBox *predicateCB;
     QComboBox *relationCB;
     ComboBox *objectCB;
+    QPushButton *addBtn;
     QHBoxLayout *subjectLayout;
 
     QList<QueryNode*> restrictions;
     QVBoxLayout *restrictionLayout;
 
-    QString objectVariable;//variable representing the object
+    //QString objectVariable;//variable representing the object
     QString parentClass;//URI of parent predicate
 };
 
+
+
 QueryNode::QueryNode(QString parentClass)
-        : QVBoxLayout(), d(new Private)
+        : QVBoxLayout(), d(new Private(parentClass))
 {
-    d->parentClass = parentClass;
     init();
 }
 
@@ -64,6 +81,13 @@ void QueryNode::init()
     this->addLayout(container);
 }
 
+QueryNode::~QueryNode()
+{
+    delete d;
+}
+
+/**** BACKEND QUERYING  ******/
+
 void QueryNode::findObjects()
 {
     QueryThread *qt = new QueryThread(this);
@@ -93,18 +117,35 @@ void QueryNode::findPredicates()
             this, SLOT(addPredicates(QList<StringPair>)));
 
     QString query = QString("SELECT DISTINCT ?label ?property WHERE {"
-                            " ?property <http://www.w3.org/2000/01/rdf-schema#domain> <%1> ."
-                            " OPTIONAL { ?property  <http://www.w3.org/2000/01/rdf-schema#label> ?label } }"
+                            " { "
+                            " ?property <http://www.w3.org/2000/01/rdf-schema#domain> <%1> "
+                            " OPTIONAL { ?property  <http://www.w3.org/2000/01/rdf-schema#label> ?label }"
+                            " } UNION {"
+                            " ?instance a <%1> . "
+                            " ?instance ?property ?object "
+                            " OPTIONAL { ?property  <http://www.w3.org/2000/01/rdf-schema#label> ?label } "
+                            " } } "
                             ).arg(d->parentClass);
     qt->setQuery( query );
     qt->start();
 }
 
+/**** INTERFACE AND TREE MANIPULATIONS ******/
+
 void QueryNode::addSubjects(QList<StringPair> subjects)
 {
+    //cleanup
     d->restrictions.clear();
-    //FIXME: remove restrictions from layout
+    for(int i=0; i<d->restrictionLayout->count(); i++) {
+        QueryNode *qn = (QueryNode*)d->restrictionLayout->itemAt(i);
+        d->restrictionLayout->removeItem(qn);
+        qn->deleteLater();
+    }
 
+    d->objectCB->clear();
+
+
+    //add subjects
     foreach(StringPair sp, subjects) {
         d->objectCB->addItem(sp.s1, sp.s2);  //add s2 as the data associated to the item
         //kDebug() << "++**++ Added item" << sp.s1 << sp.s2;
@@ -114,26 +155,39 @@ void QueryNode::addSubjects(QList<StringPair> subjects)
         d->objectCB->setCurrentIndex(0);
     }
 
+    //change interface
     QString object = d->objectCB->itemData( d->objectCB->currentIndex() ).toString();
     if (object == "http://www.w3.org/2001/XMLSchema#string" ||
         object == "http://www.w3.org/2000/01/rdf-schema#Literal") { //Literal
-        d->relationCB = new ComboBox();
-        connect(d->relationCB, SIGNAL(currentIndexChanged(int)),
-                this, SLOT(updateQueryPart()));
-        d->relationCB->resize( GlobalSize );
-        d->relationCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        d->relationCB->insertItems(0, RelationList);
-        d->subjectLayout->insertWidget(1, d->relationCB );
+
+        if(d->relationCB == 0) {
+            d->relationCB = new ComboBox();
+            connect(d->relationCB, SIGNAL(currentIndexChanged(int)),
+                    this, SLOT(updateQueryPart()));
+            d->relationCB->resize( GlobalSize );
+            d->relationCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+            d->relationCB->insertItems(0, RelationList);
+            d->subjectLayout->insertWidget(1, d->relationCB );
+        }
 
         d->objectCB->clear();
         d->objectCB->setEditable( true );
     }
-    else { //not literal (root node or not)
-        QPushButton *btnAdd = new QPushButton("+");
-        btnAdd->setBaseSize(20, 20);
-        connect(btnAdd, SIGNAL(clicked()),this, SLOT(addRestriction()));
-        d->subjectLayout->addWidget(btnAdd);
+    else { //not literal (root node or not)        
+        if(d->relationCB != 0) {
+            d->subjectLayout->removeWidget(d->relationCB);
+            d->relationCB->deleteLater();
+            d->relationCB = 0;
+        }
+        d->objectCB->setEditable(false);
+        if(d->addBtn == 0) {
+            d->addBtn = new QPushButton("+");
+            d->addBtn->setBaseSize(20, 20);
+            connect(d->addBtn, SIGNAL(clicked()),this, SLOT(addRestriction()));
+            d->subjectLayout->addWidget(d->addBtn);
+        }
     }
+    updateQueryPart();
 }
 
 void QueryNode::addPredicates(QList<StringPair> predicates)
@@ -161,27 +215,51 @@ void QueryNode::addObjectToLayout()
 {
     //add the objectCB to the layout
 
-    d->objectCB = new ComboBox();
-    d->objectCB->resize( GlobalSize );
-    d->objectCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    if(d->objectCB == 0) {
+        d->objectCB = new ComboBox();
+        d->objectCB->resize( GlobalSize );
+        d->objectCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    connect(d->objectCB, SIGNAL(currentIndexChanged(int)),
-                this, SLOT(updateQueryPart()));
-    connect(d->objectCB, SIGNAL(editTextChanged(QString)),
-                this, SLOT(updateQueryPart()));
-    connect(d->objectCB, SIGNAL(addVarToOutput(QString)),
-            this, SIGNAL(addVarToOutput(QString)));
+        connect(d->objectCB, SIGNAL(currentIndexChanged(int)),
+                    this, SLOT(updateQueryPart()));
+        connect(d->objectCB, SIGNAL(editTextChanged(QString)),
+                    this, SLOT(updateQueryPart()));
+        connect(d->objectCB, SIGNAL(addVarToOutput(QString)),
+                this, SIGNAL(addVarToOutput(QString)));
+        //FIXME: connect to removeRestrictions() method.
+        connect(d->objectCB, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(removeRestrictions()));
 
-    findObjects();
+        findObjects();
 
-    d->subjectLayout->addWidget(d->objectCB);
+        d->subjectLayout->addWidget(d->objectCB);
+    }
+    else {
+        //kDebug() << "It's not null! " << QString::number(d->objectCB->count());
+        findObjects();
+    }
 }
+
+void QueryNode::removeRestrictions()
+{
+    for(int i=0; i<d->restrictionLayout->count(); i++) {
+        QueryNode *qn = (QueryNode*) d->restrictionLayout->itemAt(i);
+        d->restrictionLayout->removeItem(qn);
+        qn->deleteLater();
+    }
+    d->restrictions.clear();
+}
+
+/****** QUERY COMPUTATION *******/
 
 QString QueryNode::queryPart()
 {
-    //FIXME: assign var names at creation
-    //FIXME: the only changed query part returns its query string:
+    //FIXME(not urgent): the only changed query part returns its query string:
     //       use this, and don't recompute anything
+    if(d->objectCB == 0) {
+        return QString();
+    }
+
     QString var = d->objectCB->varName();
 
     if(d->parentClass.isEmpty()) { //root node    
@@ -192,18 +270,24 @@ QString QueryNode::queryPart()
         }
         return QString(var + " a <" + classUri + "> . " + childrenQueryParts);
     }    
-    if(d->objectCB->isEditable()) { //Literal node //FIXME: segmentation fault if objectCB doesn't exist?
+
+    if(d->objectCB->isEditable()) { //Literal node
+        QString relStr = QString("contains");
+        if(d->relationCB) {
+            relStr = d->relationCB->currentText();
+        }
         //FIXME: wrong output if no value is entered
         QString predUri = d->predicateCB->itemData(d->predicateCB->currentIndex()).toString();
         QString filterStr;
         QString object = d->objectCB->currentText();
-        if (d->relationCB->currentText() == "equals") {
+        if (relStr == "equals") {
             filterStr = QString(". FILTER regex(" + var + ", '^" + object + "$', 'i') . ");
-        } else if (d->relationCB->currentText() == "contains") {
+        } else if (relStr == "contains") {
             filterStr = QString(". FILTER regex(" + var + ", '" + object + "', 'i') . ") ;
         }
         return QString("<" + predUri + "> " + var + filterStr);
     }
+
     else { //Resource node
         QString predUri = d->predicateCB->itemData(d->predicateCB->currentIndex()).toString();
         QString classUri = d->objectCB->itemData(d->objectCB->currentIndex()).toString();
