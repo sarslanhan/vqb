@@ -202,18 +202,11 @@ void QueryNode::addPredicates(QList<StringPair> predicates)
     d->predicateCB->blockSignals(false);
 }
 
-void QueryNode::addRestriction()
-{
-    QueryNode *qn = new QueryNode(d->objectCB->itemData(d->objectCB->currentIndex()).toString());
-    d->restrictions.append(qn);
-    d->restrictionLayout->addLayout(qn);
-    connect(qn, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryPart()));
-    connect(qn, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
-}
-
 void QueryNode::addObjectToLayout()
 {
     //add the objectCB to the layout
+
+    //FIXME: sometimes one of the CBs is longer
 
     if(d->objectCB == 0) {
         d->objectCB = new ComboBox();
@@ -240,9 +233,19 @@ void QueryNode::addObjectToLayout()
     }
 }
 
+
+void QueryNode::addRestriction()
+{
+    QueryNode *qn = new QueryNode(d->objectCB->itemData(d->objectCB->currentIndex()).toString());
+    d->restrictions.append(qn);
+    d->restrictionLayout->addLayout(qn);
+    connect(qn, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryPart()));
+    connect(qn, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
+}
+
 void QueryNode::removeRestrictions()
 {
-    for(int i=0; i<d->restrictionLayout->count(); i++) {
+    for(int i=d->restrictionLayout->count()-1; i>=0; i--) {
         QueryNode *qn = (QueryNode*) d->restrictionLayout->itemAt(i);
         d->restrictionLayout->removeItem(qn);
         qn->deleteLater();
