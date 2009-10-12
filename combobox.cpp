@@ -36,7 +36,7 @@ void ComboBox::attach()
 }
 */
 
-QString ComboBox::varName() const
+QString ComboBox::varName()
 {
     return m_varName;
 }

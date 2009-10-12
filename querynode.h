@@ -10,6 +10,7 @@ class QueryNode : public QVBoxLayout
     Q_OBJECT
 public:
     QueryNode(QString parentClass = QString());//filtering class
+    ~QueryNode();
 
     /** Returns the query part contributed by this node
       */
@@ -32,6 +33,7 @@ private:
 private slots:
     void addRestriction();
     void addObjectToLayout();
+    void removeRestrictions();
 
     void findObjects();
     void findPredicates();
