@@ -24,23 +24,23 @@ public slots:
     //void attachConstraint(int index, QString varName, QString varClass); //DEPRECATED
     /** Adds a variable to the output list
       */
-    void queryPartChanged(int index, QString constraint);
+    void queryTreeChanged(int index, QString constraint);
     void refreshQuery();
     void addVarToOutput(QString var);
     void tabChanged(int index);
+    void queryTreeDeleted(int treeNumber);
 
 signals:
     void refresh();
 
 private:
-    void addSubjectTree();
     void init();
 
     class Private;
     Private * const d;
 
 private slots:
-    void btnAdd_clicked();
+    void addQueryTree();
 };
 
 #endif // VQBFORM_H
