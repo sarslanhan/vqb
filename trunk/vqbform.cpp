@@ -27,8 +27,8 @@ public:
     Ui::VqbFormClass *ui;
     QPushButton *btnAdd;
     QVBoxLayout *topLayout; //layout holding the constraint lines
-    QStringList constraintStrings;
-    QStringList queryParts;
+    QStringList queryTreeStrings;
+    QList<SubjectTree*> queryTrees;
 };
 
 /*************      CONSTR, DESTR, INIT      ****************/
@@ -50,13 +50,9 @@ void VqbForm::init()
 {
     /* Layouts and visual elements */
 
-    d->btnAdd = new QPushButton("+");   // add button
+    d->btnAdd = new QPushButton("New Query Tree");   // add button
     d->btnAdd->setBaseSize(100, 50);
-    connect(d->btnAdd, SIGNAL(clicked()),
-            this, SLOT(btnAdd_clicked()));
-
-    d->topLayout = new QVBoxLayout;
-    //d->topLayout->setSizeConstraint( QLayout::SetMaximumSize );
+    connect(d->btnAdd, SIGNAL(clicked()), this, SLOT(addQueryTree()));
 
     QHBoxLayout *qhbl = new QHBoxLayout; //button's layout
     qhbl->setDirection(QBoxLayout::RightToLeft);
@@ -68,18 +64,12 @@ void VqbForm::init()
     frame->setLayout(layout);
     d->ui->scrollArea->setWidget(frame);
 
-    /*
-        d->ui->verticalLayout->addLayout( d->topLayout, 1 );//the top stack
-        d->ui->verticalLayout->addLayout( qhbl, 1 );//the bottom layout (holding the button)
-        d->ui->verticalLayout->addStretch( 5 );
-    */
-
+    d->topLayout = new QVBoxLayout;
     layout->addLayout(d->topLayout, 1);  //the top stack
     layout->addLayout(qhbl, 1);  //the bottom layout (holding the button)
     layout->addStretch(5);
 
-    addSubjectTree();
-
+    addQueryTree();
     new SparqlHighlighter(d->ui->queryViewer);
 
     /* Menus and initializations */
@@ -92,26 +82,16 @@ void VqbForm::init()
     this->addAction(refreshAction);
     this->setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    connect(d->ui->tabWidget, SIGNAL(currentChanged(int)),
-            this, SLOT(tabChanged(int)));
+    connect(d->ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 }
 
 /*************      PUBLIC SLOTS      ****************/
-/*
-void VqbForm::attachConstraint(int index, QString varName, QString varClass)
-{
-    //FIXME: correct or remove index
-    Q_UNUSED(index);
-    //addConstraint(true, varName, varClass);
-    refreshQuery();
-}
-*/
 
-void VqbForm::queryPartChanged(int index, QString queryPart)
+void VqbForm::queryTreeChanged(int index, QString queryTreeString)
 {
-    kDebug() << "Subject tree " << index << " has changed:" << queryPart;
-    if (index < d->queryParts.count()) {
-        d->queryParts[index] = queryPart;
+    kDebug() << "Subject tree " << index << " has changed:" << queryTreeString;
+    if (index < d->queryTreeStrings.count()) {
+        d->queryTreeStrings[index] = queryTreeString;
     }
     refreshQuery();
 }
@@ -123,7 +103,7 @@ void VqbForm::refreshQuery()
     output.replace("\n", " ");
     query.append(output);
     query.append(" \n WHERE { \n");
-    foreach(QString s, d->queryParts) {
+    foreach(QString s, d->queryTreeStrings) {
         query.append(s);
     }
     query.append("}\n");
@@ -163,39 +143,46 @@ void VqbForm::tabChanged(int index)
         kDebug() << "Ran query: " << q;
         QString result = QString(script.readAllStandardOutput().data()) + (QString) script.readAllStandardError().data();
         d->ui->queryResults->setText(result);
-
-
     }
-
 }
 
 /*************        PRIVATE PARTS        ****************/
 //not mine
 
-void VqbForm::addSubjectTree()
+void VqbForm::addQueryTree()
 {
     if (d->topLayout) {
-        SubjectTree *st = new SubjectTree(d->queryParts.count(), this);
-        d->topLayout->addWidget(st);
-        d->queryParts.append("");
+        SubjectTree *qt = new SubjectTree(d->queryTrees.count(), this);
+        d->topLayout->addWidget(qt);
+        d->queryTrees.append(qt);
+        d->queryTreeStrings.append("");
 
-        //connect(this, SIGNAL(refresh()), st, SLOT(rebuildQueryPart()));
-
-        connect(st, SIGNAL(queryPartChanged(int, QString)),
-                this, SLOT(queryPartChanged(int, QString)));
-
-        /*connect( c, SIGNAL(attachConstraint(int,QString,QString)),
-                 this, SLOT(attachConstraint(int,QString,QString)) );
-                 */
+        connect(qt, SIGNAL(queryTreeChanged(int,QString)), this, SLOT(queryTreeChanged(int, QString)));
+        connect(qt, SIGNAL(queryTreeDeleted(int)), this, SLOT(queryTreeDeleted(int)));
     }
 }
 
-
-void VqbForm::btnAdd_clicked()
+void VqbForm::queryTreeDeleted(int treeNumber)
 {
-    //addConstraint( false, QString(), QString() );
-    addSubjectTree();
-}
+    kDebug() << "Query Deleted " << treeNumber;
+    int i;
+    for(i=treeNumber; i<d->queryTrees.size()-1; i++) {
+        kDebug() << "Moving " << i+1 << " to " << i;
+        d->queryTrees[i] = d->queryTrees[i+1];
+        d->queryTrees[i]->setTreeNumber(i);
+        d->queryTreeStrings[i] = d->queryTreeStrings[i+1];
+    }
 
+    kDebug() << i << ", " << d->queryTrees.size();
+
+    if (i < d->queryTrees.size()) {
+        kDebug() << "Size = " << d->queryTrees.size();
+        kDebug() << "Removing Query Tree " << i;
+        d->queryTrees.removeAt(i);
+        d->queryTreeStrings.removeAt(i);
+        kDebug() << "Size = " << d->queryTrees.size();
+    }
+    refreshQuery();
+}
 
 #include "vqbform.moc"

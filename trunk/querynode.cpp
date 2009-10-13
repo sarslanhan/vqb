@@ -6,6 +6,7 @@
 #include <QSize>
 #include <QList>
 #include <QPushButton>
+#include <KPushButton>
 
 #include <KDebug>
 #include <KRandom>
@@ -18,34 +19,33 @@ class QueryNode::Private
 {
 public:
     Private(QString _parentClass)
-            : predicateCB(0), relationCB(0), objectCB(0), addBtn(0), subjectLayout(0),  restrictionLayout(0)
+            : predicateCB(0), relationCB(0), objectCB(0), addBtn(0), removeBtn(0), subjectLayout(0),  restrictionLayout(0)
     {
         parentClass  = _parentClass;
     }
     ~Private()
     {
         QList<QObject*> objects;
-        objects << predicateCB << relationCB << objectCB << restrictionLayout << subjectLayout << addBtn;
+        objects << predicateCB << relationCB << objectCB << restrictionLayout << subjectLayout << addBtn << removeBtn;
         foreach(QObject *o, objects) {
             if(o != 0) {
                 o->deleteLater();
             }
         }
     }
+
     QComboBox *predicateCB;
     QComboBox *relationCB;
     ComboBox *objectCB;
-    QPushButton *addBtn;
+    KPushButton *addBtn;
+    KPushButton *removeBtn;
     QHBoxLayout *subjectLayout;
 
     QList<QueryNode*> restrictions;
     QVBoxLayout *restrictionLayout;
 
-    //QString objectVariable;//variable representing the object
     QString parentClass;//URI of parent predicate
 };
-
-
 
 QueryNode::QueryNode(QString parentClass)
         : QVBoxLayout(), d(new Private(parentClass))
@@ -67,18 +67,18 @@ void QueryNode::init()
         findPredicates();//FIXME: get predicates from parent
 
         d->subjectLayout->addWidget( d->predicateCB );
-        connect(d->predicateCB, SIGNAL(currentIndexChanged(int)),
-                this, SLOT(addObjectToLayout()));
-        connect(d->predicateCB, SIGNAL(currentIndexChanged(int)),
-                this, SLOT(updateQueryPart()));
+        connect(d->predicateCB, SIGNAL(currentIndexChanged(int)), this, SLOT(addObjectToLayout()));
+        connect(d->predicateCB, SIGNAL(currentIndexChanged(int)), this, SLOT(updateQueryPart()));
     }    
+
     //Restriction Layout 
     d->restrictionLayout = new QVBoxLayout();
+    d->restrictionLayout->setAlignment(Qt::AlignLeft);
     QHBoxLayout *container = new QHBoxLayout();//to indent restrictionLayout
     container->addSpacing(IndentSize);
     container->addLayout(d->restrictionLayout);
     this->addLayout(d->subjectLayout);
-    this->addLayout(container);
+    this->addLayout(container);    
 }
 
 QueryNode::~QueryNode()
@@ -91,9 +91,9 @@ QueryNode::~QueryNode()
 void QueryNode::findObjects()
 {
     QueryThread *qt = new QueryThread(this);
-    connect(qt, SIGNAL(queryDone(QList<StringPair>)),
-            this, SLOT(addSubjects(QList<StringPair>)));
+    connect(qt, SIGNAL(queryDone(QList<StringPair>)), this, SLOT(addSubjects(QList<StringPair>)));
     QString query;
+
     if(!d->parentClass.isEmpty()) { //if not root node
         kDebug() << (int) d->predicateCB;
         QString predicate = d->predicateCB->itemData( d->predicateCB->currentIndex() ).toString();
@@ -106,6 +106,7 @@ void QueryNode::findObjects()
     query = "SELECT DISTINCT ?label ?class WHERE"
                     "{ ?resource a ?class .  ?class <http://www.w3.org/2000/01/rdf-schema#label> ?label }";
     }
+
     qt->setQuery(query);
     qt->start();
 }
@@ -113,8 +114,7 @@ void QueryNode::findObjects()
 void QueryNode::findPredicates()
 {
     QueryThread *qt = new QueryThread(this);
-    connect(qt, SIGNAL(queryDone(QList<StringPair>)),
-            this, SLOT(addPredicates(QList<StringPair>)));
+    connect(qt, SIGNAL(queryDone(QList<StringPair>)), this, SLOT(addPredicates(QList<StringPair>)));
 
     QString query = QString("SELECT DISTINCT ?label ?property WHERE {"
                             " { "
@@ -135,12 +135,7 @@ void QueryNode::findPredicates()
 void QueryNode::addSubjects(QList<StringPair> subjects)
 {
     //cleanup
-    d->restrictions.clear();
-    for(int i=0; i<d->restrictionLayout->count(); i++) {
-        QueryNode *qn = (QueryNode*)d->restrictionLayout->itemAt(i);
-        d->restrictionLayout->removeItem(qn);
-        qn->deleteLater();
-    }
+    removeRestrictions();
 
     d->objectCB->clear();
 
@@ -174,19 +169,32 @@ void QueryNode::addSubjects(QList<StringPair> subjects)
         d->objectCB->setEditable( true );
     }
     else { //not literal (root node or not)        
-        if(d->relationCB != 0) {
+        if(d->relationCB != 0) {//relation CB
             d->subjectLayout->removeWidget(d->relationCB);
             d->relationCB->deleteLater();
             d->relationCB = 0;
         }
         d->objectCB->setEditable(false);
-        if(d->addBtn == 0) {
-            d->addBtn = new QPushButton("+");
+
+        if(d->addBtn == 0) {//add button
+            d->addBtn = new KPushButton(KStandardGuiItem::add().icon(), "");
+            d->addBtn->setToolTip("Add Restriction to " + d->objectCB->currentText());
             d->addBtn->setBaseSize(20, 20);
+            d->addBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             connect(d->addBtn, SIGNAL(clicked()),this, SLOT(addRestriction()));
-            d->subjectLayout->addWidget(d->addBtn);
+            d->restrictionLayout->addWidget(d->addBtn);
         }
     }
+
+    if(d->removeBtn == 0) {//remove button
+        d->removeBtn = new KPushButton(KStandardGuiItem::remove().icon(), "");
+        d->removeBtn->setToolTip("Remove Restriction");
+        d->removeBtn->setBaseSize(20, 20);
+        d->removeBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        connect(d->removeBtn, SIGNAL(clicked()),this, SLOT(emitRemove()));
+        d->subjectLayout->addWidget(d->removeBtn);
+    }
+
     updateQueryPart();
 }
 
@@ -205,52 +213,57 @@ void QueryNode::addPredicates(QList<StringPair> predicates)
 void QueryNode::addObjectToLayout()
 {
     //add the objectCB to the layout
-
     //FIXME: sometimes one of the CBs is longer
-
     if(d->objectCB == 0) {
         d->objectCB = new ComboBox();
         d->objectCB->resize( GlobalSize );
         d->objectCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-        connect(d->objectCB, SIGNAL(currentIndexChanged(int)),
-                    this, SLOT(updateQueryPart()));
-        connect(d->objectCB, SIGNAL(editTextChanged(QString)),
-                    this, SLOT(updateQueryPart()));
-        connect(d->objectCB, SIGNAL(addVarToOutput(QString)),
-                this, SIGNAL(addVarToOutput(QString)));
-        //FIXME: connect to removeRestrictions() method.
-        connect(d->objectCB, SIGNAL(currentIndexChanged(int)),
-                this, SLOT(removeRestrictions()));
+        connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(updateQueryPart()));
+        connect(d->objectCB, SIGNAL(editTextChanged(QString)), this, SLOT(updateQueryPart()));
+        connect(d->objectCB, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
+        connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(removeRestrictions()));
 
         findObjects();
 
         d->subjectLayout->addWidget(d->objectCB);
     }
     else {
-        //kDebug() << "It's not null! " << QString::number(d->objectCB->count());
         findObjects();
     }
 }
-
 
 void QueryNode::addRestriction()
 {
     QueryNode *qn = new QueryNode(d->objectCB->itemData(d->objectCB->currentIndex()).toString());
     d->restrictions.append(qn);
-    d->restrictionLayout->addLayout(qn);
+    d->restrictionLayout->insertLayout(d->restrictionLayout->count()-1, qn);
     connect(qn, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryPart()));
     connect(qn, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
+    connect(qn, SIGNAL(removeClicked(QueryNode*)), this, SLOT(removeRestriction(QueryNode*)));
 }
 
 void QueryNode::removeRestrictions()
 {
-    for(int i=d->restrictionLayout->count()-1; i>=0; i--) {
-        QueryNode *qn = (QueryNode*) d->restrictionLayout->itemAt(i);
+    foreach(QueryNode *qn, d->restrictions) {
         d->restrictionLayout->removeItem(qn);
         qn->deleteLater();
     }
     d->restrictions.clear();
+}
+
+void QueryNode::removeRestriction(QueryNode *qn)
+{
+    kDebug() << "Removing Restriction...";
+    d->restrictionLayout->removeItem(qn);
+    d->restrictions.removeAt(d->restrictions.indexOf(qn));
+    qn->deleteLater();
+}
+
+void QueryNode::emitRemove()
+{
+    kDebug() << "Emitting remove";
+    emit removeClicked(this);
 }
 
 /****** QUERY COMPUTATION *******/

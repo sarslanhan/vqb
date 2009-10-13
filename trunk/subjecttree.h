@@ -11,15 +11,18 @@ public:
     SubjectTree(int constraintNo, QWidget* parent = 0);
 
 public slots:
-    void updateQueryPart(QString queryPart);
+    void updateQueryTree(QString queryPart);
+    void setTreeNumber(int treeNumber);
+    void close();
 
 signals:
-    void queryPartChanged(int, QString);
+    void queryTreeChanged(int, QString);
+    void queryTreeDeleted(int);
 
 private:
     void init();
 
-    int m_constraintNo;
+    int m_treeNumber;
     QueryNode *m_root;
 };
 

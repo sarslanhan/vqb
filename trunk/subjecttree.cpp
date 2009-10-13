@@ -9,32 +9,29 @@
 
 
 
-SubjectTree::SubjectTree(int constraintNo, QWidget * parent)
+SubjectTree::SubjectTree(int treeNumber, QWidget * parent)
         : QGroupBox(parent)
 {
-    m_constraintNo = constraintNo;
+    setTreeNumber(treeNumber);
     init();
 }
 
 void SubjectTree::init()
 {
-    setTitle("Subject " + QString::number(m_constraintNo + 1));
-
     m_root = new QueryNode();
     QVBoxLayout *l = new QVBoxLayout();
     this->setLayout(l);
     l->addLayout(m_root);
 
-    connect(m_root, SIGNAL(queryPartChanged(QString)),
-            this, SLOT(updateQueryPart(QString)));
-    connect(m_root, SIGNAL(addVarToOutput(QString)),
-            parent(), SLOT(addVarToOutput(QString)));
+    connect(m_root, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryTree(QString)));
+    connect(m_root, SIGNAL(addVarToOutput(QString)), parent(), SLOT(addVarToOutput(QString)));
+    connect(m_root, SIGNAL(removeClicked(QueryNode*)), this, SLOT(close()));
 
     QAction *removeAction = KStandardAction::close(this, SLOT(close()), this);
     removeAction->setText(tr("Remove &subject tree"));
     removeAction->setStatusTip(tr("Removes this constraint from the query and GUI"));
     removeAction->setShortcut(0);
-    /*QAction *refresh = KStandardAction::redisplay(this, SLOT(rebuildQueryPart()), this);
+    /*QAction *refresh = KStandardAction::redisplay(this, SLOT(rebuildQueryTree()), this);
     refresh->setText(tr("&Refresh query"));
     refresh->setShortcut(0);
     this->addAction(refresh);
@@ -44,9 +41,21 @@ void SubjectTree::init()
     setAttribute(Qt::WA_DeleteOnClose);   //delete when closed
 }
 
-void SubjectTree::updateQueryPart(QString queryPart)
+void SubjectTree::updateQueryTree(QString queryTree)
 {
-    emit queryPartChanged(m_constraintNo, queryPart);
+    emit queryTreeChanged(m_treeNumber, queryTree);
+}
+
+void SubjectTree::setTreeNumber(int treeNumber)
+{
+    m_treeNumber = treeNumber;
+    setTitle("Subject " + QString::number(m_treeNumber + 1));
+}
+
+void SubjectTree::close()
+{
+    emit queryTreeDeleted(m_treeNumber);
+    QGroupBox::close();
 }
 
 #include "subjecttree.moc"
