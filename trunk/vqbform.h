@@ -41,6 +41,9 @@ private:
 
 private slots:
     void addQueryTree();
+    void moveOutputUp();
+    void moveOutputDown();
+    void removeOutput();
 };
 
 #endif // VQBFORM_H

@@ -10,15 +10,18 @@ SOURCES += main.cpp \
     combobox.cpp \
     sparqlhighlighter.cpp \
     subjecttree.cpp \
-    querynode.cpp
+    querynode.cpp \
+    vqbinstancesform.cpp
 HEADERS += vqbform.h \
     querythread.h \
     constraint.h \
     combobox.h \
     sparqlhighlighter.h \
     subjecttree.h \
-    querynode.h
-FORMS += vqbform.ui
+    querynode.h \
+    vqbinstancesform.h
+FORMS += vqbform.ui \
+    vqbinstancesform.ui
 OTHER_FILES += CMakeLists.txt \
     notes.txt
 CONFIG += qt \
