@@ -10,6 +10,7 @@ namespace Soprano
 class Model;
 }
 
+//FIXME:: QPair makes this redundant
 struct StringPair {
 public:
     QString s1, s2;

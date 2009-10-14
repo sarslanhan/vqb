@@ -12,13 +12,18 @@
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QListWidget>
+#include <QListWidgetItem>
 
 #include <QProcess>
 
 #include <kdebug.h>
 #include <kstandardaction.h>
 #include <kaction.h>
-
+#include <KPushButton>
+#include <KIcon>
+#include <KIconLoader>
+#include <KStandardGuiItem>
 
 
 class VqbForm::Private
@@ -50,6 +55,15 @@ void VqbForm::init()
 {
     /* Layouts and visual elements */
 
+    //outputList
+    d->ui->buttonUp->setIcon(KIcon("arrow-up"));
+    connect(d->ui->buttonUp, SIGNAL(clicked()), this, SLOT(moveOutputUp()));
+    d->ui->buttonDown->setIcon(KIcon("arrow-down"));
+    connect(d->ui->buttonDown, SIGNAL(clicked()), this, SLOT(moveOutputDown()));
+    d->ui->buttonRemove->setIcon(KStandardGuiItem::remove().icon());
+    connect(d->ui->buttonRemove, SIGNAL(clicked()), this, SLOT(removeOutput()));
+    //kDebug() << KIconLoader::global()->queryIcons(KIconLoader::Desktop);
+
     d->btnAdd = new QPushButton("New Query Tree");   // add button
     d->btnAdd->setBaseSize(100, 50);
     connect(d->btnAdd, SIGNAL(clicked()), this, SLOT(addQueryTree()));
@@ -59,7 +73,7 @@ void VqbForm::init()
     qhbl->addWidget(d->btnAdd, 1);
     qhbl->addStretch(10);
 
-    QFrame* frame = new QFrame();
+    QFrame* frame = new QFrame(); //main frame
     QVBoxLayout* layout = new QVBoxLayout();
     frame->setLayout(layout);
     d->ui->scrollArea->setWidget(frame);
@@ -99,9 +113,9 @@ void VqbForm::queryTreeChanged(int index, QString queryTreeString)
 void VqbForm::refreshQuery()
 {
     QString query = "SELECT DISTINCT ";
-    QString output = d->ui->outputList->toPlainText();
-    output.replace("\n", " ");
-    query.append(output);
+    foreach(QListWidgetItem *item, d->ui->outputList->findItems(QString(), Qt::MatchContains)) {
+        query.append(item->text() + " ");
+    }
     query.append(" \n WHERE { \n");
     foreach(QString s, d->queryTreeStrings) {
         query.append(s);
@@ -112,8 +126,7 @@ void VqbForm::refreshQuery()
 
 void VqbForm::addVarToOutput(QString var)
 {
-    //kDebug() << "---- " << var;
-    d->ui->outputList->appendPlainText(var);
+    d->ui->outputList->addItem(var);
     refreshQuery();
 }
 
@@ -164,10 +177,8 @@ void VqbForm::addQueryTree()
 
 void VqbForm::queryTreeDeleted(int treeNumber)
 {
-    kDebug() << "Query Deleted " << treeNumber;
     int i;
     for(i=treeNumber; i<d->queryTrees.size()-1; i++) {
-        kDebug() << "Moving " << i+1 << " to " << i;
         d->queryTrees[i] = d->queryTrees[i+1];
         d->queryTrees[i]->setTreeNumber(i);
         d->queryTreeStrings[i] = d->queryTreeStrings[i+1];
@@ -176,12 +187,38 @@ void VqbForm::queryTreeDeleted(int treeNumber)
     kDebug() << i << ", " << d->queryTrees.size();
 
     if (i < d->queryTrees.size()) {
-        kDebug() << "Size = " << d->queryTrees.size();
-        kDebug() << "Removing Query Tree " << i;
         d->queryTrees.removeAt(i);
         d->queryTreeStrings.removeAt(i);
-        kDebug() << "Size = " << d->queryTrees.size();
     }
+    refreshQuery();
+}
+
+void VqbForm::moveOutputUp()
+{
+    QListWidget* lw = d->ui->outputList;
+    int i = lw->currentRow();
+    if(i > 0) {
+        QListWidgetItem *item = lw->takeItem(i);
+        lw->insertItem(i-1, item);
+        lw->setCurrentRow(i-1);
+    }
+    refreshQuery();
+
+}
+void VqbForm::moveOutputDown()
+{
+    QListWidget* lw = d->ui->outputList;
+    int i = lw->currentRow();
+    if(i < lw->count()-1) {
+        QListWidgetItem *item = lw->takeItem(i);
+        lw->insertItem(i+1, item);
+        lw->setCurrentRow(i+1);
+    }
+    refreshQuery();
+}
+void VqbForm::removeOutput()
+{
+    d->ui->outputList->takeItem( d->ui->outputList->currentRow() );
     refreshQuery();
 }
 

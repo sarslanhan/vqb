@@ -1,11 +1,16 @@
-New idea for VQB:
-   - something like using WordNet for similar words, and searching based on that
+----- Future considerations ------------
+
+- something like using WordNet for similar words, and searching based on that
+
+- When adding to Konduit: add it to a *different folder*
 
 
+--------------    Vqb improvements --------------
+
+- Show prefixes
 
 
-
-
+---------- FOAF INFERENCING ----------------------
 
 name:
     - domain = owl:Thing
@@ -17,17 +22,9 @@ Person:
             geo:SpatiaThing (not subclass of owl:Thing)
 
 
-FUTURE:
-- When adding to Konduit: add it to a *different folder*
 
 
-NOW:
-- Use a local numbering: start from 0 ??
-- cache tree results, and only recompute the part that has changed ?
-
-
-
-
+---------------------- BACKUP -------------------------
 
 void VqbForm::addConstraint( bool isAttached, QString parentVarName, QString parentClass )
 {

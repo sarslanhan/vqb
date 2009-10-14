@@ -12,7 +12,7 @@
 #include <KRandom>
 
 static const QSize GlobalSize(120, 20);//global size for most screen elements
-static const int IndentSize = 20;
+static const int IndentSize = 40;
 static const QStringList RelationList( QStringList() << "contains" << "equals" );
 
 class QueryNode::Private
