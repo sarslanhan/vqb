@@ -11,7 +11,9 @@ SOURCES += main.cpp \
     sparqlhighlighter.cpp \
     subjecttree.cpp \
     querynode.cpp \
-    vqbinstancesform.cpp
+    vqbinstancesform.cpp \
+    vqbmainwindow.cpp \
+    vqbschemaform.cpp
 HEADERS += vqbform.h \
     querythread.h \
     constraint.h \
@@ -19,9 +21,11 @@ HEADERS += vqbform.h \
     sparqlhighlighter.h \
     subjecttree.h \
     querynode.h \
-    vqbinstancesform.h
-FORMS += vqbform.ui \
-    vqbinstancesform.ui
+    vqbinstancesform.h \
+    vqbmainwindow.h \
+    vqbschemaform.h
+FORMS += vqbinstancesform.ui \
+    vqbmainwindow.ui
 OTHER_FILES += CMakeLists.txt \
     notes.txt
 CONFIG += qt \

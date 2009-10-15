@@ -14,8 +14,14 @@ public:
     explicit VqbInstancesForm(QWidget *parent = 0);
     virtual ~VqbInstancesForm();
 
+public slots:
+    void queryChanged(QString query);
+    void addVarToOutput(QString var);
+
 private:
     Ui::VqbInstancesForm *m_ui;
+
+
 };
 
 #endif // VQBINSTANCESFORM_H
