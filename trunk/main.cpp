@@ -1,5 +1,6 @@
 #include <QtGui/QApplication>
 #include "vqbform.h"
+#include "vqbmainwindow.h"
 
 #include <QFont>
 
@@ -30,9 +31,9 @@ int main(int argc, char *argv[])
 
     KApplication app;
     //QFont f;
-    //f.setPointSize(10);
+    //f.setPointSize(9);
     //app.setFont(f);
-    VqbForm w;
+    VqbMainWindow w;
     w.show();
     return app.exec();
 }

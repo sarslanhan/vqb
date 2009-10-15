@@ -1,13 +1,45 @@
------ Future considerations ------------
+**** TODO -------------------
+
+- VqbForm::queryChanged: remove outputs not in the query
+
+
+
+**** Future considerations ------------
 
 - something like using WordNet for similar words, and searching based on that
 
 - When adding to Konduit: add it to a *different folder*
 
 
---------------    Vqb improvements --------------
+****  Vqb improvements --------------
 
 - Show prefixes
+
+
+**** Thesis
+
+- emphasize data-driven aspect
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ---------- FOAF INFERENCING ----------------------
