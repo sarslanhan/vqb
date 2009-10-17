@@ -3,6 +3,8 @@
 
 #include <QComboBox>
 
+//FIXME: rename to something more relevant
+
 class ComboBox : public QComboBox
 {
     Q_OBJECT

@@ -14,7 +14,9 @@ set(vqb_SRCS
   main.cpp
   vqbmainwindow.cpp
   vqbform.cpp
+  vqbglobal.cpp
   vqbschemaform.cpp
+  vqbinstancesform.cpp
   querythread.cpp
   combobox.cpp
   sparqlhighlighter.cpp
@@ -22,7 +24,7 @@ set(vqb_SRCS
   querynode.cpp
   )
 
-kde4_add_ui_files(vqb_SRCS vqbmainwindow.ui)
+kde4_add_ui_files(vqb_SRCS vqbmainwindow.ui vqbinstancesform.ui)
 kde4_add_executable(vqb ${vqb_SRCS})
 
 target_link_libraries(vqb soprano sopranoclient
