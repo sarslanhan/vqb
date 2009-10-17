@@ -2,11 +2,14 @@
 #include "ui_vqbmainwindow.h"
 #include "vqbform.h"
 #include "vqbschemaform.h"
+#include "vqbinstancesform.h"
 #include "sparqlhighlighter.h"
 
 #include <QProcess>
+#include <QInputDialog>
 
 #include <KDebug>
+
 
 VqbMainWindow::VqbMainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,7 +38,18 @@ void VqbMainWindow::init()
 
     connect(m_ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
-    VqbForm *vqbForm = new VqbSchemaForm(this);
+    //FIXME: get this on a different thread?
+    QString choice = QInputDialog::getItem(this, "Please choose interface mode", "Interface choser", QStringList() << "Schema-based" << "Instance-based", 0, false);
+
+    //FIXME: test and refine this
+    VqbForm *vqbForm;
+    if(choice == "Schema-based") {
+        vqbForm = new VqbSchemaForm(this);
+    }
+    else {
+        vqbForm = new VqbInstancesForm(this);
+    }
+
     m_ui->scrollArea->setWidget(vqbForm);
 }
 

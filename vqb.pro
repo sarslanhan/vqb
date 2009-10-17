@@ -13,7 +13,8 @@ SOURCES += main.cpp \
     querynode.cpp \
     vqbinstancesform.cpp \
     vqbmainwindow.cpp \
-    vqbschemaform.cpp
+    vqbschemaform.cpp \
+    vqbglobal.cpp
 HEADERS += vqbform.h \
     querythread.h \
     constraint.h \
@@ -23,7 +24,8 @@ HEADERS += vqbform.h \
     querynode.h \
     vqbinstancesform.h \
     vqbmainwindow.h \
-    vqbschemaform.h
+    vqbschemaform.h \
+    vqbglobal.h
 FORMS += vqbinstancesform.ui \
     vqbmainwindow.ui
 OTHER_FILES += CMakeLists.txt \
@@ -31,4 +33,4 @@ OTHER_FILES += CMakeLists.txt \
 CONFIG += qt \
     link_pkgconfig
 PKGCONFIG += soprano
-INCLUDEPATH = /home/kde-devel/kde/include/
+INCLUDEPATH = /home/kde-devel/kde/include

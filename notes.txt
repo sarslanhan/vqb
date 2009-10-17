@@ -1,6 +1,12 @@
 **** TODO -------------------
 
 - VqbForm::queryChanged: remove outputs not in the query
+- apply prefixing on resulting query
+- add colors to restrictiolayouts (like Kate colors the open files), to better highlight membership
+- color output comboboxes? (setStyleSheet)
+- add predicates to output as well?
+- fix CB size problems
+
 
 
 
@@ -9,6 +15,8 @@
 - something like using WordNet for similar words, and searching based on that
 
 - When adding to Konduit: add it to a *different folder*
+
+- KDE4 HCI Checklist
 
 
 ****  Vqb improvements --------------
@@ -22,16 +30,16 @@
 
 
 
+**** Old-Vqb style Vqb ----------
 
+Advantages
+----------
+- better overview of things already added
+- cleaner interface
 
-
-
-
-
-
-
-
-
+Disadvantages
+--------------
+- Inflexibility
 
 
 

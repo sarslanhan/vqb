@@ -1,5 +1,4 @@
 #include "vqbschemaform.h"
-#include "vqbform.h"
 #include "vqbmainwindow.h"
 #include "ui_vqbform.h"
 #include "sparqlhighlighter.h"
@@ -48,11 +47,6 @@ VqbSchemaForm::VqbSchemaForm(VqbMainWindow *parent)
     emit queryChanged("hihihuhuhu");
 }
 
-VqbSchemaForm::~VqbSchemaForm()
-{
-    delete d;
-}
-
 void VqbSchemaForm::init()
 {
     /* Layouts and visual elements */
@@ -75,6 +69,12 @@ void VqbSchemaForm::init()
     layout->addStretch(5);
 
     addQueryTree();
+}
+
+
+VqbSchemaForm::~VqbSchemaForm()
+{
+    delete d;
 }
 
 /*************      PUBLIC SLOTS      ****************/
