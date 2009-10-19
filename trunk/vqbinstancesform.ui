@@ -159,4 +159,7 @@
  </customwidgets>
  <resources/>
  <connections/>
+ <slots>
+  <slot>updateTriple()</slot>
+ </slots>
 </ui>

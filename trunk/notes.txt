@@ -1,11 +1,15 @@
 **** TODO -------------------
 
-- VqbForm::queryChanged: remove outputs not in the query
+VqbMainWindow:
+- queryChanged: remove outputs not in the query
 - apply prefixing on resulting query
-- add colors to restrictiolayouts (like Kate colors the open files), to better highlight membership
-- color output comboboxes? (setStyleSheet)
-- add predicates to output as well?
+
+VqbFormSchema:
+- add colors to restrictionLayouts (like Kate colors the open files), to better highlight membership
 - fix CB size problems
+- introduce variables
+- ? color comboboxes that have been added to the output? (setStyleSheet)
+
 
 
 

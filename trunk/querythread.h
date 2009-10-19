@@ -35,14 +35,26 @@ public:
     */
     void setQuery(QString query);
 
+
+    /** Static SYNCHRONOUS utility function.
+       Returns query results of a simple SELECT query
+       query - the query to run
+       freeVar - the variable to get bindings for
+    */
+    static QStringList queryResults( QString query, QString freeVar );
+
+    /** Static SYNCHRONOUS utility function.
+        Counts the query results of a simple SELECT query
+    */
+    static int countQueryResults( QString query );
+
 signals:
     void queryDone(QList<StringPair>);
 
 private:
-    class Private;
-    Private * const d;
+    QString m_query;
 
-    Soprano::Model* nepomukMainModel();
+    static Soprano::Model* nepomukMainModel();
 
 };
 
