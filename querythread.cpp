@@ -15,31 +15,20 @@
 
 #include <kdebug.h>
 
-class QueryThread::Private
-{
-public:
-    Private() {}
-    QString query;
-};
-
 QueryThread::QueryThread(QObject *parent)
-        : QThread(parent),
-        d(new Private)
+        : QThread(parent)
 {
     qRegisterMetaType<QList<StringPair> >("QList<StringPair>");//user-defined types need to be registered to be used as signals
-    d->query = "SELECT DISTINCT ?s WHERE { ?s ?p ?o } LIMIT 50";
+    m_query = "SELECT DISTINCT ?s WHERE { ?s ?p ?o } LIMIT 50";
 }
 
 void QueryThread::run()
 {
-    kDebug() << "\n\n *** Querying: " << d->query;
+    kDebug() << "\n\n *** Querying: " << m_query;
 
-    QMutex mutex;//this might not be necessary
-    mutex.lock();
-    Soprano::Model* m = nepomukMainModel();
-    mutex.unlock();
+    Soprano::Model* m = QueryThread::nepomukMainModel();
 
-    Soprano::QueryResultIterator it = m->executeQuery(d->query, Soprano::Query::QueryLanguageSparql);
+    Soprano::QueryResultIterator it = m->executeQuery(m_query, Soprano::Query::QueryLanguageSparql);
 
     //QList<Soprano::Node> resNodes;
     QList<StringPair> res;
@@ -84,7 +73,7 @@ void QueryThread::run()
 
 void QueryThread::setQuery(QString query)
 {
-    d->query = query;
+    m_query = query;
 }
 
 static Soprano::Model *s_model = 0;
@@ -92,6 +81,9 @@ static Soprano::Inference::InferenceModel *s_im = 0;
 
 Soprano::Model* QueryThread::nepomukMainModel()
 {
+    QMutex mutex;//this might not be necessary
+    mutex.lock();
+
     // we use a dummy test model here
     if (!s_model) {
         static Soprano::Client::DBusClient client("org.kde.NepomukServer");
@@ -105,10 +97,59 @@ Soprano::Model* QueryThread::nepomukMainModel()
     //return s_model;
     if (!s_im) {
         s_im = new Soprano::Inference::InferenceModel(s_model);
-//        s_im->addStatements( s_model->listStatements().allStatements() );
+    //s_im->addStatements( s_model->listStatements().allStatements() );
         s_im->performInference();
     }
+
+    mutex.unlock();
     return s_im;
+}
+
+/**************** SYCHRONOUS utility methods ************/
+
+
+QStringList QueryThread::queryResults( QString query, QString freeVar )
+{
+    QString s = "SELECT DISTINCT ?" + freeVar + " WHERE { " + query + " } LIMIT 50";//"SELECT * WHERE {" + query + "} LIMIT 1";
+    //add prefixes
+    //s = VisualQueryBuilderConsts::addPrefixes( s );
+    //kDebug() << "--- Running query: " << s;
+
+    Soprano::Model* m = QueryThread::nepomukMainModel();
+    Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
+    QList<QString> res;
+    QList<Soprano::BindingSet> allStatements = it.allBindings();
+
+    QString val;
+    foreach (Soprano::BindingSet s, allStatements ) {
+              Soprano::Node n = s.value(freeVar);
+              if ( n.isResource() ) {
+                  val = n.uri().toString();
+                  //val = VisualQueryBuilderConsts::getPrefixForm( val );
+              } else if ( n.isLiteral() ) {
+                  val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
+              }
+              //kDebug() << "--- Found: " << val;
+              res << val;
+    }
+
+    //kDebug() << "--- *** The results: " << res;
+
+    return res;
+}
+
+int QueryThread::countQueryResults( QString query )
+{
+    //QString s = VisualQueryBuilderConsts::addPrefixes( query );
+    //kDebug() << "*** Counting results for: " << s;
+    Soprano::QueryResultIterator it = QueryThread::nepomukMainModel()->executeQuery( query, Soprano::Query::QueryLanguageSparql );
+    /*
+    QList<Soprano::BindingSet> allStatements = it.allBindings();
+    int resNo = allStatements.count();;
+    return resNo;
+    */
+    //kDebug() << "*** Counted " << resNo << " results";
+    return it.allBindings().count();
 }
 
 #include "querythread.moc"
