@@ -12,6 +12,7 @@
 
 #include <QRegExp>
 #include <QTimer>
+#include <QCompleter>
 
 VqbInstancesForm::VqbInstancesForm(VqbMainWindow *parent) :
     VqbForm(parent),
@@ -32,19 +33,11 @@ void VqbInstancesForm::updateCurrentTriple()
 {
     QString triple;
     triple = m_ui->cbSubject->currentText() + " " + m_ui->cbPredicate->currentText() + " ";
-    if(m_ui->checkBoxFilter->isChecked()) {//Filter ON
-        QString var = QString("?v" +  QString::number(KRandom::random() % 80 + 20)) ;
-        QString relation = m_ui->cbRelation->currentText();
-        if (relation == "contains") {
-            triple.append( var + " . FILTER regex(" + var + ", '" + m_ui->cbObject->currentText() + "', 'i') . ") ;
-        }
-        else if (relation == "equals") {
-            triple.append( var + " . FILTER regex(" + var + ", '^" + m_ui->cbObject->currentText() + "$', 'i') . ");
-        }
-    }
-    else {//Filter OFF
-        triple.append(VqbGlobal::getCanonicalForm(m_ui->cbObject->currentText(), m_ui->cbType->currentText()));
-    }
+    triple += VqbGlobal::constructObject(m_ui->checkBoxFilter->isChecked(),
+                                         m_ui->cbRelation->currentText(),
+                                         m_ui->cbObject->currentText(),
+                                         m_ui->cbType->currentText());
+
 
     m_ui->listBoxConditions->lineEdit()->setText(triple);
     m_currentTriple = triple;
@@ -55,6 +48,12 @@ void VqbInstancesForm::updateCurrentTriple()
 
 void VqbInstancesForm::updateTypes()
 {
+    if(m_ui->checkBoxFilter->isChecked()) {
+        m_ui->cbType->setEnabled(false);
+        return;
+    }
+
+    m_ui->cbType->setEnabled(true);
     QString text = m_ui->cbObject->currentText();
     m_ui->cbType->clear();
     QStringList types = VqbGlobal::literalTypes();
@@ -71,7 +70,6 @@ void VqbInstancesForm::updateTypes()
     }
     m_ui->cbType->clear();
     m_ui->cbType->insertItems(-1, types);
-
 }
 
 
@@ -83,39 +81,41 @@ void VqbInstancesForm::updateCompleters()
         return;
     }// else
     m_lastQuery = query;
+    //kDebug() << "####### " << query;
 
+    //FIXME?: launch on a different thread, maybe
     colorLineEdits(QueryThread::countQueryResults(query));
 
-    /*
-    if( QueryThread::countQueryResults(query) == 0 ) {
-        //setColor( lineEditOS, comboBoxOP->lineEdit(), lineEditOO, comboBoxTypesO->currentText(), Qt::red );
 
-    }
-    else {
-        colorLineEdits(Qt::white);
-        //setColor( lineEditOS, comboBoxOP->lineEdit(), lineEditOO, comboBoxTypesO->currentText(), Qt::white );
-    }
-    */
-
-/*    //generate random name
-    srand( QTime::currentTime().msec() );
-    QString varName;
-    varName.setNum( 100 + rand() % 1000 );
-    varName.prepend("xyz" + varName);
+    QString varName = VqbGlobal::randomVarName();  
 
     //query for SUBJECT autocompletion
-    query = "?" + varName + " " + comboBoxOP->currentText() + " " + VisualQueryBuilderConsts::getCanonicalForm( lineEditOO->text(), comboBoxTypesO->currentText() );
-    setCompletersOS( qTh->runQuery( query, varName ) );
-
-    //query for OBJECT
-    query = lineEditOS->text() + " " + comboBoxOP->currentText() + " " + "?" + varName;
-    setCompletersOO( qTh->runQuery( query, varName ) );
+    query = varName + " " + m_ui->cbPredicate->currentText() + " ";
+    query += VqbGlobal::constructObject(m_ui->checkBoxFilter->isChecked(),
+                                         m_ui->cbRelation->currentText(),
+                                         m_ui->cbObject->currentText(),
+                                         m_ui->cbType->currentText());
+    QCompleter *c = new QCompleter(QueryThread::queryResults(query, varName), this);
+    c->setCaseSensitivity(Qt::CaseInsensitive);
+    c->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
+    m_ui->cbSubject->lineEdit()->setCompleter(c);
 
     //query for PREDICATE
-    setCompletersOP( QStringList() );
+    query =  m_ui->cbSubject->currentText() + " " + varName + " ";
+    query += VqbGlobal::constructObject(m_ui->checkBoxFilter->isChecked(),
+                                         m_ui->cbRelation->currentText(),
+                                         m_ui->cbObject->currentText(),
+                                         m_ui->cbType->currentText());
+    m_ui->cbPredicate->lineEdit()->setCompleter(new  QCompleter(QueryThread::queryResults(query, varName), this));
+
+    //query for OBJECT
+    query = m_ui->cbSubject->currentText() + m_ui->cbPredicate->currentText() + varName;
+    m_ui->cbObject->lineEdit()->setCompleter(new  QCompleter(QueryThread::queryResults(query, varName), this));
+
+/*    //generate random name    
+    setCompletersOS( qTh->runQuery( query, varName ) );
     */
 }
-
 /******** Utility functions *************/
 
 void VqbInstancesForm::colorLineEdits(bool hasResults)
@@ -144,7 +144,7 @@ void VqbInstancesForm::colorLineEdits(bool hasResults)
     } else { //variables are not colored
         lP->setPalette(paletteWhite);
     }
-    if (!(rx.exactMatch( lO->text() ) && m_ui->cbType->currentText() == "var")) { //only non-variables are colored
+    if (!(rx.exactMatch( lO->text() ) && m_ui->cbType->currentText() == "var" && !m_ui->checkBoxFilter->isChecked())) { //only non-variables are colored
         lO->setPalette(paletteColored);
     } else { //color variables with white
         lO->setPalette(paletteWhite);
@@ -156,18 +156,19 @@ void VqbInstancesForm::colorLineEdits(bool hasResults)
 
 void VqbInstancesForm::init()
 {
-    m_ui->cbRelation->insertItems(0, QStringList() << "equals" << "contains");
-
     //triple updating signals
-    connect(m_ui->cbSubject, SIGNAL(editTextChanged(QString)),
+    //connect(m_ui->cbObject, SIGNAL(editTextChanged(QString)),
+    connect(m_ui->cbSubject->lineEdit(), SIGNAL(editingFinished()),
             this, SLOT(updateCurrentTriple()));
     connect(m_ui->cbSubject, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(updateCurrentTriple()));
-    connect(m_ui->cbPredicate, SIGNAL(editTextChanged(QString)),
+    //connect(m_ui->cbPredicate, SIGNAL(editTextChanged(QString)),
+    connect(m_ui->cbPredicate->lineEdit(), SIGNAL(editingFinished()),
             this, SLOT(updateCurrentTriple()));
     connect(m_ui->cbPredicate, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(updateCurrentTriple()));
-    connect(m_ui->cbObject, SIGNAL(editTextChanged(QString)),
+    //connect(m_ui->cbObject, SIGNAL(editTextChanged(QString)),
+    connect(m_ui->cbObject->lineEdit(), SIGNAL(editingFinished()),
             this, SLOT(updateCurrentTriple()));
     connect(m_ui->cbObject, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(updateCurrentTriple()));
@@ -181,15 +182,19 @@ void VqbInstancesForm::init()
     //type updating signal
     connect(m_ui->cbObject, SIGNAL(editTextChanged(QString)),
             this, SLOT(updateTypes()));
+    connect(m_ui->checkBoxFilter, SIGNAL(toggled(bool)),
+            this, SLOT(updateTypes()));
 
     //initializations
     m_ui->cbSubject->lineEdit()->setText("?s");
     m_ui->cbPredicate->lineEdit()->setText("?p");
     m_ui->cbObject->lineEdit()->setText("?o");
+    m_ui->cbRelation->insertItems(0, QStringList() << "equals" << "contains");
 
     //initial GUI population
-    updateCurrentTriple();
     updateTypes();
+    updateCurrentTriple();
+
 }
 
 

@@ -1,4 +1,5 @@
 #include "combobox.h"
+#include "vqbglobal.h"
 
 #include <QAction>
 
@@ -10,7 +11,7 @@
 ComboBox::ComboBox(QWidget* parent)
         : QComboBox(parent)
 {
-    m_varName = QString("?v" +  QString::number(KRandom::random() % 80 + 20)) ;
+    m_varName = VqbGlobal::randomVarName();//QString("?v" +  QString::number(KRandom::random() % 80 + 20)) ;
 
     setToolTip(m_varName);
 

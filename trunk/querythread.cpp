@@ -1,4 +1,5 @@
 #include "querythread.h"
+#include "vqbglobal.h"
 
 #include <QString>
 #include <QList>
@@ -24,10 +25,9 @@ QueryThread::QueryThread(QObject *parent)
 
 void QueryThread::run()
 {
-    kDebug() << "\n\n *** Querying: " << m_query;
-
+    //kDebug() << "\n\n *** Querying: " << m_query;
     Soprano::Model* m = QueryThread::nepomukMainModel();
-
+    //FIXME: see if there's a query syntax checker in Soprano
     Soprano::QueryResultIterator it = m->executeQuery(m_query, Soprano::Query::QueryLanguageSparql);
 
     //QList<Soprano::Node> resNodes;
@@ -110,22 +110,22 @@ Soprano::Model* QueryThread::nepomukMainModel()
 
 QStringList QueryThread::queryResults( QString query, QString freeVar )
 {
-    QString s = "SELECT DISTINCT ?" + freeVar + " WHERE { " + query + " } LIMIT 50";//"SELECT * WHERE {" + query + "} LIMIT 1";
+    QString s = "SELECT DISTINCT " + freeVar + " WHERE { " + query + " } LIMIT 50";//"SELECT * WHERE {" + query + "} LIMIT 1";
     //add prefixes
-    //s = VisualQueryBuilderConsts::addPrefixes( s );
+    s = VqbGlobal::addPrefixes( s );
     //kDebug() << "--- Running query: " << s;
 
     Soprano::Model* m = QueryThread::nepomukMainModel();
     Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
-    QList<QString> res;
+    QStringList res;
     QList<Soprano::BindingSet> allStatements = it.allBindings();
 
     QString val;
     foreach (Soprano::BindingSet s, allStatements ) {
-              Soprano::Node n = s.value(freeVar);
+              Soprano::Node n = s.value(freeVar.replace("?", ""));
               if ( n.isResource() ) {
                   val = n.uri().toString();
-                  //val = VisualQueryBuilderConsts::getPrefixForm( val );
+                  val = VqbGlobal::prefixForm( val );
               } else if ( n.isLiteral() ) {
                   val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
               }
@@ -133,22 +133,13 @@ QStringList QueryThread::queryResults( QString query, QString freeVar )
               res << val;
     }
 
-    //kDebug() << "--- *** The results: " << res;
-
     return res;
 }
 
 int QueryThread::countQueryResults( QString query )
 {
-    //QString s = VisualQueryBuilderConsts::addPrefixes( query );
-    //kDebug() << "*** Counting results for: " << s;
+    query = VqbGlobal::addPrefixes(query);
     Soprano::QueryResultIterator it = QueryThread::nepomukMainModel()->executeQuery( query, Soprano::Query::QueryLanguageSparql );
-    /*
-    QList<Soprano::BindingSet> allStatements = it.allBindings();
-    int resNo = allStatements.count();;
-    return resNo;
-    */
-    //kDebug() << "*** Counted " << resNo << " results";
     return it.allBindings().count();
 }
 
