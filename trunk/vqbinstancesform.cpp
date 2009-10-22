@@ -3,6 +3,7 @@
 #include "vqbmainwindow.h"
 #include "vqbglobal.h"
 #include "querythread.h"
+#include "completerlineedit.h"
 
 #include </home/kde-devel/kde/include/kcombobox.h>
 #include </home/kde-devel/kde/include/klineedit.h>
@@ -86,31 +87,33 @@ void VqbInstancesForm::updateCompleters()
     //FIXME?: launch on a different thread, maybe
     colorLineEdits(QueryThread::countQueryResults(query));
 
-
     QString varName = VqbGlobal::randomVarName();  
+    QString subject = m_ui->cbSubject->currentText();
+    QString predicate = m_ui->cbPredicate->currentText();
+    QString object = VqbGlobal::constructObject(m_ui->checkBoxFilter->isChecked(),
+                                         m_ui->cbRelation->currentText(),
+                                         m_ui->cbObject->currentText(),
+                                         m_ui->cbType->currentText());
 
     //query for SUBJECT autocompletion
-    query = varName + " " + m_ui->cbPredicate->currentText() + " ";
-    query += VqbGlobal::constructObject(m_ui->checkBoxFilter->isChecked(),
-                                         m_ui->cbRelation->currentText(),
-                                         m_ui->cbObject->currentText(),
-                                         m_ui->cbType->currentText());
-    QCompleter *c = new QCompleter(QueryThread::queryResults(query, varName), this);
-    c->setCaseSensitivity(Qt::CaseInsensitive);
+    query = varName + " " + predicate + " " + object;
+    QCompleter *c;// = new QCompleter(QueryThread::queryResults(query, varName), this);
+    /*c->setCaseSensitivity(Qt::CaseInsensitive);
     c->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
-    m_ui->cbSubject->lineEdit()->setCompleter(c);
+    m_ui->cbSubject->lineEdit()->setCompleter(c);*/
+    ((CompleterLineEdit *) m_ui->cbSubject->lineEdit())->addItems(QueryThread::queryResults(query, varName));
 
-    //query for PREDICATE
-    query =  m_ui->cbSubject->currentText() + " " + varName + " ";
-    query += VqbGlobal::constructObject(m_ui->checkBoxFilter->isChecked(),
-                                         m_ui->cbRelation->currentText(),
-                                         m_ui->cbObject->currentText(),
-                                         m_ui->cbType->currentText());
-    m_ui->cbPredicate->lineEdit()->setCompleter(new  QCompleter(QueryThread::queryResults(query, varName), this));
+    //query for PREDICATE autocompletion
+    query =  subject + " " + varName + " " + object;
+    c = new QCompleter(QueryThread::queryResults(query, varName), this);
+    c->setCaseSensitivity(Qt::CaseInsensitive);
+    m_ui->cbPredicate->lineEdit()->setCompleter(c);
 
-    //query for OBJECT
-    query = m_ui->cbSubject->currentText() + m_ui->cbPredicate->currentText() + varName;
-    m_ui->cbObject->lineEdit()->setCompleter(new  QCompleter(QueryThread::queryResults(query, varName), this));
+    //query for OBJECT autocompletiono
+    query = subject + " " + predicate + " " + varName;
+    c = new QCompleter(QueryThread::queryResults(query, varName), this);
+    c->setCaseSensitivity(Qt::CaseInsensitive);
+    m_ui->cbObject->lineEdit()->setCompleter(c);
 
 /*    //generate random name    
     setCompletersOS( qTh->runQuery( query, varName ) );
@@ -156,6 +159,9 @@ void VqbInstancesForm::colorLineEdits(bool hasResults)
 
 void VqbInstancesForm::init()
 {
+    //LineEdits
+    m_ui->cbSubject->setLineEdit(new CompleterLineEdit(m_ui->cbSubject));
+
     //triple updating signals
     //connect(m_ui->cbObject, SIGNAL(editTextChanged(QString)),
     connect(m_ui->cbSubject->lineEdit(), SIGNAL(editingFinished()),
@@ -194,7 +200,13 @@ void VqbInstancesForm::init()
     //initial GUI population
     updateTypes();
     updateCurrentTriple();
+}
 
+
+void VqbInstancesForm::updateVars()
+{
+    //FIXME: add to comboboxes and completers
+    //update m_varList;
 }
 
 

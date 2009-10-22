@@ -127,7 +127,8 @@ QStringList QueryThread::queryResults( QString query, QString freeVar )
                   val = n.uri().toString();
                   val = VqbGlobal::prefixForm( val );
               } else if ( n.isLiteral() ) {
-                  val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
+                  QString dtUri = n.literal().dataTypeUri().toString();
+                  val = "\"" + n.literal().toString() + "\"" + (dtUri.isEmpty() ? "" : "^^<"+ dtUri +">");
               }
               //kDebug() << "--- Found: " << val;
               res << val;

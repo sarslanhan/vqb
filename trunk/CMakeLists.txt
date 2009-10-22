@@ -22,6 +22,7 @@ set(vqb_SRCS
   sparqlhighlighter.cpp
   subjecttree.cpp
   querynode.cpp
+  completerlineedit.cpp
   )
 
 kde4_add_ui_files(vqb_SRCS vqbmainwindow.ui vqbinstancesform.ui)

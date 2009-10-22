@@ -6,7 +6,7 @@
 QStringList VqbGlobal::literalTypes()
 {
     //FIXME?: don't create it every time
-    return QStringList() << "URI" << "var" << "string" << "int" << "Literal";// <<"decimal" << "dateTime" <<;
+    return QStringList() << "URI" << "var" << "Literal" << "string" << "int";// <<"decimal" << "dateTime" <<;
 }
 
 QString VqbGlobal::typeRegExp(QString type)
@@ -18,7 +18,7 @@ QString VqbGlobal::typeRegExp(QString type)
         return QString("([\\?\\$]\\w+)");
     }
     else if(type=="URI") {
-         return QString("((\"[\\S\\s]*\"\\^\\^)?<[\\S\\s]*>)|(\\S+:\\S+)");//"[<[\\w+://]?\\S*>]|[w+:w+]");//URI
+         return QString("((\"[\\S\\s]*\"\\^\\^)?<[\\S\\s]*>)|(\\S+:\\S+)|(\"[\\S\\s]*\")");//"[<[\\w+://]?\\S*>]|[w+:w+]");//URI
     }
     else if(type=="int") {
         return QString("([+-]?\\d+)?");
@@ -116,6 +116,15 @@ QMap<QString, QString>  VqbGlobal::prefixes()
     prefixList.insert("xesam", "http://freedesktop.org/standards/xesam/1.0/core#");
     prefixList.insert("nao", "http://www.semanticdesktop.org/ontologies/2007/08/15/nao#");
     prefixList.insert("protege", "http://protege.stanford.edu/system#" );
+    prefixList.insert("robots","");
+    prefixList.insert("owl","http://www.w3.org/2002/07/owl#");
+    prefixList.insert("dbp","http://dbpedia.org/property/");
+    prefixList.insert("swrc","http://swrc.ontoware.org/ontology#");
+    prefixList.insert("d2rq","http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#");
+    prefixList.insert("nie","http://www.semanticdesktop.org/ontologies/2007/01/19/nie#");
+    prefixList.insert("dcmitype","http://purl.org/dc/dcmitype/");
+
+
     }
 
     return prefixList;

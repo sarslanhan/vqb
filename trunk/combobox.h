@@ -5,6 +5,10 @@
 
 //FIXME: rename to something more relevant
 
+/**
+  Custom QComboBox: having a variable name, and a signal returning it
+  */
+
 class ComboBox : public QComboBox
 {
     Q_OBJECT

@@ -19,12 +19,14 @@ private:
     Ui::VqbInstancesForm *m_ui;
     QString m_currentTriple;
     QString m_lastQuery;    
+    QStringList m_varList;
 
 private slots:
     void init();
     void updateCurrentTriple();
     void updateTypes();
     void updateCompleters();
+    void updateVars();
     void colorLineEdits(bool hasResults);//isEmpty specifies whether the current triple has any results or not
 
 
