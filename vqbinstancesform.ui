@@ -157,6 +157,14 @@
    <header>keditlistbox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cbSubject</tabstop>
+  <tabstop>cbPredicate</tabstop>
+  <tabstop>checkBoxFilter</tabstop>
+  <tabstop>cbRelation</tabstop>
+  <tabstop>cbObject</tabstop>
+  <tabstop>cbType</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <slots>

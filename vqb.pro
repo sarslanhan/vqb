@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     vqbinstancesform.cpp \
     vqbmainwindow.cpp \
     vqbschemaform.cpp \
-    vqbglobal.cpp
+    vqbglobal.cpp \
+    completerlineedit.cpp
 HEADERS += vqbform.h \
     querythread.h \
     constraint.h \
@@ -25,7 +26,8 @@ HEADERS += vqbform.h \
     vqbinstancesform.h \
     vqbmainwindow.h \
     vqbschemaform.h \
-    vqbglobal.h
+    vqbglobal.h \
+    completerlineedit.h
 FORMS += vqbinstancesform.ui \
     vqbmainwindow.ui
 OTHER_FILES += CMakeLists.txt \
