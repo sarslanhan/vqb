@@ -52,6 +52,7 @@ QString VqbGlobal::constructObject(bool filterOn, QString relation, QString expr
         finalForm += expression;
     }
     else if ( type == "Literal" ) {
+        //FIXME: handle quotes within strings - find some formatting function
         finalForm += "\"" + expression + "\"";
     }
     else if ( type == "string" ) {

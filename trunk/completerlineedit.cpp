@@ -8,20 +8,34 @@
 #include <KDebug>
 
 CompleterLineEdit::CompleterLineEdit(QWidget *parent)
-        : QLineEdit(parent), m_completer(0)
+        : KLineEdit(parent), m_completer(0)
 {
     setCompleter(new QCompleter(this));
-    completer()->setWidget(this);
-    completer()->popup()->setAlternatingRowColors( true );
-    QObject::connect(completer(), SIGNAL(activated(const QString&)),
-                  this, SLOT(setText(const QString&)));
 }
 
 
 void CompleterLineEdit::setCompleter(QCompleter *completer)
 {
-    kDebug() << "Setting completer to " << completer;
+    if(completer == m_completer) {
+        return;
+    }
+
+    if(m_completer) {
+        disconnect(m_completer, 0, this, 0);
+        if(m_completer->parent() == this) {
+            delete m_completer;
+        }
+    }
     m_completer = completer;
+
+    if(!m_completer) {
+        return;
+    }
+
+    m_completer->setWidget(this);
+    m_completer->popup()->setAlternatingRowColors( true );
+    QObject::connect(m_completer, SIGNAL(activated(QString)),
+                  this, SLOT(setText(QString)));
 }
 
 
@@ -33,41 +47,51 @@ QCompleter *CompleterLineEdit::completer() const
 
 void CompleterLineEdit::keyPressEvent(QKeyEvent *e)
 {
-   if( e->key() == Qt::Key_Backspace ) {
+    KLineEdit::keyPressEvent(e);
+    return;
+
+    if(e->key() == Qt::Key_Backspace) {
        backspace();
        e->accept();
-   }
-   else if (e->key() == Qt::Key_Delete) {
+    }
+    else if (e->key() == Qt::Key_Delete) {
        del();
        e->accept();
-   }
-   else if ( e->key() == Qt::Key_Down ) {
-       QLineEdit::keyPressEvent( e );
+    }
+    else if (e->key() == Qt::Key_Down) {
+       KLineEdit::keyPressEvent(e);
        e->accept();
-   }
-   else if( e->key() & 0x01000000 ) { //all other non-text keys
-       QLineEdit::keyPressEvent( e );
+    }
+    else if(e->key() & 0x01000000) { //all other non-text keys
+       KLineEdit::keyPressEvent(e);
        return; // let the completer do default behavior
-   }
-   else {
-       QLineEdit::keyPressEvent( e );
+    }
+    else {
+       KLineEdit::keyPressEvent(e);
        e->accept();
-   }  
+    }
 
     QStringList completionList;
-    foreach( QString item, m_items ) {
+    foreach(QString item, m_items) {
         if(item.contains(text(), Qt::CaseInsensitive)) {
             //FIXME: highlight autocompletion expression
             completionList << item;
         }
     }
-    kDebug() << (int)completer() << " " << (int) m_completer;
-    completer()->setModel(new QStringListModel(completionList));
+    //m_completer->setModel(new QStringListModel(completionList));
+
+    QStringListModel *model = new QStringListModel();
+    model->setStringList(completionList);
+
+    m_completer->setModel(model);
+    //CompleterLineEdit::setCompleter(new QCompleter(model, this));
 
     //create completer with empty prefix, and show popup
-    completer()->setCompletionPrefix( "" );
-    completer()->popup()->setCurrentIndex(completer()->completionModel()->index(0, 0));
-    completer()->complete();
+    m_completer->setCompletionPrefix( "" );
+    m_completer->popup()->setCurrentIndex(m_completer->completionModel()->index(0, 0));
+    m_completer->complete();
+
+
 }
 
 

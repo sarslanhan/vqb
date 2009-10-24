@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>720</width>
-    <height>320</height>
+    <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>50</y>
+     <y>10</y>
      <width>311</width>
      <height>221</height>
     </rect>
@@ -138,10 +138,46 @@
    <property name="geometry">
     <rect>
      <x>330</x>
-     <y>50</y>
+     <y>10</y>
      <width>371</width>
      <height>221</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listVars">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>250</y>
+     <width>211</width>
+     <height>121</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="KPushButton" name="buttonAddToOutput">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>280</y>
+     <width>131</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Add to Output</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>240</x>
+     <y>260</y>
+     <width>78</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Variables:</string>
    </property>
   </widget>
  </widget>
@@ -155,6 +191,11 @@
    <class>KEditListBox</class>
    <extends>QGroupBox</extends>
    <header>keditlistbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KPushButton</class>
+   <extends>QPushButton</extends>
+   <header>kpushbutton.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

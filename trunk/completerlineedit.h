@@ -1,12 +1,12 @@
 #ifndef COMPLETERLINEEDIT_H
 #define COMPLETERLINEEDIT_H
 
-#include <QLineEdit>
+#include <KLineEdit>
 #include <QSet>
 
 class QCompleter;
 
-class CompleterLineEdit : public QLineEdit
+class CompleterLineEdit : public KLineEdit
 {
     Q_OBJECT
 
