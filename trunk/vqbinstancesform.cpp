@@ -105,7 +105,6 @@ void VqbInstancesForm::updateCompleters()
     query = varName + " " + predicate + " " + object + " . " + m_queryPart;
     kDebug() << "============= " << query;
     //CompleterLineEdit *cle = ((CompleterLineEdit *) m_ui->cbSubject->lineEdit());//>addItems(QueryThread::queryResults(query, varName));
-    //cle->completionObject()->setItems(QueryThread::queryResults(query, varName));;//new KCompletion();
     ((KLineEdit*)m_ui->cbSubject->lineEdit())->completionObject()->setItems(QueryThread::queryResults(query, varName));;
 
     query =  subject + " " + varName + " " + object + m_queryPart;
@@ -195,10 +194,9 @@ void VqbInstancesForm::colorLineEdits(bool hasResults)
 void VqbInstancesForm::init()
 {
     //LineEdits
-    /*m_ui->cbSubject->setLineEdit(new CompleterLineEdit(m_ui->cbSubject));
+    m_ui->cbSubject->setLineEdit(new CompleterLineEdit(m_ui->cbSubject));
     m_ui->cbPredicate->setLineEdit(new CompleterLineEdit(m_ui->cbPredicate));
     m_ui->cbObject->setLineEdit(new CompleterLineEdit(m_ui->cbObject));
-    */
 
     //initializations
     m_ui->cbSubject->lineEdit()->setText("?s");
