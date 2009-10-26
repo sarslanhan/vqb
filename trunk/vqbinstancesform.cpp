@@ -22,6 +22,7 @@ VqbInstancesForm::VqbInstancesForm(VqbMainWindow *parent) :
 {
     m_ui->setupUi(this);
     init();
+    kDebug() << "Init done";
 }
 
 VqbInstancesForm::~VqbInstancesForm()
@@ -103,17 +104,13 @@ void VqbInstancesForm::updateCompleters()
 
     //autocompletion
     query = varName + " " + predicate + " " + object + " . " + m_queryPart;
-    kDebug() << "============= " << query;
-    //CompleterLineEdit *cle = ((CompleterLineEdit *) m_ui->cbSubject->lineEdit());//>addItems(QueryThread::queryResults(query, varName));
-    ((KLineEdit*)m_ui->cbSubject->lineEdit())->completionObject()->setItems(QueryThread::queryResults(query, varName));;
+    m_queryThreads[0]->startIncrementalQuery(query, varName);
 
     query =  subject + " " + varName + " " + object + m_queryPart;
-    //((CompleterLineEdit *) m_ui->cbPredicate->lineEdit())->addItems(QueryThread::queryResults(query, varName));
-    ((KLineEdit*)m_ui->cbPredicate->lineEdit())->completionObject()->setItems(QueryThread::queryResults(query, varName));;
+    m_queryThreads[1]->startIncrementalQuery(query, varName);
 
     query = subject + " " + predicate + " " + varName + m_queryPart;
-    //((CompleterLineEdit *) m_ui->cbObject->lineEdit())->addItems(QueryThread::queryResults(query, varName));
-    ((KLineEdit*)m_ui->cbObject->lineEdit())->completionObject()->setItems(QueryThread::queryResults(query, varName));;
+    m_queryThreads[2]->startIncrementalQuery(query, varName);
 }
 
 
@@ -170,6 +167,7 @@ void VqbInstancesForm::colorLineEdits(bool hasResults)
     QPalette paletteWhite( lO->palette() );//white palette
     paletteWhite.setColor( QPalette::Base, Qt::white );
 
+    //FIXME:we should probably color everything. When a variable occurs twice, the results might be null because of that
     //perform the coloring
     if ( !rx.exactMatch( lS->text() ) ) {
         lS->setPalette(paletteColored);
@@ -193,12 +191,21 @@ void VqbInstancesForm::colorLineEdits(bool hasResults)
 
 void VqbInstancesForm::init()
 {
+    //query threads
+    m_queryThreads.append(new QueryThread(this));
+    m_queryThreads.append(new QueryThread(this));
+    m_queryThreads.append(new QueryThread(this));
+
     //LineEdits
     m_ui->cbSubject->setLineEdit(new CompleterLineEdit(m_ui->cbSubject));
     m_ui->cbPredicate->setLineEdit(new CompleterLineEdit(m_ui->cbPredicate));
     m_ui->cbObject->setLineEdit(new CompleterLineEdit(m_ui->cbObject));
 
-    //initializations
+    connect(m_queryThreads[0], SIGNAL(resultFound(QString)), (CompleterLineEdit *) m_ui->cbSubject->lineEdit(), SLOT(addItem(QString)));
+    connect(m_queryThreads[1], SIGNAL(resultFound(QString)), (CompleterLineEdit *) m_ui->cbPredicate->lineEdit(), SLOT(addItem(QString)));
+    connect(m_queryThreads[2], SIGNAL(resultFound(QString)), (CompleterLineEdit *) m_ui->cbObject->lineEdit(), SLOT(addItem(QString)));
+
+    //initializations    
     m_ui->cbSubject->lineEdit()->setText("?s");
     m_ui->cbPredicate->lineEdit()->setText("?p");
     m_ui->cbObject->lineEdit()->setText("?o");
@@ -235,7 +242,7 @@ void VqbInstancesForm::init()
 
     //initial GUI population
     updateTypes();
-    updateCurrentTriple();
+    //updateCurrentTriple();
 }
 
 

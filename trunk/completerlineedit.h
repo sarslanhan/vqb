@@ -1,8 +1,7 @@
 #ifndef COMPLETERLINEEDIT_H
 #define COMPLETERLINEEDIT_H
 
-#include <KLineEdit>
-#include <QSet>
+#include </home/kde-devel/kde/include/klineedit.h>
 
 class CompleterLineEdit : public KLineEdit
 {
@@ -13,13 +12,14 @@ public:
 
 public slots:
     void addItems(QStringList items);
+    void addItem(QString item);
     void clearItems();
 
 protected slots:
     void makeCompletion (const QString &);
 
 private:
-    QSet<QString> *m_items;
+    QString m_lastText;
 };
 
 #endif // COMPLETERLINEEDIT_H

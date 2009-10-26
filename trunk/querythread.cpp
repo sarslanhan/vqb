@@ -5,6 +5,7 @@
 #include <QList>
 #include <QStringList>
 #include <QMutex>
+#include <QTimer>
 
 #include <Soprano/Soprano>
 #include <Soprano/Model>
@@ -21,6 +22,7 @@ QueryThread::QueryThread(QObject *parent)
 {
     qRegisterMetaType<QList<StringPair> >("QList<StringPair>");//user-defined types need to be registered to be used as signals
     m_query = "SELECT DISTINCT ?s WHERE { ?s ?p ?o } LIMIT 50";
+    m_timer = new QTimer(this);
 }
 
 void QueryThread::run()
@@ -105,12 +107,52 @@ Soprano::Model* QueryThread::nepomukMainModel()
     return s_im;
 }
 
+void QueryThread::startIncrementalQuery( QString query, QString var )
+{
+/*
+    QString s = "SELECT " + var + " WHERE { " + query + " }";
+    //add prefixes    
+    s = VqbGlobal::addPrefixes( s );
+    //kDebug() << "--- Running query: " << s;
+
+    Soprano::Model* m = QueryThread::nepomukMainModel();
+    Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
+    QStringList res;
+    QList<Soprano::BindingSet> allStatements = it.allBindings();
+
+    QString val;
+    foreach (Soprano::BindingSet s, allStatements ) {
+              Soprano::Node n = s.value(freeVar.replace("?", ""));
+              if ( n.isResource() ) {
+                  val = n.uri().toString();
+                  val = VqbGlobal::prefixForm( val );
+              } else if ( n.isLiteral() ) {
+                  QString dtUri = n.literal().dataTypeUri().toString();
+                  val = "\"" + n.literal().toString() + "\"" + (dtUri.isEmpty() ? "" : "^^<"+ dtUri +">");
+              }
+              //kDebug() << "--- Found: " << val;
+              res << val;
+    }
+
+    return res;
+*/
+    m_timer->stop();
+    disconnect(m_timer, SIGNAL(timeout()), 0, 0);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(fireTestIncrement()));
+    m_timer->start(500);
+}
+
+void QueryThread::fireTestIncrement()
+{
+    emit resultFound(VqbGlobal::randomVarName());
+}
+
 /**************** SYCHRONOUS utility methods ************/
 
 
 QStringList QueryThread::queryResults( QString query, QString freeVar )
 {
-    QString s = "SELECT DISTINCT " + freeVar + " WHERE { " + query + " } LIMIT 50";//"SELECT * WHERE {" + query + "} LIMIT 1";
+    QString s = "SELECT DISTINCT " + freeVar + " WHERE { " + query + " } LIMIT 100";//"SELECT * WHERE {" + query + "} LIMIT 1";
     //add prefixes
     s = VqbGlobal::addPrefixes( s );
     //kDebug() << "--- Running query: " << s;
