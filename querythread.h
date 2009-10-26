@@ -2,8 +2,7 @@
 #define QUERYTHREAD_H
 
 #include <QThread>
-class QString;
-class QStringList;
+class QTimer;
 
 namespace Soprano
 {
@@ -48,11 +47,27 @@ public:
     */
     static int countQueryResults( QString query );
 
+
+public slots:
+
+    /** Runs a query and incrementally fires the results using the resultFound signal
+    */
+    void startIncrementalQuery(QString query, QString var);
+
+
 signals:
     void queryDone(QList<StringPair>);
+    void resultFound(QString item);
+
+
+private slots:
+    //temporary function
+    void fireTestIncrement();
+
 
 private:
     QString m_query;
+    QTimer *m_timer;
 
     static Soprano::Model* nepomukMainModel();
 

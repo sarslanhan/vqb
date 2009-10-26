@@ -3,6 +3,7 @@
 
 #include "vqbform.h"
 class VqbMainWindow;
+class QueryThread;
 
 namespace Ui {
     class VqbInstancesForm;
@@ -30,6 +31,7 @@ private:
     QString m_currentTriple;
     QString m_lastTriple;
     QStringList m_varList;
+    QList<QueryThread*> m_queryThreads;
 
     QString m_queryPart;
 
