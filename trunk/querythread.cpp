@@ -1,11 +1,12 @@
 #include "querythread.h"
 #include "vqbglobal.h"
-
 #include <QString>
 #include <QList>
 #include <QStringList>
 #include <QMutex>
 #include <QTimer>
+#include <QSet>
+#include <QPair>
 
 #include <Soprano/Soprano>
 #include <Soprano/Model>
@@ -20,66 +21,102 @@
 QueryThread::QueryThread(QObject *parent)
         : QThread(parent)
 {
-    qRegisterMetaType<QList<StringPair> >("QList<StringPair>");//user-defined types need to be registered to be used as signals
-    m_query = "SELECT DISTINCT ?s WHERE { ?s ?p ?o } LIMIT 50";
-    m_timer = new QTimer(this);
+    qRegisterMetaType<QList<QPair<QString, QString> > >("QList<QPair<QString, QString> >");//user-defined types need to be registered to be used as signals
 }
 
 void QueryThread::run()
 {
+    if(m_queryMode == QueryThread::SingleQuery) {
+        singleQuery();
+    }
+    else if(m_queryMode == QueryThread::IncrementalQuery) {
+        incrementalQuery();
+    }
+}
+
+void QueryThread::singleQuery()
+{
     //kDebug() << "\n\n *** Querying: " << m_query;
     Soprano::Model* m = QueryThread::nepomukMainModel();
-    //FIXME: see if there's a query syntax checker in Soprano
     Soprano::QueryResultIterator it = m->executeQuery(m_query, Soprano::Query::QueryLanguageSparql);
 
-    //QList<Soprano::Node> resNodes;
-    QList<StringPair> res;
+    QList<QPair<QString,QString> > res;
     QList<Soprano::BindingSet> allStatements = it.allBindings();
 
-    StringPair  val;
+    QPair<QString,QString>   val;
     Soprano::Node n;
     foreach(Soprano::BindingSet s, allStatements) {
 
         n = s.value(0);
         if (n.isResource()) {
-            val.s1 = n.uri().toString();
+            val.first = n.uri().toString();
             //val = VisualQueryBuilderConsts::getPrefixForm( val );
         } else if (n.isLiteral()) {
             //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
-            val.s1 = n.literal().toString();
+            val.first = n.literal().toString();
             //kDebug() << "__||__ Datatype: " << n.dataType();
         }
 
         n = s.value(1);
         if (n.isResource()) {
-            val.s2 = n.uri().toString();
+            val.second = n.uri().toString();
             //val = VisualQueryBuilderConsts::getPrefixForm( val );
         } else if (n.isLiteral()) {
             //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
-            val.s2 = n.literal().toString();
+            val.second = n.literal().toString();
             //kDebug() << "__||__ Datatype: " << n.dataType();
         }
 
         //kDebug() << "Found: " << val.s1 << val.s2;
-        res << val;
-        //resNodes << n;
+        res.append(val);
     }
 
     //kDebug() << "\n\n ===> Results: " << ": \n";
-    //foreach( StringPair s, res ) { kDebug() << s.s1 << s.s2 << endl; }
-
-
     emit queryDone(res);
-    //emit queryDoneNodes( resNodes );
 }
 
-void QueryThread::setQuery(QString query)
+void QueryThread::incrementalQuery()
+{
+    QString s = "SELECT " + this->m_varName + " WHERE { " + this->m_query + " }";
+    //add prefixes
+    s = VqbGlobal::addPrefixes( s );
+    kDebug() << "--- Running query: " << s;
+
+    Soprano::Model* m = QueryThread::nepomukMainModel();
+    Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
+    QSet<QString> results;
+    QList<Soprano::BindingSet> allStatements = it.allBindings();
+
+    QString val;
+    foreach (Soprano::BindingSet s, allStatements ) {
+              Soprano::Node n = s.value(this->m_varName.replace("?", ""));
+              if ( n.isResource() ) {
+                  val = n.uri().toString();
+                  val = VqbGlobal::prefixForm( val );
+              } else if ( n.isLiteral() ) {
+                  QString dtUri = n.literal().dataTypeUri().toString();
+                  val = "\"" + n.literal().toString() + "\"" + (dtUri.isEmpty() ? "" : "^^<"+ dtUri +">");
+              }
+              //kDebug() << "--- Found: " << val;
+              if(!results.contains(val)) {
+                  //kDebug() << "Item found: " << val;
+                  emit(resultFound(val));//notification of a new item
+                  results.insert(val);
+              }
+    }
+}
+
+void QueryThread::setQuery(QString query, QString varName, QueryMode queryMode)
 {
     m_query = query;
+    m_varName = varName;
+    m_queryMode = queryMode;
 }
 
+/**************** utility functions ************/
+
 static Soprano::Model *s_model = 0;
-static Soprano::Inference::InferenceModel *s_im = 0;
+//static Soprano::Inference::InferenceModel *s_im = 0;
 
 Soprano::Model* QueryThread::nepomukMainModel()
 {
@@ -96,59 +133,17 @@ Soprano::Model* QueryThread::nepomukMainModel()
         s_model = new Soprano::Util::DummyModel();
     }
 
-    //return s_model;
-    if (!s_im) {
+    /*if (!s_im) {
         s_im = new Soprano::Inference::InferenceModel(s_model);
     //s_im->addStatements( s_model->listStatements().allStatements() );
         s_im->performInference();
     }
+    */
 
     mutex.unlock();
-    return s_im;
+    //return s_im;
+    return s_model;
 }
-
-void QueryThread::startIncrementalQuery( QString query, QString var )
-{
-/*
-    QString s = "SELECT " + var + " WHERE { " + query + " }";
-    //add prefixes    
-    s = VqbGlobal::addPrefixes( s );
-    //kDebug() << "--- Running query: " << s;
-
-    Soprano::Model* m = QueryThread::nepomukMainModel();
-    Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
-    QStringList res;
-    QList<Soprano::BindingSet> allStatements = it.allBindings();
-
-    QString val;
-    foreach (Soprano::BindingSet s, allStatements ) {
-              Soprano::Node n = s.value(freeVar.replace("?", ""));
-              if ( n.isResource() ) {
-                  val = n.uri().toString();
-                  val = VqbGlobal::prefixForm( val );
-              } else if ( n.isLiteral() ) {
-                  QString dtUri = n.literal().dataTypeUri().toString();
-                  val = "\"" + n.literal().toString() + "\"" + (dtUri.isEmpty() ? "" : "^^<"+ dtUri +">");
-              }
-              //kDebug() << "--- Found: " << val;
-              res << val;
-    }
-
-    return res;
-*/
-    m_timer->stop();
-    disconnect(m_timer, SIGNAL(timeout()), 0, 0);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(fireTestIncrement()));
-    m_timer->start(500);
-}
-
-void QueryThread::fireTestIncrement()
-{
-    emit resultFound(VqbGlobal::randomVarName());
-}
-
-/**************** SYCHRONOUS utility methods ************/
-
 
 QStringList QueryThread::queryResults( QString query, QString freeVar )
 {
@@ -185,6 +180,7 @@ int QueryThread::countQueryResults( QString query )
     Soprano::QueryResultIterator it = QueryThread::nepomukMainModel()->executeQuery( query, Soprano::Query::QueryLanguageSparql );
     return it.allBindings().count();
 }
+
 
 #include "querythread.moc"
 

@@ -2,18 +2,12 @@
 #define QUERYTHREAD_H
 
 #include <QThread>
-class QTimer;
+#include <QPair>
 
 namespace Soprano
 {
 class Model;
 }
-
-//FIXME:: QPair makes this redundant
-struct StringPair {
-public:
-    QString s1, s2;
-};
 
 /*! Thread class that executes queries (and performs some utility functions)
 */
@@ -23,54 +17,44 @@ class QueryThread : public QThread
     Q_OBJECT
 
 public:
+    enum QueryMode{ SingleQuery, IncrementalQuery };
+
     QueryThread(QObject *parent);
 
-    /** Runs the query and extracts the first two bindings
-     *  (if the second one is invalid, it returns invalid nodes).
+    /** Runs the query:
+        - for SingleQuery: extracts the first two bindings
+        - for IncrementalQuery: extracts the binding corresponding to varName
      */
     void run();
 
-    /** Sets the query to be run on the RDF repository
+    /** Sets the query to be run on the RDF repository with the run() function
     */
-    void setQuery(QString query);
+    void setQuery(QString query, QString varName = QString(), QueryMode queryMode = QueryThread::SingleQuery);
 
-
-    /** Static SYNCHRONOUS utility function.
+    /** SYNCHRONOUS utility function.
        Returns query results of a simple SELECT query
        query - the query to run
        freeVar - the variable to get bindings for
     */
     static QStringList queryResults( QString query, QString freeVar );
 
-    /** Static SYNCHRONOUS utility function.
+    /** SYNCHRONOUS utility function.
         Counts the query results of a simple SELECT query
     */
     static int countQueryResults( QString query );
 
-
-public slots:
-
-    /** Runs a query and incrementally fires the results using the resultFound signal
-    */
-    void startIncrementalQuery(QString query, QString var);
-
-
 signals:
-    void queryDone(QList<StringPair>);
+    void queryDone(QList<QPair<QString, QString> >);
     void resultFound(QString item);
 
-
-private slots:
-    //temporary function
-    void fireTestIncrement();
-
-
 private:
-    QString m_query;
-    QTimer *m_timer;
-
+    void singleQuery();//fires results at the end
+    void incrementalQuery();//fires each result item in turn
     static Soprano::Model* nepomukMainModel();
 
+    QString m_query;
+    QString m_varName;
+    QueryMode m_queryMode;
 };
 
 #endif // QUERYTHREAD_H

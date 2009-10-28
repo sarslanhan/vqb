@@ -117,7 +117,7 @@ QMap<QString, QString>  VqbGlobal::prefixes()
     prefixList.insert("xesam", "http://freedesktop.org/standards/xesam/1.0/core#");
     prefixList.insert("nao", "http://www.semanticdesktop.org/ontologies/2007/08/15/nao#");
     prefixList.insert("protege", "http://protege.stanford.edu/system#" );
-    prefixList.insert("robots","");
+    //prefixList.insert("robots","");
     prefixList.insert("owl","http://www.w3.org/2002/07/owl#");
     prefixList.insert("dbp","http://dbpedia.org/property/");
     prefixList.insert("swrc","http://swrc.ontoware.org/ontology#");
