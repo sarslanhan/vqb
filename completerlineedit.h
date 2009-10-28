@@ -13,7 +13,6 @@ public:
 public slots:
     void addItems(QStringList items);
     void addItem(QString item);
-    void clearItems();
 
 protected slots:
     void makeCompletion (const QString &);

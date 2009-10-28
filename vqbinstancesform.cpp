@@ -104,13 +104,14 @@ void VqbInstancesForm::updateCompleters()
 
     //autocompletion
     query = varName + " " + predicate + " " + object + " . " + m_queryPart;
-    m_queryThreads[0]->startIncrementalQuery(query, varName);
+    //m_queryThreads[0]->startIncrementalQuery(query, varName);
+    kDebug() << "Query started";
 
     query =  subject + " " + varName + " " + object + m_queryPart;
-    m_queryThreads[1]->startIncrementalQuery(query, varName);
+    //m_queryThreads[1]->startIncrementalQuery(query, varName);
 
     query = subject + " " + predicate + " " + varName + m_queryPart;
-    m_queryThreads[2]->startIncrementalQuery(query, varName);
+    //m_queryThreads[2]->startIncrementalQuery(query, varName);
 }
 
 

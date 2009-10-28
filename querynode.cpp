@@ -3,11 +3,12 @@
 #include "combobox.h"
 
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QSize>
 #include <QList>
 #include <QPushButton>
-#include <KPushButton>
 
+#include <KPushButton>
 #include <KDebug>
 #include <KRandom>
 
@@ -91,7 +92,7 @@ QueryNode::~QueryNode()
 void QueryNode::findObjects()
 {
     QueryThread *qt = new QueryThread(this);
-    connect(qt, SIGNAL(queryDone(QList<StringPair>)), this, SLOT(addSubjects(QList<StringPair>)));
+    connect(qt, SIGNAL(queryDone(QList<QPair<QString,QString> >)), this, SLOT(addSubjects(QList<QPair<QString,QString> >)));
     QString query;
 
     if(!d->parentClass.isEmpty()) { //if not root node
@@ -114,7 +115,7 @@ void QueryNode::findObjects()
 void QueryNode::findPredicates()
 {
     QueryThread *qt = new QueryThread(this);
-    connect(qt, SIGNAL(queryDone(QList<StringPair>)), this, SLOT(addPredicates(QList<StringPair>)));
+    connect(qt, SIGNAL(queryDone(QList<QPair<QString,QString> >)), this, SLOT(addPredicates(QList<QPair<QString,QString> >)));
 
     QString query = QString("SELECT DISTINCT ?label ?property WHERE {"
                             " { "
@@ -132,7 +133,7 @@ void QueryNode::findPredicates()
 
 /**** INTERFACE AND TREE MANIPULATIONS ******/
 
-void QueryNode::addSubjects(QList<StringPair> subjects)
+void QueryNode::addSubjects(QList<QPair<QString,QString> > subjects)
 {
     //cleanup
     removeRestrictions();
@@ -141,9 +142,12 @@ void QueryNode::addSubjects(QList<StringPair> subjects)
 
 
     //add subjects
-    foreach(StringPair sp, subjects) {
-        d->objectCB->addItem(sp.s1, sp.s2);  //add s2 as the data associated to the item
-        //kDebug() << "++**++ Added item" << sp.s1 << sp.s2;
+    //foreach(QPair<QString, QString> sp, subjects) {
+    QPair<QString, QString> sp;
+    for(int i=0; i<subjects.count(); i++) {
+        sp = subjects[i];
+        d->objectCB->addItem(sp.first, sp.second);  //add s2 as the data associated to the item
+        //kDebug() << "++**++ Added item" << sp.first << sp.second;
     }
 
     if(d->objectCB->count() == 1) {
@@ -198,13 +202,16 @@ void QueryNode::addSubjects(QList<StringPair> subjects)
     updateQueryPart();
 }
 
-void QueryNode::addPredicates(QList<StringPair> predicates)
+void QueryNode::addPredicates(QList<QPair<QString,QString> > predicates)
 {
     d->predicateCB->blockSignals(true);  //don't trigger object population
     d->predicateCB->clear();
-    foreach(StringPair sp, predicates) {
+    //foreach(QPair<QString,QString>  sp, predicates) {
+    QPair<QString, QString> sp;
+    for(int i=0; i<predicates.count(); i++) {
+        sp = predicates[i];
         //FIXME: if label is empty, parse (I don't know what I meant by this)
-        d->predicateCB->addItem(sp.s1.isEmpty() ? sp.s2 : sp.s1, sp.s2);  //add s2 as the data associated to the item
+        d->predicateCB->addItem(sp.first.isEmpty() ? sp.second : sp.first, sp.second);  //add s2 as the data associated to the item
     }
     d->predicateCB->setCurrentIndex(-1);  //insertItem( 0, "?p" );
     d->predicateCB->blockSignals(false);

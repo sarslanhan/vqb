@@ -10,7 +10,7 @@
 #include <KCompletionBox>
 
 CompleterLineEdit::CompleterLineEdit(QWidget *parent)
-        : KLineEdit(parent), m_items(new QSet<QString>)
+        : KLineEdit(parent)
 {
     completionBox()->setActivateOnSelect(false);
 }
@@ -37,11 +37,6 @@ void CompleterLineEdit::addItem(QString newItem)
         doCompletion(text());
         completionBox()->setCurrentItem(item);
     }
-}
-
-void CompleterLineEdit::clearItems()
-{
-    m_items->clear();
 }
 
 #include "completerlineedit.moc"
