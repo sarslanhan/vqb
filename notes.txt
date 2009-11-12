@@ -9,10 +9,10 @@ VqbFormSchema:
 - fix CB size problems
 - introduce variables
 - ? color comboboxes that have been added to the output? (setStyleSheet)
+- use prefix form for the QStringPair results
 
 VqbFormInstances:
 - clarify URI/Literal/String in the case of string values, e.g. "tag"
-- implement queryChanged()
 
 
 
@@ -20,11 +20,6 @@ VqbFormInstances:
 - something like using WordNet for similar words, and searching based on that
 - When adding to Konduit: add it to a *different folder*
 - KDE4 HCI Checklist
-
-**** Thesis
-
-- emphasize data-driven aspect
-
 
 
 **** Old-Vqb style Vqb ----------

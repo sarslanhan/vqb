@@ -11,7 +11,6 @@ public:
     CompleterLineEdit(QWidget *parent = 0);
 
 public slots:
-    void addItems(QStringList items);
     void addItem(QString item);
 
 protected slots:

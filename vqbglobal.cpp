@@ -113,19 +113,25 @@ QMap<QString, QString>  VqbGlobal::prefixes()
     prefixList.insert("dc", "http://purl.org/dc/elements/1.1/");
     prefixList.insert("dcterms", "http://purl.org/dc/terms/");
     prefixList.insert("foaf", "http://xmlns.com/foaf/0.1/");
-    prefixList.insert("nrl", "http://www.semanticdesktop.org/ontologies/2007/08/15/nrl#");
-    prefixList.insert("xesam", "http://freedesktop.org/standards/xesam/1.0/core#");
-    prefixList.insert("nao", "http://www.semanticdesktop.org/ontologies/2007/08/15/nao#");
     prefixList.insert("protege", "http://protege.stanford.edu/system#" );
-    //prefixList.insert("robots","");
     prefixList.insert("owl","http://www.w3.org/2002/07/owl#");
     prefixList.insert("dbp","http://dbpedia.org/property/");
     prefixList.insert("swrc","http://swrc.ontoware.org/ontology#");
     prefixList.insert("d2rq","http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#");
-    prefixList.insert("nie","http://www.semanticdesktop.org/ontologies/2007/01/19/nie#");
     prefixList.insert("dcmitype","http://purl.org/dc/dcmitype/");
+    prefixList.insert("geo","http://www.w3.org/2003/01/geo/wgs84_pos#");
 
-
+    prefixList.insert("xesam", "http://freedesktop.org/standards/xesam/1.0/core#");
+    prefixList.insert("nrl", "http://www.semanticdesktop.org/ontologies/2007/08/15/nrl#");
+    prefixList.insert("nie","http://www.semanticdesktop.org/ontologies/2007/01/19/nie#");
+    prefixList.insert("nao", "http://www.semanticdesktop.org/ontologies/2007/08/15/nao#");
+    prefixList.insert("nfo","http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#");
+    prefixList.insert("nexif","http://www.semanticdesktop.org/ontologies/2007/05/10/nexif#");
+    prefixList.insert("nco","http://www.semanticdesktop.org/ontologies/2007/03/22/nco#");
+    prefixList.insert("nmo","http://www.semanticdesktop.org/ontologies/2007/03/22/nmo#");
+    prefixList.insert("nid3","http://www.semanticdesktop.org/ontologies/2007/05/10/nid3#");
+    prefixList.insert("ncal","http://www.semanticdesktop.org/ontologies/2007/04/02/ncal#");
+    prefixList.insert("pimo","http://www.semanticdesktop.org/ontologies/2007/11/01/pimo#");
     }
 
     return prefixList;

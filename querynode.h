@@ -2,7 +2,7 @@
 #define QUERYNODE_H
 
 #include <QVBoxLayout>
-#include <QPair>
+#include "querythread.h"
 
 class QueryNode : public QVBoxLayout
 {
@@ -16,8 +16,8 @@ public:
     QString queryPart();
 
 public slots:
-    void addSubjects(QList<QPair<QString,QString> > subjectList);
-    void addPredicates(QList<QPair<QString,QString> > predicateList);
+    void addSubjects(QList<QStringPair> subjectList);
+    void addPredicates(QList<QStringPair > predicateList);
 
 signals:
     void queryPartChanged(QString queryPart);
