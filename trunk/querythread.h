@@ -4,6 +4,8 @@
 #include <QThread>
 #include <QPair>
 
+typedef QPair<QString, QString> QStringPair;
+
 namespace Soprano
 {
 class Model;
@@ -44,7 +46,7 @@ public:
     static int countQueryResults( QString query );
 
 signals:
-    void queryDone(QList<QPair<QString, QString> >);
+    void queryDone(QList<QStringPair>);
     void resultFound(QString item);
 
 private:

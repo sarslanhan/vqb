@@ -13,7 +13,7 @@ void SparqlHighlighter::highlightBlock(const QString &text)
     QTextCharFormat myClassFormat;
     myClassFormat.setFontWeight(QFont::Bold);
     myClassFormat.setForeground(Qt::darkMagenta);
-    QString pattern = "(\\b|\\s)(SELECT|DISTINCT|WHERE|FILTER|a)\\s";
+    QString pattern = "\\b(SELECT|DISTINCT|WHERE|FILTER|PREFIX|a)\\b";
 
     QRegExp expression(pattern);
     int index = text.indexOf(expression);
@@ -26,7 +26,7 @@ void SparqlHighlighter::highlightBlock(const QString &text)
     //strings and values
     myClassFormat.setFontWeight(QFont::Normal);
     myClassFormat.setForeground(Qt::darkGreen);
-    pattern = "(\"[\\S\\s]*\")|'[\\S\\s]*')|((\\b|\\s)\\d+)";
+    pattern = "(\".*\")|('.*')|(\\d+)";;
 
     expression.setPattern(pattern);
     index = text.indexOf(expression);
@@ -50,9 +50,10 @@ void SparqlHighlighter::highlightBlock(const QString &text)
     }
 
     //vars
+    //FIXME: this doesn't work, if the var is at the beginning of the row
     myClassFormat.setFontWeight(QFont::Normal);
     myClassFormat.setForeground(Qt::red);
-    pattern = "(\\b|\\s|\\W)\\?\\w+\\b";
+    pattern = "(\\?|\\$)[A-Za-z]\\w*";
 
     expression.setPattern(pattern);
     index = text.indexOf(expression);

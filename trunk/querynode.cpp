@@ -1,6 +1,7 @@
 #include "querynode.h"
-#include "querythread.h"
+//#include "querythread.h"
 #include "combobox.h"
+#include "vqbglobal.h"
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -12,7 +13,7 @@
 #include <KDebug>
 #include <KRandom>
 
-static const QSize GlobalSize(120, 20);//global size for most screen elements
+static const QSize GlobalSize(200, 20);//global size for most screen elements
 static const int IndentSize = 40;
 static const QStringList RelationList( QStringList() << "contains" << "equals" );
 
@@ -92,7 +93,7 @@ QueryNode::~QueryNode()
 void QueryNode::findObjects()
 {
     QueryThread *qt = new QueryThread(this);
-    connect(qt, SIGNAL(queryDone(QList<QPair<QString,QString> >)), this, SLOT(addSubjects(QList<QPair<QString,QString> >)));
+    connect(qt, SIGNAL(queryDone(QList<QStringPair>)), this, SLOT(addSubjects(QList<QStringPair>)));
     QString query;
 
     if(!d->parentClass.isEmpty()) { //if not root node
@@ -115,7 +116,7 @@ void QueryNode::findObjects()
 void QueryNode::findPredicates()
 {
     QueryThread *qt = new QueryThread(this);
-    connect(qt, SIGNAL(queryDone(QList<QPair<QString,QString> >)), this, SLOT(addPredicates(QList<QPair<QString,QString> >)));
+    connect(qt, SIGNAL(queryDone(QList<QStringPair>)), this, SLOT(addPredicates(QList<QStringPair>)));
 
     QString query = QString("SELECT DISTINCT ?label ?property WHERE {"
                             " { "
@@ -133,7 +134,7 @@ void QueryNode::findPredicates()
 
 /**** INTERFACE AND TREE MANIPULATIONS ******/
 
-void QueryNode::addSubjects(QList<QPair<QString,QString> > subjects)
+void QueryNode::addSubjects(QList<QStringPair> subjects)
 {
     //cleanup
     removeRestrictions();
@@ -142,8 +143,8 @@ void QueryNode::addSubjects(QList<QPair<QString,QString> > subjects)
 
 
     //add subjects
-    //foreach(QPair<QString, QString> sp, subjects) {
-    QPair<QString, QString> sp;
+    //foreach(QStringPairsp, subjects) {
+    QStringPair sp;
     for(int i=0; i<subjects.count(); i++) {
         sp = subjects[i];
         d->objectCB->addItem(sp.first, sp.second);  //add s2 as the data associated to the item
@@ -202,12 +203,12 @@ void QueryNode::addSubjects(QList<QPair<QString,QString> > subjects)
     updateQueryPart();
 }
 
-void QueryNode::addPredicates(QList<QPair<QString,QString> > predicates)
+void QueryNode::addPredicates(QList<QStringPair > predicates)
 {
     d->predicateCB->blockSignals(true);  //don't trigger object population
     d->predicateCB->clear();
-    //foreach(QPair<QString,QString>  sp, predicates) {
-    QPair<QString, QString> sp;
+    //foreach(QStringPair  sp, predicates) {
+    QStringPair sp;
     for(int i=0; i<predicates.count(); i++) {
         sp = predicates[i];
         //FIXME: if label is empty, parse (I don't know what I meant by this)
@@ -225,6 +226,7 @@ void QueryNode::addObjectToLayout()
         d->objectCB = new ComboBox();
         d->objectCB->resize( GlobalSize );
         d->objectCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        d->objectCB->setEditable(true);
 
         connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(updateQueryPart()));
         connect(d->objectCB, SIGNAL(editTextChanged(QString)), this, SLOT(updateQueryPart()));
@@ -265,6 +267,8 @@ void QueryNode::removeRestriction(QueryNode *qn)
     d->restrictionLayout->removeItem(qn);
     d->restrictions.removeAt(d->restrictions.indexOf(qn));
     qn->deleteLater();
+
+    updateQueryPart();//refresh
 }
 
 void QueryNode::emitRemove()
@@ -277,10 +281,17 @@ void QueryNode::emitRemove()
 
 QString QueryNode::queryPart()
 {
-    //FIXME(not urgent): the only changed query part returns its query string:
-    //       use this, and don't recompute anything
+    //FIXME(not urgent): only the changed query part returns its query string:
+    //       use that, and don't recompute anything
     if(d->objectCB == 0) {
         return QString();
+    }
+
+    //variable
+    QString objectVar;
+    QRegExp rx(VqbGlobal::typeRegExp("var"));
+    if(rx.exactMatch(d->objectCB->currentText())) {
+        objectVar = d->objectCB->currentText();
     }
 
     QString var = d->objectCB->varName();

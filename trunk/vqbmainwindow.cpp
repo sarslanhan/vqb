@@ -1,6 +1,7 @@
 #include "vqbmainwindow.h"
 #include "ui_vqbmainwindow.h"
 #include "vqbform.h"
+#include "vqbglobal.h"
 #include "vqbschemaform.h"
 #include "vqbinstancesform.h"
 #include "sparqlhighlighter.h"
@@ -74,7 +75,7 @@ void VqbMainWindow::refreshQuery()
     query.append(" \n WHERE { \n");
     query.append(m_queryPart);
     query.append("}\n");
-    m_ui->queryViewer->setText(query);
+    m_ui->queryViewer->setText(VqbGlobal::addPrefixes(query));
 }
 
 void VqbMainWindow::moveOutputUp()

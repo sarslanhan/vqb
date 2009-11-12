@@ -21,7 +21,7 @@
 QueryThread::QueryThread(QObject *parent)
         : QThread(parent)
 {
-    qRegisterMetaType<QList<QPair<QString, QString> > >("QList<QPair<QString, QString> >");//user-defined types need to be registered to be used as signals
+    qRegisterMetaType<QList<QStringPair> >("QList<QStringPair>");//user-defined types need to be registered to be used as signals
 }
 
 void QueryThread::run()
@@ -40,7 +40,7 @@ void QueryThread::singleQuery()
     Soprano::Model* m = QueryThread::nepomukMainModel();
     Soprano::QueryResultIterator it = m->executeQuery(m_query, Soprano::Query::QueryLanguageSparql);
 
-    QList<QPair<QString,QString> > res;
+    QList<QStringPair> res;
     QList<Soprano::BindingSet> allStatements = it.allBindings();
 
     QPair<QString,QString>   val;
@@ -77,16 +77,19 @@ void QueryThread::singleQuery()
 
 void QueryThread::incrementalQuery()
 {
-    QString s = "SELECT " + this->m_varName + " WHERE { " + this->m_query + " }";
+    //NOTE: for fast results, just select DISTINCT with LIMIT 100
+    QString s = "SELECT DISTINCT " + this->m_varName + " WHERE { " + this->m_query + " } LIMIT 50";
     //add prefixes
     s = VqbGlobal::addPrefixes( s );
-    kDebug() << "--- Running query: " << s;
+    kDebug() << "---000--- Running query: " << s;
 
     Soprano::Model* m = QueryThread::nepomukMainModel();
     Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
     QSet<QString> results;
     QList<Soprano::BindingSet> allStatements = it.allBindings();
 
+
+    kDebug() << "---000--- " << allStatements.count();
     QString val;
     foreach (Soprano::BindingSet s, allStatements ) {
               Soprano::Node n = s.value(this->m_varName.replace("?", ""));
@@ -97,13 +100,14 @@ void QueryThread::incrementalQuery()
                   QString dtUri = n.literal().dataTypeUri().toString();
                   val = "\"" + n.literal().toString() + "\"" + (dtUri.isEmpty() ? "" : "^^<"+ dtUri +">");
               }
-              //kDebug() << "--- Found: " << val;
+
               if(!results.contains(val)) {
                   //kDebug() << "Item found: " << val;
                   emit(resultFound(val));//notification of a new item
                   results.insert(val);
               }
     }
+    kDebug() << "---000--- Query done.";
 }
 
 void QueryThread::setQuery(QString query, QString varName, QueryMode queryMode)
@@ -120,9 +124,6 @@ static Soprano::Model *s_model = 0;
 
 Soprano::Model* QueryThread::nepomukMainModel()
 {
-    QMutex mutex;//this might not be necessary
-    mutex.lock();
-
     // we use a dummy test model here
     if (!s_model) {
         static Soprano::Client::DBusClient client("org.kde.NepomukServer");
@@ -140,7 +141,6 @@ Soprano::Model* QueryThread::nepomukMainModel()
     }
     */
 
-    mutex.unlock();
     //return s_im;
     return s_model;
 }

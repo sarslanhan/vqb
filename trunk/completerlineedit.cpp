@@ -21,20 +21,16 @@ void CompleterLineEdit::makeCompletion(const QString& text)
     m_lastText = text;
 }
 
-void CompleterLineEdit::addItems(QStringList newItems)
-{
-    completionObject()->insertItems(newItems);
-}
-
 void CompleterLineEdit::addItem(QString newItem)
 {
     //FIXME: some problems when pressing arrow-down for the first item
-    kDebug() << "New item: " << newItem;
     completionObject()->addItem(newItem);
-    if(completionBox()->isVisible()) {
+    if(hasFocus()) { //completionBox()->isVisible() || completionObject()->items().size() == 1) {//if it is visible, or if it had no objects before
+        //kDebug() << "Completing with: " << m_lastText;
         setText(m_lastText);
         QListWidgetItem *item = completionBox()->currentItem();
         doCompletion(text());
+        completionBox()->setVisible(true);
         completionBox()->setCurrentItem(item);
     }
 }
