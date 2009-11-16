@@ -9,20 +9,19 @@
 #include "sparqlhighlighter.h"
 
 #include <QProcess>
-#include <QInputDialog>
 #include <QClipboard>
+#include <QTimer>
 
 #include <KDebug>
-//#include </home/kde-devel/kde/include/kfiledialog.h>
 #include <KFileDialog>
 #include <KSaveFile>
 #include <KUrl>
 #include <KConfigGroup>
-
+#include <KInputDialog>
 
 
 VqbMainWindow::VqbMainWindow(QWidget *parent) :
-    QMainWindow(parent), m_ui(new Ui::VqbMainWindow), m_pastebinApiKey("6bqWgxxnkOQpahdgoD3vuG05aNwazhan")
+    QMainWindow(parent), m_mainForm(0), m_ui(new Ui::VqbMainWindow), m_pastebinApiKey("6bqWgxxnkOQpahdgoD3vuG05aNwazhan")
 {
     m_ui->setupUi(this);
     init();
@@ -41,24 +40,18 @@ void VqbMainWindow::init()
     connect(m_ui->buttonDown, SIGNAL(clicked()), this, SLOT(moveOutputDown()));
     m_ui->buttonRemove->setIcon(KStandardGuiItem::remove().icon());
     connect(m_ui->buttonRemove, SIGNAL(clicked()), this, SLOT(removeOutput()));
-    //kDebug() << KIconLoader::global()->queryIcons(KIconLoader::Desktop);
 
     new SparqlHighlighter(m_ui->queryViewer);
 
     connect(m_ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
-    //FIXME: get this on a different thread?
-    QString choice = QInputDialog::getItem(this, "Please choose interface mode", "Interface choser", QStringList() << "Schema-based" << "Instance-based", 0, false);
+    QTimer::singleShot(0, this, SLOT(initStartupMenu()));
 
-    //FIXME: escape should close the application?
-    VqbForm *vqbForm;
-    if(choice == "Schema-based") {
-        vqbForm = new VqbSchemaForm(this);
-    }
-    else {
-        vqbForm = new VqbInstancesForm(this);
-    }
-    m_ui->scrollArea->setWidget(vqbForm);
+}
+
+void VqbMainWindow::initStartupMenu()
+{
+    showStartupMenu(true);
 }
 
 void VqbMainWindow::addVarToOutput(QString var)
@@ -144,7 +137,8 @@ void VqbMainWindow::tabChanged(int index)
     }
 }
 
-/***** Menu actions ******/
+/***************************** Menu actions ********************************/
+
 
 void VqbMainWindow::on_actionSave_triggered()
 {
@@ -156,10 +150,10 @@ void VqbMainWindow::on_actionSave_triggered()
     outputByteArray.append(m_ui->queryViewer->toPlainText().toUtf8());
     file.write(outputByteArray);
     if( file.finalize() ) {
-        m_ui->statusBar->showMessage("File " + outputFileName + " saved successfully.", 30000);//show it for 30 seconds
+        m_ui->statusBar->showMessage("File " + outputFileName + " saved successfully.");//show it for 30 seconds
     }
     else {
-        m_ui->statusBar->showMessage("Error saving file " + outputFileName + "!", 30000);//show it for 30 seconds
+        m_ui->statusBar->showMessage("Error saving file " + outputFileName + "!");//show it for 30 seconds
     }
     file.close();
 }
@@ -170,6 +164,51 @@ void VqbMainWindow::on_actionExit_triggered()
     close();
 }
 
+
+void VqbMainWindow::on_action_Return_to_Startup_triggered()
+{
+    showStartupMenu(false);
+}
+
+void VqbMainWindow::showStartupMenu(bool exitOnCancel)
+{
+    hide();
+    if(m_mainForm) {
+        m_mainForm->hide();
+    }
+
+    QString choice = KInputDialog::getItem("Please choose interface mode", "VQB Startup", QStringList() << "Schema-based" << "Instance-based", 0, false);
+
+    if(choice == "Schema-based") {
+        if(m_mainForm) {
+            m_mainForm->hide();
+            m_mainForm->deleteLater();
+        }
+        m_mainForm = new VqbSchemaForm(this);
+    }
+    else if (choice == "Instance-based") {
+        if(m_mainForm) {
+            m_mainForm->hide();
+            m_mainForm->deleteLater();
+        }
+        m_mainForm = new VqbInstancesForm(this);
+    }
+    else if (exitOnCancel) { //Cancel at first startup
+        close();
+        return;
+    }
+    else { //Cancel
+        show();
+        m_mainForm->show();
+        return;
+    }
+
+    //remove old VqbForm
+    show();
+    m_mainForm->show();
+    m_ui->scrollArea->setWidget(m_mainForm);
+    m_ui->queryViewer->clear();
+}
 
 void VqbMainWindow::on_actionPostToPastebin_triggered()
 {
@@ -217,6 +256,3 @@ void VqbMainWindow::readKIOData(KIO::Job *job, const QByteArray &data)
 
     m_pastebinData.append(data);
 }
-
-
-

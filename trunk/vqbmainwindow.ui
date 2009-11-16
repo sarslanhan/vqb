@@ -191,6 +191,8 @@
     </property>
     <addaction name="actionSave"/>
     <addaction name="actionExit"/>
+    <addaction name="separator"/>
+    <addaction name="action_Return_to_Startup"/>
    </widget>
    <widget class="QMenu" name="menuWeb">
     <property name="title">
@@ -215,6 +217,11 @@
   <action name="actionPostToPastebin">
    <property name="text">
     <string>Post to pastebin.com</string>
+   </property>
+  </action>
+  <action name="action_Return_to_Startup">
+   <property name="text">
+    <string>&amp;Return to Startup</string>
    </property>
   </action>
  </widget>
