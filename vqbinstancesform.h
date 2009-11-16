@@ -30,12 +30,11 @@ private slots:
     void updateCompletersPredicate(QString text);
     void updateCompletersObject(QString text);
 
-    void colorLineEdits(bool hasResults);//isEmpty specifies whether the current triple has any results or not
+    void colorLineEdits();
 
 private:  
     Ui::VqbInstancesForm *m_ui;
     QString m_currentTriple;
-    QString m_lastTriple;
     QStringList m_varList;
     QList<QueryThread*> m_queryThreads;
     QueryThread *m_queryThread;
