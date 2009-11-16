@@ -66,6 +66,7 @@ void QueryNode::init()
     }
     else { //child node
         d->predicateCB = new QComboBox();
+        d->predicateCB->setStatusTip("Predicate of the RDF triple");
         findPredicates();//FIXME: get predicates from parent
 
         d->subjectLayout->addWidget( d->predicateCB );
@@ -162,6 +163,7 @@ void QueryNode::addSubjects(QList<QStringPair> subjects)
 
         if(d->relationCB == 0) {
             d->relationCB = new ComboBox();
+            d->relationCB->setStatusTip("Constraint relation");
             connect(d->relationCB, SIGNAL(currentIndexChanged(int)),
                     this, SLOT(updateQueryPart()));
             d->relationCB->resize( GlobalSize );
@@ -184,6 +186,7 @@ void QueryNode::addSubjects(QList<QStringPair> subjects)
         if(d->addBtn == 0) {//add button
             d->addBtn = new KPushButton(KStandardGuiItem::add().icon(), "");
             d->addBtn->setToolTip("Add Restriction to " + d->objectCB->currentText());
+            d->addBtn->setStatusTip("Adds restriction to parent element " + d->objectCB->currentText());
             d->addBtn->setBaseSize(20, 20);
             d->addBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             connect(d->addBtn, SIGNAL(clicked()),this, SLOT(addRestriction()));
@@ -194,6 +197,7 @@ void QueryNode::addSubjects(QList<QStringPair> subjects)
     if(d->removeBtn == 0) {//remove button
         d->removeBtn = new KPushButton(KStandardGuiItem::remove().icon(), "");
         d->removeBtn->setToolTip("Remove Restriction");
+        d->removeBtn->setStatusTip("Removes restriction");
         d->removeBtn->setBaseSize(20, 20);
         d->removeBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         connect(d->removeBtn, SIGNAL(clicked()),this, SLOT(emitRemove()));
@@ -224,6 +228,7 @@ void QueryNode::addObjectToLayout()
     //FIXME: sometimes one of the CBs is longer
     if(d->objectCB == 0) {
         d->objectCB = new ComboBox();
+        d->objectCB->setStatusTip("Object of the RDF triple");
         d->objectCB->resize( GlobalSize );
         d->objectCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         d->objectCB->setEditable(true);

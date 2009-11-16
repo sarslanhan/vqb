@@ -43,8 +43,6 @@ VqbSchemaForm::VqbSchemaForm(VqbMainWindow *parent)
         : VqbForm(parent), d(new Private)
 {
     init();
-
-    emit queryChanged("hihihuhuhu");
 }
 
 void VqbSchemaForm::init()
@@ -52,6 +50,7 @@ void VqbSchemaForm::init()
     /* Layouts and visual elements */
 
     d->btnAdd = new QPushButton("New Query Tree");   // add button
+    d->btnAdd->setStatusTip("Adds a new query tree");
     d->btnAdd->setBaseSize(100, 50);
     connect(d->btnAdd, SIGNAL(clicked()), this, SLOT(addQueryTree()));
 

@@ -42,16 +42,6 @@ void VqbInstancesForm::updateCurrentTriple()
 
     m_ui->listBoxConditions->lineEdit()->setText(triple);
     m_currentTriple = triple;
-
-    /*
-    //FIXME: Count query results using the BGP as well?
-    QString query = "SELECT * WHERE { " + m_currentTriple + " } LIMIT 1";
-    colorLineEdits(QueryThread::countQueryResults(query));
-    */
-
-    //update completers for comboboxes
-    //FIXME: connect this signal separately, to allow firing updateCurrentTriple on KLineEdit::editTextChanged()
-    //updateCompleters();
 }
 
 void VqbInstancesForm::updateTypes()
@@ -80,50 +70,6 @@ void VqbInstancesForm::updateTypes()
     m_ui->cbType->insertItems(-1, types);
 }
 
-/*
-void VqbInstancesForm::updateCompleters()
-{
-    kDebug() << "Udating completers";
-    if( m_currentTriple == m_lastTriple ) { //nothing's changed
-        return;
-    }// else
-    m_lastTriple = m_currentTriple;
-
-    QString varName = "?slot";
-    QString subject = m_ui->cbSubject->currentText();
-    subject = subject.isEmpty() ? VqbGlobal::randomVarName() : subject;
-    QString predicate = m_ui->cbPredicate->currentText();
-    predicate = predicate.isEmpty() ? VqbGlobal::randomVarName() : predicate;
-    QString object = m_ui->cbObject->currentText();
-    object = object.isEmpty() ? VqbGlobal::randomVarName() :
-                                VqbGlobal::constructObject(m_ui->checkBoxFilter->isChecked(),
-                                                           m_ui->cbRelation->currentText(),
-                                                           m_ui->cbObject->currentText(),
-                                                           m_ui->cbType->currentText());
-
-    kDebug() << "--------------------------- Completion query: " << subject << predicate << object;
-
-    //autocompletion
-    QString query = varName + " " + predicate + " " + object + " . " + m_queryPart;
-    m_queryThreads[0]->setQuery(query, varName, QueryThread::IncrementalQuery);
-    m_queryThreads[0]->start();
-    kDebug() << "Query started";
-
-    query =  subject + " " + varName + " " + object + m_queryPart;
-    m_queryThreads[1]->setQuery(query, varName, QueryThread::IncrementalQuery);
-    m_queryThreads[1]->start();
-    kDebug() << "Query started";
-    //m_queryThreads[1]->startIncrementalQuery(query, varName);
-
-    query = subject + " " + predicate + " " + varName + m_queryPart;
-    m_queryThreads[2]->setQuery(query, varName, QueryThread::IncrementalQuery);
-    m_queryThreads[2]->start();
-    kDebug() << "Query started";
-    //m_queryThreads[2]->startIncrementalQuery(query, varName);
-}
-*/
-
-
 void VqbInstancesForm::on_listBoxConditions_changed()
 {
     //update query part
@@ -133,7 +79,7 @@ void VqbInstancesForm::on_listBoxConditions_changed()
     }
     emit queryChanged(m_queryPart);
 
-    updateCompleters();//BGP has changed
+    //updateCompleters();//BGP has changed
     updateVars();
 }
 
@@ -176,8 +122,6 @@ void VqbInstancesForm::updateCompletersSubject(QString text)
             (CompleterLineEdit*)m_ui->cbSubject->lineEdit(), SLOT(addItem(QString)));
 
     m_queryThread->start();
-
-    //FIXME: if no results, color LineEdits ? - have the LineEdit fire a signal with the number of elements?
 }
 
 void VqbInstancesForm::updateCompletersPredicate(QString text)
@@ -219,13 +163,18 @@ QString VqbInstancesForm::constructCompletionQuery(QString text, int slotNumber)
     }
     query += " FILTER regex( str(" + slotVar + "), '" + text + "', 'i') . ";
 
+    //FIXME: use BGP
+
     return query;
 }
 
 /******** Utility functions *************/
 
-void VqbInstancesForm::colorLineEdits(bool hasResults)
+void VqbInstancesForm::colorLineEdits()
 {
+    int hasResults = QueryThread::countQueryResults("SELECT * WHERE { " + m_currentTriple + " } LIMIT 1");
+    //FIXME: use BGP
+
     QRegExp rx(VqbGlobal::typeRegExp("var"));
 
     //init the three LineEdits
@@ -234,28 +183,13 @@ void VqbInstancesForm::colorLineEdits(bool hasResults)
     QLineEdit *lO = m_ui->cbObject->lineEdit();
 
     //init the coloring Palettes
-    QPalette paletteColored( lO->palette() );//palette adjusted to given color
-    paletteColored.setColor( QPalette::Base, hasResults ? Qt::white : Qt::red );
-    QPalette paletteWhite( lO->palette() );//white palette
-    paletteWhite.setColor( QPalette::Base, Qt::white );
+    QPalette palette( lO->palette() );//palette adjusted to given color
+    palette.setColor( QPalette::Base, hasResults ? Qt::white : Qt::red );
 
-    //FIXME?: we should probably color everything. When a variable occurs twice, the results might be null because of that
     //perform the coloring
-    if ( !rx.exactMatch( lS->text() ) ) {
-        lS->setPalette(paletteColored);
-    } else { //variables are not colored
-        lS->setPalette(paletteWhite);
-    }
-    if ( !rx.exactMatch( lP->text() ) ) {
-        lP->setPalette(paletteColored);
-    } else { //variables are not colored
-        lP->setPalette(paletteWhite);
-    }
-    if (!(rx.exactMatch( lO->text() ) && m_ui->cbType->currentText() == "var" && !m_ui->checkBoxFilter->isChecked())) { //only non-variables are colored
-        lO->setPalette(paletteColored);
-    } else { //color variables with white
-        lO->setPalette(paletteWhite);
-    }
+    lS->setPalette(palette);
+    lP->setPalette(palette);
+    lO->setPalette(palette);
 }
 
 /********** Initialization *************/
@@ -284,17 +218,14 @@ void VqbInstancesForm::init()
     m_ui->cbRelation->insertItems(0, QStringList() << "equals" << "contains");
 
     //triple updating signals
-    //connect(m_ui->cbObject, SIGNAL(editTextChanged(QString)),
     connect(m_ui->cbSubject->lineEdit(), SIGNAL(textChanged(QString)),//(editingFinished()),
             this, SLOT(updateCurrentTriple()));
     connect(m_ui->cbSubject, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(updateCurrentTriple()));
-    //connect(m_ui->cbPredicate, SIGNAL(editTextChanged(QString)),
     connect(m_ui->cbPredicate->lineEdit(), SIGNAL(textChanged(QString)),//(editingFinished()),
             this, SLOT(updateCurrentTriple()));
     connect(m_ui->cbPredicate, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(updateCurrentTriple()));
-    //connect(m_ui->cbObject, SIGNAL(editTextChanged(QString)),
     connect(m_ui->cbObject->lineEdit(), SIGNAL(textChanged(QString)),//(editingFinished()),
             this, SLOT(updateCurrentTriple()));
     connect(m_ui->cbObject, SIGNAL(currentIndexChanged(QString)),
@@ -317,6 +248,12 @@ void VqbInstancesForm::init()
             this, SLOT(updateCompletersSubject(QString)));
 
     //FIXME: activate colorLineEdits on editingFinished
+    connect(m_ui->cbSubject->lineEdit(), SIGNAL(editingFinished()),
+            this, SLOT(colorLineEdits()));
+    connect(m_ui->cbObject->lineEdit(), SIGNAL(editingFinished()),
+            this, SLOT(colorLineEdits()));
+    connect(m_ui->cbPredicate->lineEdit(), SIGNAL(editingFinished()),
+            this, SLOT(colorLineEdits()));
 
     //initial GUI population
     updateTypes();
@@ -334,6 +271,4 @@ void VqbInstancesForm::on_buttonAddToOutput_clicked()
 
 
 #include "vqbinstancesform.moc"
-
-
 

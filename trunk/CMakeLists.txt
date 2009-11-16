@@ -30,9 +30,11 @@ kde4_add_executable(vqb ${vqb_SRCS})
 
 target_link_libraries(vqb soprano sopranoclient
   ${KDE4_KDEUI_LIBS}
+  ${KDE4_KIO_LIBS}
   ${SOPRANO_LIBRARIES}
   ${QT_QTCORE_LIBRARY}
   ${SOPRANO_CLIENT_LIBRARIES}
+  ${KDE4_PLASMA_LIBS}
 )
 
 install(TARGETS vqb DESTINATION ${BIN_INSTALL_DIR})
