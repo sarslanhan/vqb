@@ -14,10 +14,7 @@ public:
     VqbForm(VqbMainWindow *parent = 0);
 
 signals:
-    void addVarToOutput(QString var);
     void queryChanged(QString query);
-
-private:
     
 };
 

@@ -1,5 +1,5 @@
-#ifndef VQBSCHEMAFORM_H
-#define VQBSCHEMAFORM_H
+#ifndef VQBSCHEMACONSTRUCT_H
+#define VQBSCHEMACONSTRUCT_H
 
 
 #include "vqbform.h"
@@ -13,15 +13,15 @@ class VqbMainWindow;
 
 namespace Ui
 {
-class VqbSchemaFormClass;
+    class VqbSchemaConstruct;
 }
 
-class VqbSchemaForm : public VqbForm
+class VqbSchemaConstruct : public VqbForm
 {
     Q_OBJECT
 public:
-    VqbSchemaForm(VqbMainWindow *parent = 0);
-    ~VqbSchemaForm();
+    VqbSchemaConstruct(VqbMainWindow *parent = 0);
+    ~VqbSchemaConstruct();
 
 public slots:
     void queryTreeChanged(int index, QString constraint);
@@ -32,9 +32,10 @@ private:
     void init();
     void emitQueryChanged();
 
+    Ui::VqbSchemaConstruct *m_ui;
     class Private;
     Private * const d;
 
 };
 
-#endif // VQBSCHEMAFORM_H
+#endif // VQBSCHEMACONSTRUCT_H

@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VqbInstancesConstruct</class>
+ <widget class="QWidget" name="VqbInstancesConstruct">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>720</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QGroupBox" name="groupBoxConditions">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>240</y>
+     <width>701</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Conditions</string>
+   </property>
+   <widget class="QGroupBox" name="groupBoxCTriples">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>291</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="toolTip">
+     <string>Enter a string, integer, date or URI.
+
+Examples:
+	foaf:Person
+	5
+	Knud Moeller
+            	&lt;http://purl.org/dc/terms/title&gt;
+	</string>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>Triple Construction</string>
+    </property>
+    <widget class="QCheckBox" name="checkBoxFilterConditions">
+     <property name="geometry">
+      <rect>
+       <x>64</x>
+       <y>102</y>
+       <width>61</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Filter</string>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbPredicateConditions">
+     <property name="geometry">
+      <rect>
+       <x>64</x>
+       <y>67</y>
+       <width>221</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbTypeConditions">
+     <property name="geometry">
+      <rect>
+       <x>184</x>
+       <y>167</y>
+       <width>101</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbSubjectConditions">
+     <property name="geometry">
+      <rect>
+       <x>64</x>
+       <y>27</y>
+       <width>221</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbRelationConditions">
+     <property name="geometry">
+      <rect>
+       <x>184</x>
+       <y>102</y>
+       <width>101</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbObjectConditions">
+     <property name="geometry">
+      <rect>
+       <x>64</x>
+       <y>137</y>
+       <width>221</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelSConditions">
+     <property name="geometry">
+      <rect>
+       <x>4</x>
+       <y>27</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="text">
+      <string>Subject</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelPConditions">
+     <property name="geometry">
+      <rect>
+       <x>4</x>
+       <y>67</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="text">
+      <string>Predicate</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelOConditions">
+     <property name="geometry">
+      <rect>
+       <x>14</x>
+       <y>137</y>
+       <width>41</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="text">
+      <string>Object</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="KEditListBox" name="listBoxConditions">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>20</y>
+      <width>361</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Active Triples</string>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBoxOutputs">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>1</y>
+     <width>701</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Outputs</string>
+   </property>
+   <widget class="QGroupBox" name="groupBoxOTriples">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>291</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>Triple Construction</string>
+    </property>
+    <widget class="QCheckBox" name="checkBoxFilterOutputs">
+     <property name="geometry">
+      <rect>
+       <x>64</x>
+       <y>102</y>
+       <width>61</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Filter</string>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbPredicateOutputs">
+     <property name="geometry">
+      <rect>
+       <x>64</x>
+       <y>67</y>
+       <width>221</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbTypeOutputs">
+     <property name="geometry">
+      <rect>
+       <x>184</x>
+       <y>167</y>
+       <width>101</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbSubjectOutputs">
+     <property name="geometry">
+      <rect>
+       <x>64</x>
+       <y>27</y>
+       <width>221</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbRelationOutputs">
+     <property name="geometry">
+      <rect>
+       <x>184</x>
+       <y>102</y>
+       <width>101</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="KComboBox" name="cbObjectOutputs">
+     <property name="geometry">
+      <rect>
+       <x>64</x>
+       <y>137</y>
+       <width>221</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Enter a string, integer, date or URI.
+
+Examples:
+	foaf:Person
+	5
+	Knud Moeller
+            	&lt;http://purl.org/dc/terms/title&gt;
+	</string>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelSOutputs">
+     <property name="geometry">
+      <rect>
+       <x>4</x>
+       <y>27</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="text">
+      <string>Subject</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelPOutputs">
+     <property name="geometry">
+      <rect>
+       <x>4</x>
+       <y>67</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="text">
+      <string>Predicate</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelOOutputs">
+     <property name="geometry">
+      <rect>
+       <x>14</x>
+       <y>137</y>
+       <width>41</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="text">
+      <string>Object</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="KEditListBox" name="listBoxOutputs">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>20</y>
+      <width>361</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Active Triples</string>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KEditListBox</class>
+   <extends>QGroupBox</extends>
+   <header>keditlistbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KComboBox</class>
+   <extends>QComboBox</extends>
+   <header>kcombobox.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+ <slots>
+  <slot>updateTriple()</slot>
+ </slots>
+</ui>

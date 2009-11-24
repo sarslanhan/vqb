@@ -4,8 +4,10 @@
 #include "ui_vqbmainwindow.h"
 #include "vqbform.h"
 #include "vqbglobal.h"
-#include "vqbschemaform.h"
-#include "vqbinstancesform.h"
+#include "vqbschemaselect.h"
+#include "vqbschemaconstruct.h"
+#include "vqbinstancesselect.h"
+#include "vqbinstancesconstruct.h"
 #include "sparqlhighlighter.h"
 
 #include <QProcess>
@@ -18,13 +20,22 @@
 #include <KUrl>
 #include <KConfigGroup>
 #include <KInputDialog>
+#include <KMessageBox>
 
 
 VqbMainWindow::VqbMainWindow(QWidget *parent) :
     QMainWindow(parent), m_mainForm(0), m_ui(new Ui::VqbMainWindow), m_pastebinApiKey("6bqWgxxnkOQpahdgoD3vuG05aNwazhan")
 {
+    showStartupMenu(true);
     m_ui->setupUi(this);
-    init();
+    
+    new SparqlHighlighter(m_ui->queryViewer);
+    connect(m_ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
+
+    connect(m_ui->dockWidget, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
+    //FIXME: resize dock widget correctly
+
+    initMainForm();
 }
 
 VqbMainWindow::~VqbMainWindow()
@@ -32,21 +43,10 @@ VqbMainWindow::~VqbMainWindow()
     delete m_ui;
 }
 
-void VqbMainWindow::init()
+void VqbMainWindow::initMainForm()
 {
-    m_ui->buttonUp->setIcon(KIcon("arrow-up"));
-    connect(m_ui->buttonUp, SIGNAL(clicked()), this, SLOT(moveOutputUp()));
-    m_ui->buttonDown->setIcon(KIcon("arrow-down"));
-    connect(m_ui->buttonDown, SIGNAL(clicked()), this, SLOT(moveOutputDown()));
-    m_ui->buttonRemove->setIcon(KStandardGuiItem::remove().icon());
-    connect(m_ui->buttonRemove, SIGNAL(clicked()), this, SLOT(removeOutput()));
-
-    new SparqlHighlighter(m_ui->queryViewer);
-
-    connect(m_ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
-
-    QTimer::singleShot(0, this, SLOT(initStartupMenu()));
-
+    m_ui->scrollArea->setWidget(m_mainForm);
+    m_ui->queryViewer->clear();
 }
 
 void VqbMainWindow::initStartupMenu()
@@ -54,19 +54,12 @@ void VqbMainWindow::initStartupMenu()
     showStartupMenu(true);
 }
 
-void VqbMainWindow::addVarToOutput(QString var)
+void VqbMainWindow::queryChanged(QString query)
 {
-    m_ui->outputList->addItem(var);
-    refreshQuery();
+    m_ui->queryViewer->setText(VqbGlobal::addPrefixes(query));
 }
 
-void VqbMainWindow::queryChanged(QString queryPart)
-{
-    m_queryPart = queryPart;
-    refreshQuery();
-}
-
-void VqbMainWindow::refreshQuery()
+/*void VqbMainWindow::refreshQuery()
 {
     QString query = "SELECT DISTINCT ";
     foreach(QListWidgetItem *item, m_ui->outputList->findItems(QString(), Qt::MatchContains)) {
@@ -77,39 +70,19 @@ void VqbMainWindow::refreshQuery()
     query.append("}\n");
     m_ui->queryViewer->setText(VqbGlobal::addPrefixes(query));
 }
+*/
 
-void VqbMainWindow::moveOutputUp()
+void VqbMainWindow::dockTopLevelChanged(bool topLevel)
 {
-    QListWidget* lw = m_ui->outputList;
-    int i = lw->currentRow();
-    if(i > 0) {
-        QListWidgetItem *item = lw->takeItem(i);
-        lw->insertItem(i-1, item);
-        lw->setCurrentRow(i-1);
+    //FIXME: resize correctly
+    if(topLevel) {
+
     }
-    refreshQuery();
-
 }
-void VqbMainWindow::moveOutputDown()
-{
-    QListWidget* lw = m_ui->outputList;
-    int i = lw->currentRow();
-    if(i < lw->count()-1) {
-        QListWidgetItem *item = lw->takeItem(i);
-        lw->insertItem(i+1, item);
-        lw->setCurrentRow(i+1);
-    }
-    refreshQuery();
-}
-void VqbMainWindow::removeOutput()
-{
-    m_ui->outputList->takeItem( m_ui->outputList->currentRow() );
-    refreshQuery();
-}
-
 
 void VqbMainWindow::tabChanged(int index)
 {
+    //FIXME: remove tabs. Have a live result previewer?
     QString q;
     if (index == 1) {
         q = m_ui->queryViewer->toPlainText();
@@ -167,47 +140,48 @@ void VqbMainWindow::on_actionExit_triggered()
 
 void VqbMainWindow::on_action_Return_to_Startup_triggered()
 {
-    showStartupMenu(false);
+    int answer = KMessageBox::questionYesNoCancel(this, "Returning to startup will result in losing all previouse work. Continue?",
+                    "Confirm Return to Startup");
+
+    if(answer == KMessageBox::Yes) {
+        showStartupMenu(false);
+        initMainForm();
+    }
+    //otherwise do nothing
 }
 
 void VqbMainWindow::showStartupMenu(bool exitOnCancel)
 {
+    Q_UNUSED(exitOnCancel);
+
     hide();
     if(m_mainForm) {
         m_mainForm->hide();
+        m_mainForm->deleteLater();
     }
 
-    QString choice = KInputDialog::getItem("Please choose interface mode", "VQB Startup", QStringList() << "Schema-based" << "Instance-based", 0, false);
-
-    if(choice == "Schema-based") {
-        if(m_mainForm) {
-            m_mainForm->hide();
-            m_mainForm->deleteLater();
-        }
-        m_mainForm = new VqbSchemaForm(this);
+    //FIXME: use Ok/Exit buttons
+    QString choice = KInputDialog::getItem("Please choose interface mode", "VQB Startup", QStringList() << "S_S" << "S_C" << "I_S" << "I_C", 0, false);
+        
+    if(choice == "S_S") {
+        m_mainForm = new VqbSchemaSelect(this);
     }
-    else if (choice == "Instance-based") {
-        if(m_mainForm) {
-            m_mainForm->hide();
-            m_mainForm->deleteLater();
-        }
-        m_mainForm = new VqbInstancesForm(this);
+    else if (choice == "S_C") {
+        m_mainForm = new VqbSchemaConstruct(this);
+    }    
+    else if (choice == "I_S") {
+        m_mainForm = new VqbInstancesSelect(this);
     }
-    else if (exitOnCancel) { //Cancel at first startup
+    else if (choice == "I_C") {
+        //m_mainForm = new VqbInstancesConstruct(this);
+    }
+    else {
         close();
         return;
     }
-    else { //Cancel
-        show();
-        m_mainForm->show();
-        return;
-    }
 
-    //remove old VqbForm
     show();
-    m_mainForm->show();
-    m_ui->scrollArea->setWidget(m_mainForm);
-    m_ui->queryViewer->clear();
+    m_mainForm->show();    
 }
 
 void VqbMainWindow::on_actionPostToPastebin_triggered()

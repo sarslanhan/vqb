@@ -186,7 +186,7 @@ void QueryNode::addSubjects(QList<QStringPair> subjects)
         if(d->addBtn == 0) {//add button
             d->addBtn = new KPushButton(KStandardGuiItem::add().icon(), "");
             d->addBtn->setToolTip("Add Restriction to " + d->objectCB->currentText());
-            d->addBtn->setStatusTip("Adds restriction to parent element " + d->objectCB->currentText());
+            d->addBtn->setStatusTip("Adds property restriction to element " + d->objectCB->currentText());
             d->addBtn->setBaseSize(20, 20);
             d->addBtn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             connect(d->addBtn, SIGNAL(clicked()),this, SLOT(addRestriction()));
@@ -236,6 +236,7 @@ void QueryNode::addObjectToLayout()
         connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(updateQueryPart()));
         connect(d->objectCB, SIGNAL(editTextChanged(QString)), this, SLOT(updateQueryPart()));
         connect(d->objectCB, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
+        connect(d->objectCB, SIGNAL(removeVarFromOutput(QString)), this, SIGNAL(removeVarFromOutput(QString)));
         connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(removeRestrictions()));
 
         findObjects();
@@ -254,6 +255,7 @@ void QueryNode::addRestriction()
     d->restrictionLayout->insertLayout(d->restrictionLayout->count()-1, qn);
     connect(qn, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryPart()));
     connect(qn, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
+    connect(qn, SIGNAL(removeVarFromOutput(QString)), this, SIGNAL(removeVarFromOutput(QString)));
     connect(qn, SIGNAL(removeClicked(QueryNode*)), this, SLOT(removeRestriction(QueryNode*)));
 }
 
@@ -286,8 +288,11 @@ void QueryNode::emitRemove()
 
 QString QueryNode::queryPart()
 {
-    //FIXME(not urgent): only the changed query part returns its query string:
+    //WISH: only the changed query part returns its query string:
     //       use that, and don't recompute anything
+
+    //FIXME: use vars - based on the relation combobox (have a "variable" option).
+
     if(d->objectCB == 0) {
         return QString();
     }

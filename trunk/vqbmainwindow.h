@@ -22,10 +22,9 @@ public:
 
 public slots:
     void queryChanged(QString queryPart);
-    void addVarToOutput(QString var);
 
 private:
-    void init();
+    void initMainForm();
 
     VqbForm *m_mainForm;
     Ui::VqbMainWindow *m_ui;
@@ -41,14 +40,12 @@ private slots:
     void on_actionExit_triggered();
     void on_actionPostToPastebin_triggered();
     void tabChanged(int index);
+    void dockTopLevelChanged (bool topLevel);
 
     void initStartupMenu();
     void showStartupMenu(bool exitOnCancel);
 
-    void moveOutputUp();
-    void moveOutputDown();
-    void removeOutput();
-    void refreshQuery();    
+    //void refreshQuery();
 
     void finished(KJob* job);
     void readKIOData(KIO::Job *job, const QByteArray &data);

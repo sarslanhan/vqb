@@ -22,6 +22,7 @@ public slots:
 signals:
     void queryPartChanged(QString queryPart);
     void addVarToOutput(QString varName);
+    void removeVarFromOutput(QString varName);
     void removeClicked(QueryNode *qn);
 
 private:
