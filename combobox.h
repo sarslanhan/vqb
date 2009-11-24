@@ -2,6 +2,7 @@
 #define COMBOBOX_H
 
 #include <QComboBox>
+class QPaintEvent;
 
 //FIXME: rename to something more relevant
 
@@ -19,16 +20,18 @@ public:
 
 public slots:
     void addToOutput();
-    //void attach();
+    void removeFromOutput();
+    void paintEvent ( QPaintEvent * event );
 
 signals:
     void addVarToOutput(QString var);
-    //void attachConstraint(int constraintNo, QString var, QString className);
+    void removeVarFromOutput(QString var);
 
 private:
     QString m_varName;
-
-
+    bool m_isOutput;
+    QAction *m_removeAction;
 };
 
 #endif // COMBOBOX_H
+

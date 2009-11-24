@@ -1,20 +1,20 @@
-#ifndef VQBINSTANCESFORM_H
-#define VQBINSTANCESFORM_H
+#ifndef VQBINSTANCESSELECT_H
+#define VQBINSTANCESSELECT_H
 
 #include "vqbform.h"
 class VqbMainWindow;
 class QueryThread;
 
 namespace Ui {
-    class VqbInstancesForm;
+    class VqbInstancesSelect;
 }
 
-class VqbInstancesForm : public VqbForm {
+class VqbInstancesSelect : public VqbForm {
     Q_OBJECT
-    Q_DISABLE_COPY(VqbInstancesForm)
+    Q_DISABLE_COPY(VqbInstancesSelect)
 public:
-    explicit VqbInstancesForm(VqbMainWindow *parent = 0);
-    virtual ~VqbInstancesForm();    
+    explicit VqbInstancesSelect(VqbMainWindow *parent = 0);
+    virtual ~VqbInstancesSelect();
 
 private slots:
     void on_buttonAddToOutput_clicked();
@@ -33,7 +33,7 @@ private slots:
     void colorLineEdits();
 
 private:  
-    Ui::VqbInstancesForm *m_ui;
+    Ui::VqbInstancesSelect *m_ui;
     QString m_currentTriple;
     QStringList m_varList;
     QList<QueryThread*> m_queryThreads;
@@ -43,10 +43,6 @@ private:
     QString constructCompletionQuery(QString text, int slotNumber);
 
 
-
-
-
-
 };
 
-#endif // VQBINSTANCESFORM_H
+#endif // VQBINSTANCESSELECT_H

@@ -11,11 +11,13 @@ SOURCES += main.cpp \
     sparqlhighlighter.cpp \
     subjecttree.cpp \
     querynode.cpp \
-    vqbinstancesform.cpp \
     vqbmainwindow.cpp \
-    vqbschemaform.cpp \
     vqbglobal.cpp \
-    completerlineedit.cpp
+    completerlineedit.cpp \
+    vqbinstancesconstruct.cpp \
+    vqbinstancesselect.cpp \
+    vqbschemaselect.cpp \
+    vqbschemaconstruct.cpp
 HEADERS += vqbform.h \
     querythread.h \
     constraint.h \
@@ -23,13 +25,17 @@ HEADERS += vqbform.h \
     sparqlhighlighter.h \
     subjecttree.h \
     querynode.h \
-    vqbinstancesform.h \
     vqbmainwindow.h \
-    vqbschemaform.h \
     vqbglobal.h \
-    completerlineedit.h
-FORMS += vqbinstancesform.ui \
-    vqbmainwindow.ui
+    completerlineedit.h \
+    vqbinstancesconstruct.h \
+    vqbinstancesselect.h \
+    vqbschemaselect.h \
+    vqbschemaconstruct.h
+FORMS += vqbmainwindow.ui \
+    vqbinstancesconstruct.ui \
+    vqbinstancesselect.ui \
+    vqbschemaconstruct.ui
 OTHER_FILES += CMakeLists.txt \
     notes.txt
 CONFIG += qt \

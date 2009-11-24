@@ -24,7 +24,8 @@ void SubjectTree::init()
     l->addLayout(m_root);
 
     connect(m_root, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryTree(QString)));
-    connect(m_root, SIGNAL(addVarToOutput(QString)), parent(), SIGNAL(addVarToOutput(QString)));
+    connect(m_root, SIGNAL(addVarToOutput(QString)), parent(), SLOT(addVarToOutput(QString)));
+    connect(m_root, SIGNAL(removeVarFromOutput(QString)), parent(), SLOT(removeVarFromOutput(QString)));
     connect(m_root, SIGNAL(removeClicked(QueryNode*)), this, SLOT(close()));
 
     QAction *removeAction = KStandardAction::close(this, SLOT(close()), this);

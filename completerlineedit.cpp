@@ -12,6 +12,7 @@
 CompleterLineEdit::CompleterLineEdit(QWidget *parent)
         : KLineEdit(parent)
 {
+    //FIXME: activate row-striping
     completionBox()->setActivateOnSelect(false);
 }
 
