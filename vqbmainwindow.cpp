@@ -57,6 +57,7 @@ void VqbMainWindow::initStartupMenu()
 void VqbMainWindow::queryChanged(QString query)
 {
     m_ui->queryViewer->setText(VqbGlobal::addPrefixes(query));
+    //FIXME: convert all URIs to prefixes
 }
 
 /*void VqbMainWindow::refreshQuery()
@@ -173,7 +174,7 @@ void VqbMainWindow::showStartupMenu(bool exitOnCancel)
         m_mainForm = new VqbInstancesSelect(this);
     }
     else if (choice == "I_C") {
-        //m_mainForm = new VqbInstancesConstruct(this);
+        m_mainForm = new VqbInstancesConstruct(this);
     }
     else {
         close();

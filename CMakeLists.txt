@@ -18,7 +18,7 @@ set(vqb_SRCS
   vqbschemaselect.cpp
   vqbschemaconstruct.cpp
   vqbinstancesselect.cpp
-  #vqbinstancesconstruct.cpp
+  vqbinstancesconstruct.cpp
   querythread.cpp
   combobox.cpp
   sparqlhighlighter.cpp

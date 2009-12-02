@@ -3,7 +3,7 @@
 #include <QMap>
 #include <KRandom>
 
-QStringList VqbGlobal::literalTypes()
+QStringList VqbGlobal::objectTypes()
 {
     //FIXME?: don't create it every time
     return QStringList() << "URI" << "var" << "Literal" << "string" << "int";// <<"decimal" << "dateTime" <<;
@@ -11,14 +11,17 @@ QStringList VqbGlobal::literalTypes()
 
 QString VqbGlobal::typeRegExp(QString type)
 {
-    if(type=="string" || type=="Literal") {
+    if(type=="string") {
          return QString("[\\S\\s]*");
+    }
+    else if(type=="Literal") {
+        return QString("(\"[\\S\\s]*\"\\^\\^((<[\\S\\s]*>)|(\\S+:\\S+)))|(\"[\\S\\s]*\"(@[a-z][a-z])?)");
     }
     else if(type=="var") {
         return QString("([\\?\\$]\\w+)");
     }
-    else if(type=="URI") {
-         return QString("((\"[\\S\\s]*\"\\^\\^)?<[\\S\\s]*>)|(\\S+:\\S+)|(\"[\\S\\s]*\")");//"[<[\\w+://]?\\S*>]|[w+:w+]");//URI
+    else if (type == "URI") {
+        return QString("(<[\\S\\s]*>)|(\\w+:\\w+)");
     }
     else if(type=="int") {
         return QString("([+-]?\\d+)?");
@@ -45,27 +48,29 @@ QString VqbGlobal::constructObject(bool filterOn, QString relation, QString expr
     }
     //else //Filter OFF
 
-    if( type == "URI" ) {
+    if( type == "URI" || type == "var" || type == "Literal") {
         finalForm += expression;
     }
-    else if ( type == "var" ) {
+    /*else if ( type == "var" || type =) {
         finalForm += expression;
     }
     else if ( type == "Literal" ) {
         //FIXME: handle quotes within strings - find some formatting function
         finalForm += "\"" + expression + "\"";
     }
+    */
     else if ( type == "string" ) {
-        finalForm += "\"" + expression + "\"^^<http://www.w3.org/2001/XMLSchema#string>" ;
+        //FIXME: needs to be escaped
+        finalForm += "\"" + expression + "\"^^xsd:string" ;
     }
     else if ( type == "int" ) {
-        finalForm += "\"" + expression + "\"^^<http://www.w3.org/2001/XMLSchema#int>" ;
+        finalForm += "\"" + expression + "\"^^xsd:int" ;
     }
     else if ( type == "dateTime" ) {
-        finalForm += "\"" + expression + "\"^^<http://www.w3.org/2001/XMLSchema#dateTime>" ;
+        finalForm += "\"" + expression + "\"^^xsd:dateTime" ;
     }
     else if ( type == "decimal" ) {
-        finalForm += "\"" + expression + "\"^^<http://www.w3.org/2001/XMLSchema#decimal>" ;
+        finalForm += "\"" + expression + "\"^^xsd:decimal" ;
     }
 
     return finalForm;
@@ -90,7 +95,11 @@ QString  VqbGlobal::prefixForm( QString uri )
         }
     }
     //if no prefix found, surround predicate with < and >
-    if( !prefixFound ) {
+    if( prefixFound ) {
+        prefUri.remove("<");
+        prefUri.remove(">");
+    }
+    else {
         if(!prefUri.startsWith("<")) {
             prefUri.prepend("<");
         }
@@ -120,6 +129,8 @@ QMap<QString, QString>  VqbGlobal::prefixes()
     prefixList.insert("d2rq","http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#");
     prefixList.insert("dcmitype","http://purl.org/dc/dcmitype/");
     prefixList.insert("geo","http://www.w3.org/2003/01/geo/wgs84_pos#");
+    prefixList.insert("xsd","http://www.w3.org/2001/XMLSchema#");
+
 
     prefixList.insert("xesam", "http://freedesktop.org/standards/xesam/1.0/core#");
     prefixList.insert("nrl", "http://www.semanticdesktop.org/ontologies/2007/08/15/nrl#");
@@ -139,6 +150,9 @@ QMap<QString, QString>  VqbGlobal::prefixes()
 
 QString VqbGlobal::addPrefixes(QString query)
 {
+    //FIXME: replace everything with prefixes
+
+    //add PREFIX definitions
     foreach( QString p, prefixes().keys() ) {
         if( query.contains( p + ":" ) ) {
             QString prefix = "PREFIX " + p + ": <" + prefixes().value( p ) + ">" ;
@@ -147,5 +161,7 @@ QString VqbGlobal::addPrefixes(QString query)
             }
         }
     }
-        return query;
+
+
+    return query;
 }

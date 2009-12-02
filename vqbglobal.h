@@ -7,7 +7,7 @@
 class VqbGlobal
 {
 public:
-    static QStringList literalTypes();
+    static QStringList objectTypes();
     static QString typeRegExp(QString type);
 
     static QString constructObject(bool filterOn, QString relation, QString expression, QString type);//gets the canonical form for the object of a triple

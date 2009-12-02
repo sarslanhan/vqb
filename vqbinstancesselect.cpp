@@ -55,7 +55,7 @@ void VqbInstancesSelect::updateTypes()
     m_ui->cbType->setEnabled(true);
     QString text = m_ui->cbObject->currentText();
     m_ui->cbType->clear();
-    QStringList types = VqbGlobal::literalTypes();
+    QStringList types = VqbGlobal::objectTypes();
 
     if(!text.isEmpty()) {
         QRegExp rx;
@@ -65,13 +65,16 @@ void VqbInstancesSelect::updateTypes()
                 //kDebug() << "Removing:";
                 types.removeAt( types.indexOf( type ) );
             }
+            else {
+                kDebug() << text << " matches exactly the regexp of " << type;
+            }
         }
     }
     m_ui->cbType->clear();
     m_ui->cbType->insertItems(-1, types);
 }
 
-void VqbInstancesSelect::on_listBoxConditions_changed()
+void VqbInstancesSelect::updateQuery()
 {
     //update query part
     QString query = "SELECT DISTINCT ";
@@ -86,7 +89,6 @@ void VqbInstancesSelect::on_listBoxConditions_changed()
 
     m_queryPart = query;
     emit queryChanged(m_queryPart);
-    updateVars();
 }
 
 void VqbInstancesSelect::updateVars()
@@ -110,6 +112,8 @@ void VqbInstancesSelect::updateVars()
     //add vars to list
     m_ui->listVars->clear();
     m_ui->listVars->addItems(m_varList);
+
+    //FIXME: remove nonexistent vars from output list
 }
 
 void VqbInstancesSelect::updateCompletersSubject(QString text)
@@ -268,17 +272,27 @@ void VqbInstancesSelect::init()
     //FIXME: populate comboboxes with all possible corresponding values
 }
 
-
+/******************* GUI component events ****************/
 void VqbInstancesSelect::on_buttonAddToOutput_clicked()
 {
     if(m_ui->listVars->currentItem()) {
-//        m_ui->outputList
-        //emit(addVarToOutput(m_ui->listVars->currentItem()->text()));
+        m_ui->listOutputs->addItem(m_ui->listVars->currentItem()->text());
     }
+    updateQuery();
 }
 
+void VqbInstancesSelect::on_buttonRemoveFromOutput_clicked()
+{
+    m_ui->listOutputs->takeItem(m_ui->listOutputs->currentRow());
+    updateQuery();
+}
 
-
+void VqbInstancesSelect::on_listBoxConditions_changed()
+{
+    updateQuery();
+    updateVars();
+    //FIXME: make sure outputs vars are removed too, and this is reflected in the query
+}
 #include "vqbinstancesselect.moc"
 
 

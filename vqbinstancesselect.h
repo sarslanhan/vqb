@@ -17,6 +17,7 @@ public:
     virtual ~VqbInstancesSelect();
 
 private slots:
+    void on_buttonRemoveFromOutput_clicked();
     void on_buttonAddToOutput_clicked();
     void on_listBoxConditions_changed();
     void init();
@@ -24,7 +25,7 @@ private slots:
     void updateCurrentTriple();
     void updateTypes();
     void updateVars();
-    //void updateCompleters();
+    void updateQuery();
 
     void updateCompletersSubject(QString text);
     void updateCompletersPredicate(QString text);
