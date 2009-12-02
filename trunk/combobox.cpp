@@ -18,6 +18,7 @@ ComboBox::ComboBox(QWidget* parent)
 
     setToolTip(m_varName);
 
+    //FIXME: don't add actions for CONSTRUCT vqb
     QAction *add = KStandardAction::findNext(this, SLOT(addToOutput()), this);
     add->setText(QString("Add " + m_varName + " to output"));
     add->setStatusTip(tr("Adds the variable to the output list"));
@@ -25,7 +26,7 @@ ComboBox::ComboBox(QWidget* parent)
     addAction(add);
     setContextMenuPolicy(Qt::ActionsContextMenu);
 
-    //initialize reove action (but don't add it to the list)
+    //initialize remove action (but don't add it to the list)
     m_removeAction = KStandardAction::findNext(this, SLOT(removeFromOutput()), this);
     m_removeAction->setText(QString("Remove" + m_varName + " from to output"));
     m_removeAction->setStatusTip(tr("Removes the variable from the output list"));

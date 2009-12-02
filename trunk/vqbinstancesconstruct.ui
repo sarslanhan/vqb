@@ -53,7 +53,7 @@ Examples:
      <bool>true</bool>
     </property>
     <property name="title">
-     <string>Triple Construction</string>
+     <string>Triple</string>
     </property>
     <widget class="QCheckBox" name="checkBoxFilterConditions">
      <property name="geometry">
@@ -191,7 +191,7 @@ Examples:
      </font>
     </property>
     <property name="title">
-     <string>Active Triples</string>
+     <string>Graph Pattern</string>
     </property>
     <property name="flat">
      <bool>false</bool>
@@ -228,26 +228,13 @@ Examples:
      <bool>true</bool>
     </property>
     <property name="title">
-     <string>Triple Construction</string>
+     <string>Triple</string>
     </property>
-    <widget class="QCheckBox" name="checkBoxFilterOutputs">
-     <property name="geometry">
-      <rect>
-       <x>64</x>
-       <y>102</y>
-       <width>61</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Filter</string>
-     </property>
-    </widget>
     <widget class="KComboBox" name="cbPredicateOutputs">
      <property name="geometry">
       <rect>
        <x>64</x>
-       <y>67</y>
+       <y>70</y>
        <width>221</width>
        <height>22</height>
       </rect>
@@ -260,7 +247,7 @@ Examples:
      <property name="geometry">
       <rect>
        <x>184</x>
-       <y>167</y>
+       <y>143</y>
        <width>101</width>
        <height>22</height>
       </rect>
@@ -270,7 +257,7 @@ Examples:
      <property name="geometry">
       <rect>
        <x>64</x>
-       <y>27</y>
+       <y>30</y>
        <width>221</width>
        <height>22</height>
       </rect>
@@ -279,21 +266,11 @@ Examples:
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="KComboBox" name="cbRelationOutputs">
-     <property name="geometry">
-      <rect>
-       <x>184</x>
-       <y>102</y>
-       <width>101</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
     <widget class="KComboBox" name="cbObjectOutputs">
      <property name="geometry">
       <rect>
        <x>64</x>
-       <y>137</y>
+       <y>113</y>
        <width>221</width>
        <height>22</height>
       </rect>
@@ -316,7 +293,7 @@ Examples:
      <property name="geometry">
       <rect>
        <x>4</x>
-       <y>27</y>
+       <y>30</y>
        <width>51</width>
        <height>22</height>
       </rect>
@@ -332,7 +309,7 @@ Examples:
      <property name="geometry">
       <rect>
        <x>4</x>
-       <y>67</y>
+       <y>70</y>
        <width>51</width>
        <height>22</height>
       </rect>
@@ -348,7 +325,7 @@ Examples:
      <property name="geometry">
       <rect>
        <x>14</x>
-       <y>137</y>
+       <y>113</y>
        <width>41</width>
        <height>22</height>
       </rect>
@@ -376,7 +353,7 @@ Examples:
      </font>
     </property>
     <property name="title">
-     <string>Active Triples</string>
+     <string>Graph Pattern</string>
     </property>
     <property name="flat">
      <bool>false</bool>

@@ -13,7 +13,7 @@
 #include <KDebug>
 #include <KRandom>
 
-static const QSize GlobalSize(200, 20);//global size for most screen elements
+static const QSize GlobalSize(100, 20);//global size for most screen elements
 static const int IndentSize = 40;
 static const QStringList RelationList( QStringList() << "contains" << "equals" );
 
@@ -30,8 +30,8 @@ public:
         QList<QObject*> objects;
         objects << predicateCB << relationCB << objectCB << restrictionLayout << subjectLayout << addBtn << removeBtn;
         foreach(QObject *o, objects) {
-            if(o != 0) {
-                o->deleteLater();
+            if(o) {
+                delete o;
             }
         }
     }
@@ -66,6 +66,8 @@ void QueryNode::init()
     }
     else { //child node
         d->predicateCB = new QComboBox();
+        d->predicateCB->resize( GlobalSize );
+        d->predicateCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         d->predicateCB->setStatusTip("Predicate of the RDF triple");
         findPredicates();//FIXME: get predicates from parent
 
@@ -101,13 +103,13 @@ void QueryNode::findObjects()
         kDebug() << (int) d->predicateCB;
         QString predicate = d->predicateCB->itemData( d->predicateCB->currentIndex() ).toString();
         query = QString("SELECT DISTINCT ?label ?class WHERE {"
-                            "<%1> <http://www.w3.org/2000/01/rdf-schema#range> ?class ."
-                            "OPTIONAL { ?class <http://www.w3.org/2000/01/rdf-schema#label> ?label } }")
+                            "%1 rdfs:range ?class ."
+                            "OPTIONAL { ?class rdfs:label ?label } }")
                     .arg(predicate);
     }
     else { //root node
     query = "SELECT DISTINCT ?label ?class WHERE"
-                    "{ ?resource a ?class .  ?class <http://www.w3.org/2000/01/rdf-schema#label> ?label }";
+                    "{ ?resource a ?class .  ?class rdfs:label ?label }";
     }
 
     qt->setQuery(query);
@@ -121,12 +123,12 @@ void QueryNode::findPredicates()
 
     QString query = QString("SELECT DISTINCT ?label ?property WHERE {"
                             " { "
-                            " ?property <http://www.w3.org/2000/01/rdf-schema#domain> <%1> "
-                            " OPTIONAL { ?property  <http://www.w3.org/2000/01/rdf-schema#label> ?label }"
+                            " ?property rdfs:domain %1 "
+                            " OPTIONAL { ?property  rdfs:label ?label }"
                             " } UNION {"
-                            " ?instance a <%1> . "
+                            " ?instance a %1 . "
                             " ?instance ?property ?object "
-                            " OPTIONAL { ?property  <http://www.w3.org/2000/01/rdf-schema#label> ?label } "
+                            " OPTIONAL { ?property rdfs:label ?label } "
                             " } } "
                             ).arg(d->parentClass);
     qt->setQuery( query );
@@ -138,7 +140,7 @@ void QueryNode::findPredicates()
 void QueryNode::addSubjects(QList<QStringPair> subjects)
 {
     //cleanup
-    removeRestrictions();
+    removeAllRestrictions();
 
     d->objectCB->clear();
 
@@ -158,11 +160,11 @@ void QueryNode::addSubjects(QList<QStringPair> subjects)
 
     //change interface
     QString object = d->objectCB->itemData( d->objectCB->currentIndex() ).toString();
-    if (object == "http://www.w3.org/2001/XMLSchema#string" ||
-        object == "http://www.w3.org/2000/01/rdf-schema#Literal") { //Literal
+    if (object == "xsd:string" ||
+        object == "rdfs:Literal") { //Literal
 
         if(d->relationCB == 0) {
-            d->relationCB = new ComboBox();
+            d->relationCB = new QComboBox();
             d->relationCB->setStatusTip("Constraint relation");
             connect(d->relationCB, SIGNAL(currentIndexChanged(int)),
                     this, SLOT(updateQueryPart()));
@@ -171,6 +173,10 @@ void QueryNode::addSubjects(QList<QStringPair> subjects)
             d->relationCB->insertItems(0, RelationList);
             d->subjectLayout->insertWidget(1, d->relationCB );
         }
+
+        d->restrictionLayout->removeWidget(d->addBtn);
+        d->addBtn->deleteLater();
+        d->addBtn = 0;
 
         d->objectCB->clear();
         d->objectCB->setEditable( true );
@@ -217,6 +223,7 @@ void QueryNode::addPredicates(QList<QStringPair > predicates)
         sp = predicates[i];
         //FIXME: if label is empty, parse (I don't know what I meant by this)
         d->predicateCB->addItem(sp.first.isEmpty() ? sp.second : sp.first, sp.second);  //add s2 as the data associated to the item
+        kDebug() << sp;
     }
     d->predicateCB->setCurrentIndex(-1);  //insertItem( 0, "?p" );
     d->predicateCB->blockSignals(false);
@@ -231,13 +238,13 @@ void QueryNode::addObjectToLayout()
         d->objectCB->setStatusTip("Object of the RDF triple");
         d->objectCB->resize( GlobalSize );
         d->objectCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        d->objectCB->setEditable(true);
+        //d->objectCB->setEditable(true);
 
         connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(updateQueryPart()));
         connect(d->objectCB, SIGNAL(editTextChanged(QString)), this, SLOT(updateQueryPart()));
         connect(d->objectCB, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
         connect(d->objectCB, SIGNAL(removeVarFromOutput(QString)), this, SIGNAL(removeVarFromOutput(QString)));
-        connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(removeRestrictions()));
+        connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(removeAllRestrictions()));
 
         findObjects();
 
@@ -259,7 +266,7 @@ void QueryNode::addRestriction()
     connect(qn, SIGNAL(removeClicked(QueryNode*)), this, SLOT(removeRestriction(QueryNode*)));
 }
 
-void QueryNode::removeRestrictions()
+void QueryNode::removeAllRestrictions()
 {
     foreach(QueryNode *qn, d->restrictions) {
         d->restrictionLayout->removeItem(qn);
@@ -312,7 +319,7 @@ QString QueryNode::queryPart()
         foreach(QueryNode *node, d->restrictions) {
             childrenQueryParts.append(var + " " + node->queryPart());
         }
-        return QString(var + " a <" + classUri + "> . " + childrenQueryParts);
+        return QString(var + " a " + classUri + " . " + childrenQueryParts);
     }    
 
     if(d->objectCB->isEditable()) { //Literal node
@@ -329,7 +336,7 @@ QString QueryNode::queryPart()
         } else if (relStr == "contains") {
             filterStr = QString(". FILTER regex(" + var + ", '" + object + "', 'i') . ") ;
         }
-        return QString("<" + predUri + "> " + var + filterStr);
+        return QString(predUri + " " + var + filterStr);
     }
 
     else { //Resource node
@@ -339,9 +346,9 @@ QString QueryNode::queryPart()
         foreach(QueryNode *node, d->restrictions) {
             childrenQueryParts.append(var + " " + node->queryPart());
         }
-        return QString("<" + predUri + "> " + var + " . "
-                       + var + " a <" + classUri +
-                       + "> . " + childrenQueryParts);
+        return QString(predUri + var + " . "
+                       + var + " a " + classUri +
+                       + " . " + childrenQueryParts);
     }
 }
 

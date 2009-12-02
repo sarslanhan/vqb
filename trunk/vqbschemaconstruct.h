@@ -27,12 +27,13 @@ public slots:
     void queryTreeChanged(int index, QString constraint);
     void queryTreeDeleted(int treeNumber);
     void addQueryTree();
+    void populateOutputLists();
+    void updateTriple();
 
 private:
     void init();
     void emitQueryChanged();
 
-    Ui::VqbSchemaConstruct *m_ui;
     class Private;
     Private * const d;
 

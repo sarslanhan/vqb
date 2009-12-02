@@ -64,8 +64,208 @@
    <property name="title">
     <string>Output</string>
    </property>
+   <widget class="KEditListBox" name="listBoxConditions">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>20</y>
+      <width>321</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Graph Pattern</string>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBoxObject">
+    <property name="geometry">
+     <rect>
+      <x>250</x>
+      <y>20</y>
+      <width>111</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Object</string>
+    </property>
+    <widget class="KListWidget" name="listObject">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>91</width>
+       <height>121</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="KLineEdit" name="lineEditFilterObject">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="clickMessage">
+      <string>&lt;Filter&gt;</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbShowAllObject">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>175</y>
+       <width>88</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Show All</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBoxSubject">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>111</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Subject</string>
+    </property>
+    <widget class="KListWidget" name="listSubject">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>91</width>
+       <height>121</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="KLineEdit" name="lineEditFilterSubject">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="clickMessage">
+      <string>&lt;Filter&gt;</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbShowAllSubject">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>175</y>
+       <width>88</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Show All</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBoxPredicate">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>20</y>
+      <width>111</width>
+      <height>201</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>Predicate</string>
+    </property>
+    <widget class="KListWidget" name="listPredicate">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>91</width>
+       <height>121</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="KLineEdit" name="lineEditFilterPredicate">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>91</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="clickMessage">
+      <string>&lt;Filter&gt;</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="cbShowAllPredicate">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>175</y>
+       <width>88</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Show All</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>KListWidget</class>
+   <extends>QListWidget</extends>
+   <header>klistwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KEditListBox</class>
+   <extends>QGroupBox</extends>
+   <header>keditlistbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>klineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

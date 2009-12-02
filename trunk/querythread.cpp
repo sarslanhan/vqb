@@ -60,7 +60,7 @@ void QueryThread::singleQuery()
         n = s.value(1);
         if (n.isResource()) {
             val.second = n.uri().toString();
-            //val = VisualQueryBuilderConsts::getPrefixForm( val );
+            val.second = VqbGlobal::prefixForm( val.second );
         } else if (n.isLiteral()) {
             //val = "\"" + n.literal().toString() + "\"^^<"+ n.literal().dataTypeUri().toString()+">";
             val.second = n.literal().toString();
@@ -81,7 +81,7 @@ void QueryThread::incrementalQuery()
     QString s = "SELECT DISTINCT " + this->m_varName + " WHERE { " + this->m_query + " } LIMIT 50";
     //add prefixes
     s = VqbGlobal::addPrefixes( s );
-    kDebug() << "---000--- Running query: " << s;
+    //kDebug() << "---000--- Running query: " << s;
 
     Soprano::Model* m = QueryThread::nepomukMainModel();
     Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
@@ -89,7 +89,7 @@ void QueryThread::incrementalQuery()
     QList<Soprano::BindingSet> allStatements = it.allBindings();
 
 
-    kDebug() << "---000--- " << allStatements.count();
+    //kDebug() << "---000--- " << allStatements.count();
     QString val;
     foreach (Soprano::BindingSet s, allStatements ) {
               Soprano::Node n = s.value(this->m_varName.replace("?", ""));
@@ -107,12 +107,12 @@ void QueryThread::incrementalQuery()
                   results.insert(val);
               }
     }
-    kDebug() << "---000--- Query done.";
+    //kDebug() << "---000--- Query done.";
 }
 
 void QueryThread::setQuery(QString query, QString varName, QueryMode queryMode)
 {
-    m_query = query;
+    m_query = VqbGlobal::addPrefixes(query);
     m_varName = varName;
     m_queryMode = queryMode;
 }

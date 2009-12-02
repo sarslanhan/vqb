@@ -4,6 +4,7 @@
 #include "sparqlhighlighter.h"
 #include "subjecttree.h"
 #include "constraint.h"
+#include "vqbglobal.h"
 
 #include <QMainWindow>
 #include <QLayout>
@@ -16,6 +17,7 @@
 #include <QPushButton>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QRegExp>
 
 #include <QProcess>
 
@@ -35,14 +37,18 @@ public:
     QVBoxLayout *topLayout;//holds the query trees
     QStringList queryTreeStrings;
     QList<SubjectTree*> queryTrees;
+    QStringList outputs;
+    QString query;
+    Ui::VqbSchemaConstruct *ui;
 };
 
 /*************      CONSTR, DESTR, INIT      ****************/
 
 VqbSchemaConstruct::VqbSchemaConstruct(VqbMainWindow *parent)
-        : VqbForm(parent), m_ui(new Ui::VqbSchemaConstruct), d(new Private)
+        : VqbForm(parent), d(new Private)
 {
-    m_ui->setupUi(this);
+    d->ui = new Ui::VqbSchemaConstruct;
+    d->ui->setupUi(this);
     init();
 }
 
@@ -61,7 +67,7 @@ void VqbSchemaConstruct::init()
     qhbl->addStretch(10);
 
     QVBoxLayout* layout = new QVBoxLayout();
-    m_ui->scrollAreaWidgetContents->setLayout(layout);
+    d->ui->scrollAreaWidgetContents->setLayout(layout);
 
     d->topLayout = new QVBoxLayout; //the top QueryTree stack
     layout->addLayout(d->topLayout, 1);
@@ -69,13 +75,17 @@ void VqbSchemaConstruct::init()
     layout->addStretch(5);
 
     addQueryTree();
+
+    connect(d->ui->listSubject, SIGNAL(itemSelectionChanged()), this, SLOT(updateTriple()));
+    connect(d->ui->listPredicate, SIGNAL(itemSelectionChanged()), this, SLOT(updateTriple()));
+    connect(d->ui->listObject, SIGNAL(itemSelectionChanged()), this, SLOT(updateTriple()));
 }
 
 
 VqbSchemaConstruct::~VqbSchemaConstruct()
 {
     delete d;
-    delete m_ui;
+    delete d->ui;
 }
 
 /*************      PUBLIC SLOTS      ****************/
@@ -87,6 +97,7 @@ void VqbSchemaConstruct::queryTreeChanged(int index, QString queryTreeString)
         d->queryTreeStrings[index] = queryTreeString;
     }
     emitQueryChanged();
+    populateOutputLists();
 }
 
 
@@ -123,11 +134,88 @@ void VqbSchemaConstruct::addQueryTree()
 
 void VqbSchemaConstruct::emitQueryChanged()
 {
-    QString query;
+    QString query = "CONSTRUCT { ";
+    foreach(QString s, d->ui->listBoxConditions->items()) {
+        query.append(s + " ");
+    }
+    query.append(" } \n WHERE { \n");
     foreach(QString s, d->queryTreeStrings) {
         query.append(s);
     }
+    query.append("}\n");
+
+    d->query = query;
+
     emit queryChanged(query);
 }
+
+void VqbSchemaConstruct::populateOutputLists()
+{
+    kDebug() << d->query;
+    d->ui->listObject->clear();
+    d->ui->listSubject->clear();
+    d->ui->listPredicate->clear();;
+
+    //FIXME? use word boundaries?
+    QRegExp rx(VqbGlobal::typeRegExp("var"));
+
+    QStringList itemList;
+    QString item;
+
+    int pos = 0;
+    while ((pos = rx.indexIn( d->query, pos )) != -1) {
+        item = rx.cap(0);
+        if(!itemList.contains(item) && !item.isEmpty()) {
+            itemList.append(item);
+        }
+        pos += rx.matchedLength();
+    }
+
+    d->ui->listObject->addItems(itemList);
+    d->ui->listSubject->addItems(itemList);
+    d->ui->listPredicate->addItems(itemList);
+
+    itemList.clear();
+
+    rx.setPattern(VqbGlobal::typeRegExp("URI"));//non-literal URIs
+    kDebug() << VqbGlobal::typeRegExp("URI");
+    pos = 0;
+    while ((pos = rx.indexIn( d->query, pos )) != -1) {
+        item = rx.cap(0);
+        if( !itemList.contains(item) && !item.isEmpty() ) {
+            itemList.append(item);
+        }
+        pos += rx.matchedLength();
+        kDebug() << "Captured: " << item;
+    }
+
+    d->ui->listObject->addItems(itemList);
+    d->ui->listPredicate->addItems(itemList << "a"); //a (rdfs:type) predicate always needed
+
+    itemList.clear();
+    rx.setPattern(VqbGlobal::typeRegExp("Literal"));//literal URIs
+    kDebug() << VqbGlobal::typeRegExp("Literal");
+    pos = 0;
+    while ((pos = rx.indexIn( d->query, pos )) != -1) {
+        item = rx.cap(0);
+        if(!itemList.contains(item) ) {
+            itemList.append(item);
+        }
+        pos += rx.matchedLength();
+        kDebug() << "Captured: " << item;
+    }
+
+    d->ui->listObject->addItems(itemList);
+}
+
+void VqbSchemaConstruct::updateTriple()
+{
+    QString triple = (d->ui->listSubject->currentItem() ? d->ui->listSubject->currentItem()->text() : QString()) + " " +
+                     (d->ui->listPredicate->currentItem() ? d->ui->listPredicate->currentItem()->text() : QString()) + " " +
+                     (d->ui->listObject->currentItem() ? d->ui->listObject->currentItem()->text() : QString());
+
+    d->ui->listBoxConditions->lineEdit()->setText(triple);
+}
+
 
 #include "vqbschemaconstruct.moc"

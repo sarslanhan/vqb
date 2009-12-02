@@ -36,7 +36,7 @@ private slots:
     void addObjectToLayout();
 
     void emitRemove();
-    void removeRestrictions();
+    void removeAllRestrictions();
     void removeRestriction(QueryNode *qn);
 
 

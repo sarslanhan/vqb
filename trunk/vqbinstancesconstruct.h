@@ -18,20 +18,22 @@ public:
     virtual ~VqbInstancesConstruct();
 
 private slots:
-    void on_buttonAddToOutput_clicked();
+    void on_listBoxOutputs_changed();
     void on_listBoxConditions_changed();
     void init();
 
-    void updateCurrentTriple();
-    void updateTypes();
-    void updateVars();
+    void updateCurrentTripleC();
+    void updateCurrentTripleO();
+    void updateTypesC();
+    void updateTypesO();
     //void updateCompleters();
+    void emitQueryChanged();
 
-    void updateCompletersSubject(QString text);
-    void updateCompletersPredicate(QString text);
-    void updateCompletersObject(QString text);
+    void updateCompletersSubjectC(QString text);
+    void updateCompletersPredicateC(QString text);
+    void updateCompletersObjectC(QString text);
 
-    void colorLineEdits();
+    void colorLineEditsC();
 
 private:  
     Ui::VqbInstancesConstruct *m_ui;

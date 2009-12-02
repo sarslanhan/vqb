@@ -31,7 +31,7 @@
     <bool>true</bool>
    </property>
    <property name="title">
-    <string>Triple Construction</string>
+    <string>Triple</string>
    </property>
    <widget class="QCheckBox" name="checkBoxFilter">
     <property name="geometry">
@@ -179,7 +179,7 @@ Examples:
     </font>
    </property>
    <property name="title">
-    <string>Basic Graph Pattern</string>
+    <string>Graph Pattern</string>
    </property>
    <property name="flat">
     <bool>false</bool>
@@ -215,6 +215,12 @@ Examples:
      <font>
       <pointsize>9</pointsize>
      </font>
+    </property>
+    <property name="dragDropMode">
+     <enum>QAbstractItemView::InternalMove</enum>
+    </property>
+    <property name="movement">
+     <enum>QListView::Free</enum>
     </property>
    </widget>
    <widget class="KPushButton" name="buttonAddToOutput">
@@ -289,8 +295,11 @@ Examples:
       <height>161</height>
      </rect>
     </property>
+    <property name="dragDropMode">
+     <enum>QAbstractItemView::InternalMove</enum>
+    </property>
     <property name="movement">
-     <enum>QListView::Snap</enum>
+     <enum>QListView::Free</enum>
     </property>
    </widget>
    <widget class="KPushButton" name="buttonRemoveFromOutput">

@@ -13,7 +13,7 @@ void SparqlHighlighter::highlightBlock(const QString &text)
     QTextCharFormat myClassFormat;
     myClassFormat.setFontWeight(QFont::Bold);
     myClassFormat.setForeground(Qt::darkMagenta);
-    QString pattern = "\\b(SELECT|DISTINCT|WHERE|FILTER|PREFIX|a)\\b";
+    QString pattern = "\\b(SELECT|DISTINCT|WHERE|FILTER|PREFIX|CONSTRUCT|a)\\b";
 
     QRegExp expression(pattern);
     int index = text.indexOf(expression);
