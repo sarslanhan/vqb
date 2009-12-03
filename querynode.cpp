@@ -8,6 +8,7 @@
 #include <QSize>
 #include <QList>
 #include <QPushButton>
+#include <QFrame>
 
 #include <KPushButton>
 #include <KDebug>
@@ -21,14 +22,15 @@ class QueryNode::Private
 {
 public:
     Private(QString _parentClass)
-            : predicateCB(0), relationCB(0), objectCB(0), addBtn(0), removeBtn(0), subjectLayout(0),  restrictionLayout(0)
+            : predicateCB(0), relationCB(0), objectCB(0), addBtn(0), removeBtn(0), subjectLayout(0), restrictionContainer(0), restrictionLayout(0)
     {
         parentClass  = _parentClass;
     }
     ~Private()
     {
         QList<QObject*> objects;
-        objects << predicateCB << relationCB << objectCB << restrictionLayout << subjectLayout << addBtn << removeBtn;
+        //FIXME? does restrictionContainer delete restrictionLayout?
+        objects << predicateCB << relationCB << objectCB << subjectLayout << addBtn << removeBtn;
         foreach(QObject *o, objects) {
             if(o) {
                 delete o;
@@ -44,14 +46,17 @@ public:
     QHBoxLayout *subjectLayout;
 
     QList<QueryNode*> restrictions;
+    QWidget *restrictionContainer;
     QVBoxLayout *restrictionLayout;
 
     QString parentClass;//URI of parent predicate
+    int level;//level in the query tree
 };
 
-QueryNode::QueryNode(QString parentClass)
+QueryNode::QueryNode(QString parentClass, int level)
         : QVBoxLayout(), d(new Private(parentClass))
 {
+    d->level = level;
     init();
 }
 
@@ -79,9 +84,25 @@ void QueryNode::init()
     //Restriction Layout 
     d->restrictionLayout = new QVBoxLayout();
     d->restrictionLayout->setAlignment(Qt::AlignLeft);
+    d->restrictionLayout->setContentsMargins(0, 0, 0, 0);
+
+    d->restrictionContainer = new QFrame();
+    d->restrictionContainer->setAttribute(Qt::WA_PaintOnScreen, true);
+    d->restrictionContainer->setMinimumSize(0, 0);
+    d->restrictionContainer->resize(0, 0);
+    d->restrictionContainer->setContentsMargins(2, 2, 2, 2);
+    //d->restrictionContainer->setAutoFillBackground(true);
+    //((QFrame*)d->restrictionContainer)->setFrameStyle(QFrame::Box);
+
+    QPalette palette( d->restrictionContainer->palette() );
+    palette.setColor( QPalette::Window, d->level % 2 ? QColor(232, 231, 230) : Qt::lightGray );
+    d->restrictionContainer->setPalette(palette);
+    d->restrictionContainer->setLayout(d->restrictionLayout);
+
     QHBoxLayout *container = new QHBoxLayout();//to indent restrictionLayout
-    container->addSpacing(IndentSize);
-    container->addLayout(d->restrictionLayout);
+    container->addSpacing(IndentSize);    
+    container->addWidget(d->restrictionContainer);
+
     this->addLayout(d->subjectLayout);
     this->addLayout(container);    
 }
@@ -221,9 +242,8 @@ void QueryNode::addPredicates(QList<QStringPair > predicates)
     QStringPair sp;
     for(int i=0; i<predicates.count(); i++) {
         sp = predicates[i];
-        //FIXME: if label is empty, parse (I don't know what I meant by this)
         d->predicateCB->addItem(sp.first.isEmpty() ? sp.second : sp.first, sp.second);  //add s2 as the data associated to the item
-        kDebug() << sp;
+        //kDebug() << sp;
     }
     d->predicateCB->setCurrentIndex(-1);  //insertItem( 0, "?p" );
     d->predicateCB->blockSignals(false);
@@ -257,7 +277,7 @@ void QueryNode::addObjectToLayout()
 
 void QueryNode::addRestriction()
 {
-    QueryNode *qn = new QueryNode(d->objectCB->itemData(d->objectCB->currentIndex()).toString());
+    QueryNode *qn = new QueryNode(d->objectCB->itemData(d->objectCB->currentIndex()).toString(), d->level+1);
     d->restrictions.append(qn);
     d->restrictionLayout->insertLayout(d->restrictionLayout->count()-1, qn);
     connect(qn, SIGNAL(queryPartChanged(QString)), this, SLOT(updateQueryPart()));
@@ -298,7 +318,7 @@ QString QueryNode::queryPart()
     //WISH: only the changed query part returns its query string:
     //       use that, and don't recompute anything
 
-    //FIXME: use vars - based on the relation combobox (have a "variable" option).
+    //FIXME (future): use vars - based on the relation combobox (have a "variable" option).
 
     if(d->objectCB == 0) {
         return QString();
@@ -327,7 +347,6 @@ QString QueryNode::queryPart()
         if(d->relationCB) {
             relStr = d->relationCB->currentText();
         }
-        //FIXME: wrong output if no value is entered
         QString predUri = d->predicateCB->itemData(d->predicateCB->currentIndex()).toString();
         QString filterStr;
         QString object = d->objectCB->currentText();

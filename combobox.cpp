@@ -5,6 +5,7 @@
 #include <QPaintEvent>
 #include <QPaintEngine>
 #include <QPainter>
+#include <QPalette>
 
 #include <krandom.h>
 #include <kdebug.h>
@@ -31,6 +32,7 @@ ComboBox::ComboBox(QWidget* parent)
     m_removeAction->setText(QString("Remove" + m_varName + " from to output"));
     m_removeAction->setStatusTip(tr("Removes the variable from the output list"));
     m_removeAction->setShortcut(0);
+
 }
 
 void ComboBox::addToOutput()
