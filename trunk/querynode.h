@@ -8,7 +8,7 @@ class QueryNode : public QVBoxLayout
 {
     Q_OBJECT
 public:
-    QueryNode(QString parentClass = QString());//filtering class
+    QueryNode(QString parentClass = QString(), int level = 0);//filtering class
     ~QueryNode();
 
     /** Returns the query part contributed by this node
@@ -25,11 +25,6 @@ signals:
     void removeVarFromOutput(QString varName);
     void removeClicked(QueryNode *qn);
 
-private:
-    void init();
-
-    class Private;
-    Private * const d;
 
 private slots:
     void addRestriction();
@@ -44,6 +39,13 @@ private slots:
     void findPredicates();
 
     void updateQueryPart();
+
+private:
+    void init();
+
+    class Private;
+    Private * const d;
+
 };
 
 #endif // QUERYNODE_H
