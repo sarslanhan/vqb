@@ -32,6 +32,9 @@ private slots:
     void updateCompletersSubjectC(QString text);
     void updateCompletersPredicateC(QString text);
     void updateCompletersObjectC(QString text);
+    void updateCompletersSubjectO(QString text);
+    void updateCompletersPredicateO(QString text);
+    void updateCompletersObjectO(QString text);
 
     void colorLineEditsC();
 
@@ -43,7 +46,7 @@ private:
     QueryThread *m_queryThread;
     QString m_queryPart;
 
-    QString constructCompletionQuery(QString text, int slotNumber);
+    QString constructCompletionQuery(QString text, int slotNumber, bool isWherePart);//creates completion query based on slot number and query part
 };
 
 #endif // VQBINSTANCESCONSTRUCT_H

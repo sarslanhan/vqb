@@ -178,7 +178,6 @@ void VqbSchemaConstruct::populateOutputLists()
     itemList.clear();
 
     rx.setPattern(VqbGlobal::typeRegExp("URI"));//non-literal URIs
-    kDebug() << VqbGlobal::typeRegExp("URI");
     pos = 0;
     while ((pos = rx.indexIn( d->query, pos )) != -1) {
         item = rx.cap(0);
@@ -186,7 +185,6 @@ void VqbSchemaConstruct::populateOutputLists()
             itemList.append(item);
         }
         pos += rx.matchedLength();
-        kDebug() << "Captured: " << item;
     }
 
     d->ui->listObject->addItems(itemList);
@@ -194,7 +192,6 @@ void VqbSchemaConstruct::populateOutputLists()
 
     itemList.clear();
     rx.setPattern(VqbGlobal::typeRegExp("Literal"));//literal URIs
-    kDebug() << VqbGlobal::typeRegExp("Literal");
     pos = 0;
     while ((pos = rx.indexIn( d->query, pos )) != -1) {
         item = rx.cap(0);
@@ -202,7 +199,6 @@ void VqbSchemaConstruct::populateOutputLists()
             itemList.append(item);
         }
         pos += rx.matchedLength();
-        kDebug() << "Captured: " << item;
     }
 
     d->ui->listObject->addItems(itemList);

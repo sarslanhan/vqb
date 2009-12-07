@@ -81,7 +81,7 @@ void QueryThread::incrementalQuery()
     QString s = "SELECT DISTINCT " + this->m_varName + " WHERE { " + this->m_query + " } LIMIT 50";
     //add prefixes
     s = VqbGlobal::addPrefixes( s );
-    //kDebug() << "---000--- Running query: " << s;
+    kDebug() << "---000--- Running query: " << s;
 
     Soprano::Model* m = QueryThread::nepomukMainModel();
     Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
@@ -112,7 +112,7 @@ void QueryThread::incrementalQuery()
 
 void QueryThread::setQuery(QString query, QString varName, QueryMode queryMode)
 {
-    m_query = VqbGlobal::addPrefixes(query);
+    m_query = query;
     m_varName = varName;
     m_queryMode = queryMode;
 }
