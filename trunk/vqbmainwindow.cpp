@@ -88,6 +88,7 @@ void VqbMainWindow::tabChanged(int index)
     if (index == 1) {
         q = m_ui->queryViewer->toPlainText();
         q.replace("\n", " ");
+        q.append(" LIMIT 100");
 
         QString cmd = "sopranocmd --dbus org.kde.NepomukStorage --model main --querylang SPARQL query \"";
         cmd.append(q);

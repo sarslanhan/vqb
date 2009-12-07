@@ -78,6 +78,9 @@
    <property name="floating">
     <bool>false</bool>
    </property>
+   <property name="windowTitle">
+    <string>Preview</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
@@ -125,7 +128,7 @@
        <string>Test-runs the query</string>
       </property>
       <attribute name="title">
-       <string>Preview Query Results</string>
+       <string>Query Results</string>
       </attribute>
       <widget class="QTextEdit" name="queryResults">
        <property name="geometry">
@@ -145,6 +148,9 @@
    <property name="text">
     <string>&amp;Save</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
   </action>
   <action name="actionExit">
    <property name="text">
@@ -155,10 +161,16 @@
    <property name="text">
     <string>Post to pastebin.com</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
   </action>
   <action name="action_Return_to_Startup">
    <property name="text">
     <string>&amp;Return to Startup</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>

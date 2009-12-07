@@ -65,9 +65,6 @@ void VqbInstancesSelect::updateTypes()
                 //kDebug() << "Removing:";
                 types.removeAt( types.indexOf( type ) );
             }
-            else {
-                kDebug() << text << " matches exactly the regexp of " << type;
-            }
         }
     }
     m_ui->cbType->clear();
@@ -136,12 +133,37 @@ void VqbInstancesSelect::updateCompletersSubject(QString text)
 
 void VqbInstancesSelect::updateCompletersPredicate(QString text)
 {
-    Q_UNUSED(text);
+    //FIXME: stop the previous query
+    if(text.isEmpty()) { //don't complete empty string
+        return;
+    }
+
+    QString query = constructCompletionQuery(text, 2);
+    m_queryThread->setQuery(query,
+                            "?slot", QueryThread::IncrementalQuery);
+    disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
+    connect(m_queryThread, SIGNAL(resultFound(QString)),
+            (CompleterLineEdit*)m_ui->cbPredicate->lineEdit(), SLOT(addItem(QString)));
+    kDebug() << query;
+    m_queryThread->start();
 }
 
 void VqbInstancesSelect::updateCompletersObject(QString text)
 {
-    Q_UNUSED(text);
+    //FIXME: stop the previous query
+    if(text.isEmpty()) { //don't complete empty string
+        return;
+    }
+
+    QString query = constructCompletionQuery(text, 3);
+    m_queryThread->setQuery(query,
+                            "?slot", QueryThread::IncrementalQuery);
+    disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
+    connect(m_queryThread, SIGNAL(resultFound(QString)),
+            (CompleterLineEdit*)m_ui->cbObject->lineEdit(), SLOT(addItem(QString)));
+    kDebug() << query;
+
+    m_queryThread->start();
 }
 
 QString VqbInstancesSelect::constructCompletionQuery(QString text, int slotNumber)
@@ -162,19 +184,23 @@ QString VqbInstancesSelect::constructCompletionQuery(QString text, int slotNumbe
     QString query;
     switch(slotNumber) {
         case 1:
-            query = slotVar + " " + predicate + " " + object + " . " + m_queryPart;
+            query = slotVar + " " + predicate + " " + object + " . ";
             break;
         case 2:
-            query = subject + " " + slotVar + " " + object + " . " + m_queryPart;
+            query = subject + " " + slotVar + " " + object + " . ";
             break;
         case 3:
-            query = subject + " " + predicate + " " + slotVar + " . " + m_queryPart;
+            query = subject + " " + predicate + " " + slotVar + " . ";
             break;
     }
     query += " FILTER regex( str(" + slotVar + "), '" + text + "', 'i') . ";
 
-    //FIXME: use BGP
+    foreach(QString triple, m_ui->listBoxConditions->items()) {
+        query.append(triple + " . ");
+        kDebug() << triple;
+    }
 
+    kDebug() << "Returning: " << query;
     return query;
 }
 
@@ -257,6 +283,10 @@ void VqbInstancesSelect::init()
     //updating completers
     connect(m_ui->cbSubject->lineEdit(), SIGNAL(textEdited(QString)),
             this, SLOT(updateCompletersSubject(QString)));
+    connect(m_ui->cbObject->lineEdit(), SIGNAL(textEdited(QString)),
+            this, SLOT(updateCompletersObject(QString)));
+    connect(m_ui->cbPredicate->lineEdit(), SIGNAL(textEdited(QString)),
+            this, SLOT(updateCompletersPredicate(QString)));
 
     connect(m_ui->cbSubject->lineEdit(), SIGNAL(editingFinished()),
             this, SLOT(colorLineEdits()));

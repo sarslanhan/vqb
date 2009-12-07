@@ -137,13 +137,13 @@ void VqbInstancesConstruct::emitQueryChanged()
 void VqbInstancesConstruct::updateCompletersSubjectC(QString text)
 {
     //FIXME: stop the previous query
-    //m_ui->cbSubjectConditions->completionObject()->clear();
+    //m_ui->cbSubject->completionObject()->clear();
 
     if(text.isEmpty()) { //don't complete empty string
         return;
     }
 
-    m_queryThread->setQuery(constructCompletionQuery(text, 1),
+    m_queryThread->setQuery(constructCompletionQuery(text, 1, true),
                             "?slot", QueryThread::IncrementalQuery);
     disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
     connect(m_queryThread, SIGNAL(resultFound(QString)),
@@ -154,44 +154,154 @@ void VqbInstancesConstruct::updateCompletersSubjectC(QString text)
 
 void VqbInstancesConstruct::updateCompletersPredicateC(QString text)
 {
-    Q_UNUSED(text);
+    //FIXME: stop the previous query
+    if(text.isEmpty()) { //don't complete empty string
+        return;
+    }
+
+    QString query = constructCompletionQuery(text, 2, true);
+    m_queryThread->setQuery(query,
+                            "?slot", QueryThread::IncrementalQuery);
+    disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
+    connect(m_queryThread, SIGNAL(resultFound(QString)),
+            (CompleterLineEdit*)m_ui->cbPredicateConditions->lineEdit(), SLOT(addItem(QString)));
+    kDebug() << query;
+    m_queryThread->start();
 }
 
 void VqbInstancesConstruct::updateCompletersObjectC(QString text)
 {
-    Q_UNUSED(text);
+    //FIXME: stop the previous query
+    if(text.isEmpty()) { //don't complete empty string
+        return;
+    }
+
+    QString query = constructCompletionQuery(text, 3, true);
+    m_queryThread->setQuery(query,
+                            "?slot", QueryThread::IncrementalQuery);
+    disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
+    connect(m_queryThread, SIGNAL(resultFound(QString)),
+            (CompleterLineEdit*)m_ui->cbObjectConditions->lineEdit(), SLOT(addItem(QString)));
+    kDebug() << query;
+
+    m_queryThread->start();
 }
 
-QString VqbInstancesConstruct::constructCompletionQuery(QString text, int slotNumber)
+
+void VqbInstancesConstruct::updateCompletersSubjectO(QString text)
+{
+    //FIXME: stop the previous query
+
+    if(text.isEmpty()) { //don't complete empty string
+        return;
+    }
+
+    m_queryThread->setQuery(constructCompletionQuery(text, 1, false),
+                            "?slot", QueryThread::IncrementalQuery);
+    disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
+    connect(m_queryThread, SIGNAL(resultFound(QString)),
+            (CompleterLineEdit*)m_ui->cbSubjectOutputs->lineEdit(), SLOT(addItem(QString)));
+
+    m_queryThread->start();
+}
+
+void VqbInstancesConstruct::updateCompletersPredicateO(QString text)
+{
+    //FIXME: stop the previous query
+    if(text.isEmpty()) { //don't complete empty string
+        return;
+    }
+
+    QString query = constructCompletionQuery(text, 2, false);
+    m_queryThread->setQuery(query,
+                            "?slot", QueryThread::IncrementalQuery);
+    disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
+    connect(m_queryThread, SIGNAL(resultFound(QString)),
+            (CompleterLineEdit*)m_ui->cbPredicateOutputs->lineEdit(), SLOT(addItem(QString)));
+    m_queryThread->start();
+}
+
+void VqbInstancesConstruct::updateCompletersObjectO(QString text)
+{
+    //FIXME: stop the previous query
+    if(text.isEmpty()) { //don't complete empty string
+        return;
+    }
+
+    QString query = constructCompletionQuery(text, 3, false);
+    m_queryThread->setQuery(query,
+                            "?slot", QueryThread::IncrementalQuery);
+    disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
+    connect(m_queryThread, SIGNAL(resultFound(QString)),
+            (CompleterLineEdit*)m_ui->cbObjectOutputs->lineEdit(), SLOT(addItem(QString)));
+
+    m_queryThread->start();
+}
+
+QString VqbInstancesConstruct::constructCompletionQuery(QString text, int slotNumber, bool isWherePart)
 {
     //initializing fields
     QString slotVar = "?slot";
-    QString subject = m_ui->cbSubjectConditions->currentText();
-    subject = subject.isEmpty() ? VqbGlobal::randomVarName() : subject;
-    QString predicate = m_ui->cbPredicateConditions->currentText();
-    predicate = predicate.isEmpty() ? VqbGlobal::randomVarName() : predicate;
-    QString object = m_ui->cbObjectConditions->currentText();
-    object = object.isEmpty() ? VqbGlobal::randomVarName() :
-                                VqbGlobal::constructObject(m_ui->checkBoxFilterConditions->isChecked(),
-                                                           m_ui->cbRelationConditions->currentText(),
-                                                           m_ui->cbObjectConditions->currentText(),
-                                                           m_ui->cbTypeConditions->currentText());
-    //building query
     QString query;
-    switch(slotNumber) {
-        case 1:
-            query = slotVar + " " + predicate + " " + object + " . " + m_queryPart;
-            break;
-        case 2:
-            query = subject + " " + slotVar + " " + object + " . " + m_queryPart;
-            break;
-        case 3:
-            query = subject + " " + predicate + " " + slotVar + " . " + m_queryPart;
-            break;
-    }
-    query += " FILTER regex( str(" + slotVar + "), '" + text + "', 'i') . ";
 
-    //FIXME: use BGP
+    if(isWherePart) {
+        QString subject = m_ui->cbSubjectConditions->currentText();
+        subject = subject.isEmpty() ? VqbGlobal::randomVarName() : subject;
+        QString predicate = m_ui->cbPredicateConditions->currentText();
+        predicate = predicate.isEmpty() ? VqbGlobal::randomVarName() : predicate;
+        QString object = m_ui->cbObjectConditions->currentText();
+        object = object.isEmpty() ? VqbGlobal::randomVarName() :
+                                    VqbGlobal::constructObject(m_ui->checkBoxFilterConditions->isChecked(),
+                                                               m_ui->cbRelationConditions->currentText(),
+                                                               m_ui->cbObjectConditions->currentText(),
+                                                               m_ui->cbTypeConditions->currentText());
+        //building query
+        switch(slotNumber) {
+            case 1:
+                query = slotVar + " " + predicate + " " + object + " . ";
+                break;
+            case 2:
+                query = subject + " " + slotVar + " " + object + " . ";
+                break;
+            case 3:
+                query = subject + " " + predicate + " " + slotVar + " . ";
+                break;
+        }
+        query += " FILTER regex( str(" + slotVar + "), '" + text + "', 'i') . ";
+
+        //basic graph pattern (BGP - triples added so far)
+        foreach(QString triple, m_ui->listBoxConditions->items()) {
+            query.append(triple + " . ");
+        }
+    }
+    else {
+        //FIXME: proper CONSTRUCT autocompletion
+        QString subject = m_ui->cbSubjectOutputs->currentText();
+        subject = subject.isEmpty() ? VqbGlobal::randomVarName() : subject;
+        QString predicate = m_ui->cbPredicateOutputs->currentText();
+        predicate = predicate.isEmpty() ? VqbGlobal::randomVarName() : predicate;
+        QString object = m_ui->cbObjectOutputs->currentText();
+        object = object.isEmpty() ? VqbGlobal::randomVarName() :
+                                    VqbGlobal::constructObject(false,
+                                                               QString(),
+                                                               m_ui->cbObjectOutputs->currentText(),
+                                                               m_ui->cbTypeOutputs->currentText());
+        //building query
+        switch(slotNumber) {
+            case 1:
+                query = predicate +  " rdfs:domain " + slotVar + " . " + predicate + " rdfs:range " + object + " . ";
+                break;
+            case 2:
+                query = slotVar +  " rdfs:domain " + subject + " . " + slotVar + " rdfs:range " + object + " . ";
+                break;
+            case 3:
+                query = predicate +  " rdfs:domain " + subject + " . " + predicate + " rdfs:range " + slotVar + " . ";
+                break;
+        }
+        query += " FILTER regex( str(" + slotVar + "), '" + text + "', 'i') . ";
+
+        //No BGP for outputs
+    }    
 
     return query;
 }
@@ -232,9 +342,12 @@ void VqbInstancesConstruct::init()
     m_queryThreads.append(new QueryThread(this));
 
     //LineEdits
-    m_ui->cbSubjectConditions->setLineEdit(new CompleterLineEdit(m_ui->cbSubjectConditions));
-    m_ui->cbPredicateConditions->setLineEdit(new CompleterLineEdit(m_ui->cbPredicateConditions));
-    m_ui->cbObjectConditions->setLineEdit(new CompleterLineEdit(m_ui->cbObjectConditions));
+    m_ui->cbSubjectConditions->setLineEdit(new CompleterLineEdit());
+    m_ui->cbPredicateConditions->setLineEdit(new CompleterLineEdit());
+    m_ui->cbObjectConditions->setLineEdit(new CompleterLineEdit());
+    m_ui->cbSubjectOutputs->setLineEdit(new CompleterLineEdit());
+    m_ui->cbPredicateOutputs->setLineEdit(new CompleterLineEdit());
+    m_ui->cbObjectOutputs->setLineEdit(new CompleterLineEdit());
 
     connect(m_queryThreads[0], SIGNAL(resultFound(QString)), (CompleterLineEdit *) m_ui->cbSubjectConditions->lineEdit(), SLOT(addItem(QString)));
     connect(m_queryThreads[1], SIGNAL(resultFound(QString)), (CompleterLineEdit *) m_ui->cbPredicateConditions->lineEdit(), SLOT(addItem(QString)));
@@ -249,7 +362,7 @@ void VqbInstancesConstruct::init()
     m_ui->cbPredicateOutputs->lineEdit()->setText("?p");
     m_ui->cbObjectOutputs->lineEdit()->setText("?o");
 
-    //triple updating signals for Conditions
+    //triple updating signals /Conditions
     connect(m_ui->cbSubjectConditions->lineEdit(), SIGNAL(textChanged(QString)),//(editingFinished()),
             this, SLOT(updateCurrentTripleC()));
     connect(m_ui->cbSubjectConditions, SIGNAL(currentIndexChanged(QString)),
@@ -269,7 +382,7 @@ void VqbInstancesConstruct::init()
     connect(m_ui->checkBoxFilterConditions, SIGNAL(stateChanged(int)),
             this, SLOT(updateCurrentTripleC()));
 
-    //triple updating signals for Outputs
+    //triple updating signals /Outputs
     connect(m_ui->cbSubjectOutputs->lineEdit(), SIGNAL(textChanged(QString)),//(editingFinished()),
             this, SLOT(updateCurrentTripleO()));
     connect(m_ui->cbSubjectOutputs, SIGNAL(currentIndexChanged(QString)),
@@ -285,21 +398,33 @@ void VqbInstancesConstruct::init()
     connect(m_ui->cbTypeOutputs, SIGNAL(currentIndexChanged(QString)),
             this, SLOT(updateCurrentTripleO()));
 
-    //type updating signal
+    //type updating signal /Conditions
     connect(m_ui->cbObjectConditions, SIGNAL(editTextChanged(QString)),
             this, SLOT(updateTypesC()));
     connect(m_ui->checkBoxFilterConditions, SIGNAL(toggled(bool)),
             this, SLOT(updateTypesC()));
 
-    //type updating signal
+    //type updating signal /Outputs
     connect(m_ui->cbObjectOutputs, SIGNAL(editTextChanged(QString)),
             this, SLOT(updateTypesO()));
 
-    //updating completers
+    //updating completers /Conditions
     connect(m_ui->cbSubjectConditions->lineEdit(), SIGNAL(textEdited(QString)),
             this, SLOT(updateCompletersSubjectC(QString)));
+    connect(m_ui->cbObjectConditions->lineEdit(), SIGNAL(textEdited(QString)),
+            this, SLOT(updateCompletersObjectC(QString)));
+    connect(m_ui->cbPredicateConditions->lineEdit(), SIGNAL(textEdited(QString)),
+            this, SLOT(updateCompletersPredicateC(QString)));
 
-    //FIXME: activate colorLineEditsC on editingFinished
+    //updating completers /Outputs
+    connect(m_ui->cbSubjectOutputs->lineEdit(), SIGNAL(textEdited(QString)),
+            this, SLOT(updateCompletersSubjectO(QString)));
+    connect(m_ui->cbObjectOutputs->lineEdit(), SIGNAL(textEdited(QString)),
+            this, SLOT(updateCompletersObjectO(QString)));
+    connect(m_ui->cbPredicateOutputs->lineEdit(), SIGNAL(textEdited(QString)),
+            this, SLOT(updateCompletersPredicateO(QString)));
+
+    //color LineEdits /Conditions
     connect(m_ui->cbSubjectConditions->lineEdit(), SIGNAL(editingFinished()),
             this, SLOT(colorLineEditsC()));
     connect(m_ui->cbObjectConditions->lineEdit(), SIGNAL(editingFinished()),
