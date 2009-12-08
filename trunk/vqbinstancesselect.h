@@ -17,6 +17,8 @@ public:
     virtual ~VqbInstancesSelect();
 
 private slots:
+    void on_buttonDown_clicked();
+    void on_buttonUp_clicked();
     void on_buttonRemoveFromOutput_clicked();
     void on_buttonAddToOutput_clicked();
     void on_listBoxConditions_changed();

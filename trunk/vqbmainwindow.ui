@@ -19,32 +19,28 @@
    <string>VqbForm</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QScrollArea" name="scrollArea">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>19</y>
-      <width>740</width>
-      <height>480</height>
-     </rect>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Raised</enum>
-    </property>
-    <property name="widgetResizable">
-     <bool>true</bool>
-    </property>
-    <widget class="QWidget" name="scrollAreaWidgetContents">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>736</width>
-       <height>476</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>757</width>
+         <height>486</height>
+        </rect>
+       </property>
+      </widget>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -75,6 +71,12 @@
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
+   <property name="baseSize">
+    <size>
+     <width>779</width>
+     <height>248</height>
+    </size>
+   </property>
    <property name="floating">
     <bool>false</bool>
    </property>
@@ -85,63 +87,62 @@
     <number>8</number>
    </attribute>
    <widget class="QWidget" name="dockWidgetContents_4">
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>0</y>
-       <width>751</width>
-       <height>221</height>
-      </rect>
-     </property>
-     <property name="statusTip">
-      <string/>
-     </property>
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tabQuery">
-      <property name="statusTip">
-       <string>Displays current query</string>
-      </property>
-      <attribute name="title">
-       <string>Resulting Query</string>
-      </attribute>
-      <widget class="QTextEdit" name="queryViewer">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>731</width>
-         <height>171</height>
-        </rect>
+    <property name="baseSize">
+     <size>
+      <width>779</width>
+      <height>226</height>
+     </size>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="baseSize">
+        <size>
+         <width>751</width>
+         <height>221</height>
+        </size>
        </property>
-       <property name="font">
-        <font>
-         <pointsize>9</pointsize>
-        </font>
+       <property name="statusTip">
+        <string/>
        </property>
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tabQuery">
+        <property name="statusTip">
+         <string>Displays current query</string>
+        </property>
+        <attribute name="title">
+         <string>Resulting Query</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QTextEdit" name="queryViewer">
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabResults">
+        <property name="statusTip">
+         <string>Test-runs the query</string>
+        </property>
+        <attribute name="title">
+         <string>Query Results</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QTextEdit" name="queryResults"/>
+         </item>
+        </layout>
+       </widget>
       </widget>
-     </widget>
-     <widget class="QWidget" name="tabResults">
-      <property name="statusTip">
-       <string>Test-runs the query</string>
-      </property>
-      <attribute name="title">
-       <string>Query Results</string>
-      </attribute>
-      <widget class="QTextEdit" name="queryResults">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>731</width>
-         <height>171</height>
-        </rect>
-       </property>
-      </widget>
-     </widget>
-    </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <action name="actionSave">
