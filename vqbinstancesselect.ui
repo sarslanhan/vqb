@@ -13,96 +13,107 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>311</width>
-     <height>221</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="autoFillBackground">
-    <bool>true</bool>
-   </property>
-   <property name="title">
-    <string>Triple</string>
-   </property>
-   <widget class="QCheckBox" name="checkBoxFilter">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>100</y>
-      <width>61</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Filter</string>
-    </property>
-   </widget>
-   <widget class="KComboBox" name="cbPredicate">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>60</y>
-      <width>221</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="editable">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="KComboBox" name="cbType">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>180</y>
-      <width>101</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="KComboBox" name="cbSubject">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>20</y>
-      <width>221</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="editable">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="KComboBox" name="cbRelation">
-    <property name="geometry">
-     <rect>
-      <x>200</x>
-      <y>100</y>
-      <width>101</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="KComboBox" name="cbObject">
-    <property name="geometry">
-     <rect>
-      <x>80</x>
-      <y>140</y>
-      <width>221</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Enter a string, integer, date or URI.
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>2</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
+     </property>
+     <property name="title">
+      <string>Triple</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="labelS">
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="text">
+         <string>Subject</string>
+        </property>
+        <property name="buddy">
+         <cstring>cbSubject</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="KComboBox" name="cbSubject">
+        <property name="statusTip">
+         <string>Subject Field</string>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelP">
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="text">
+         <string>Predicate</string>
+        </property>
+        <property name="buddy">
+         <cstring>cbPredicate</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="KComboBox" name="cbPredicate">
+        <property name="statusTip">
+         <string>Predicate Field</string>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="checkBoxFilter">
+        <property name="statusTip">
+         <string>Filter on Object Value</string>
+        </property>
+        <property name="text">
+         <string>Filter</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="KComboBox" name="cbRelation">
+        <property name="statusTip">
+         <string>Filter Relation</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="labelO">
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <property name="text">
+         <string>Object</string>
+        </property>
+        <property name="buddy">
+         <cstring>cbObject</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2">
+       <widget class="KComboBox" name="cbObject">
+        <property name="toolTip">
+         <string>Enter a string, integer, date or URI.
 
 Examples:
 	foaf:Person
@@ -110,230 +121,202 @@ Examples:
 	Knud Moeller
             	&lt;http://purl.org/dc/terms/title&gt;
 	</string>
-    </property>
-    <property name="editable">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelS">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>61</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::RightToLeft</enum>
-    </property>
-    <property name="text">
-     <string>Subject</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelP">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>61</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::RightToLeft</enum>
-    </property>
-    <property name="text">
-     <string>Predicate</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelO">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>140</y>
-      <width>61</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="layoutDirection">
-     <enum>Qt::RightToLeft</enum>
-    </property>
-    <property name="text">
-     <string>Object</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="KEditListBox" name="listBoxConditions">
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>10</y>
-     <width>371</width>
-     <height>221</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="title">
-    <string>Graph Pattern</string>
-   </property>
-   <property name="flat">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>330</x>
-     <y>244</y>
-     <width>371</width>
-     <height>221</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="title">
-    <string>Output Variables</string>
-   </property>
-   <widget class="QListWidget" name="listOutputs">
-    <property name="geometry">
-     <rect>
-      <x>237</x>
-      <y>44</y>
-      <width>121</width>
-      <height>141</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="dragDropMode">
-     <enum>QAbstractItemView::InternalMove</enum>
-    </property>
-    <property name="movement">
-     <enum>QListView::Free</enum>
-    </property>
-   </widget>
-   <widget class="KPushButton" name="buttonAddToOutput">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>83</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Add -&gt;</string>
-    </property>
-   </widget>
-   <widget class="KPushButton" name="buttonDown">
-    <property name="geometry">
-     <rect>
-      <x>330</x>
-      <y>190</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Move Down</string>
-    </property>
-    <property name="statusTip">
-     <string>Moves variable down one position</string>
-    </property>
-   </widget>
-   <widget class="KPushButton" name="buttonUp">
-    <property name="geometry">
-     <rect>
-      <x>300</x>
-      <y>190</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Move Up</string>
-    </property>
-    <property name="statusTip">
-     <string>Moves variable up one position</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelOutputVars">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>20</y>
-      <width>151</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Output variables:</string>
-    </property>
-   </widget>
-   <widget class="QListWidget" name="listVars">
-    <property name="geometry">
-     <rect>
-      <x>12</x>
-      <y>45</y>
-      <width>121</width>
-      <height>161</height>
-     </rect>
-    </property>
-    <property name="dragDropMode">
-     <enum>QAbstractItemView::InternalMove</enum>
-    </property>
-    <property name="movement">
-     <enum>QListView::Free</enum>
-    </property>
-   </widget>
-   <widget class="KPushButton" name="buttonRemoveFromOutput">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>127</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>9</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>&lt;- Remove</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>131</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Available variables:</string>
-    </property>
-   </widget>
-  </widget>
+        </property>
+        <property name="statusTip">
+         <string>Object field</string>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="KComboBox" name="cbType">
+        <property name="statusTip">
+         <string>Object (Literal) Type</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Type</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="KEditListBox" name="listBoxConditions">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>3</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Conditional Triples</string>
+     </property>
+     <property name="statusTip">
+      <string>Conditional Triples</string>
+     </property>
+     <property name="title">
+      <string>Graph Pattern</string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>3</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>Output Variables</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Available variables:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="2">
+       <widget class="QLabel" name="labelOutputVars">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Output variables:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" rowspan="3">
+       <widget class="QListWidget" name="listVars">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>3</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::InternalMove</enum>
+        </property>
+        <property name="movement">
+         <enum>QListView::Free</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="KPushButton" name="buttonAddToOutput">
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Add to Output</string>
+        </property>
+        <property name="statusTip">
+         <string>Adds Variable to Output</string>
+        </property>
+        <property name="text">
+         <string>Add -&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" rowspan="2" colspan="2">
+       <widget class="QListWidget" name="listOutputs">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>2</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="dragDropMode">
+         <enum>QAbstractItemView::InternalMove</enum>
+        </property>
+        <property name="movement">
+         <enum>QListView::Free</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="KPushButton" name="buttonRemoveFromOutput">
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Remove from Output</string>
+        </property>
+        <property name="statusTip">
+         <string>Removes Variable from Output</string>
+        </property>
+        <property name="text">
+         <string>&lt;- Remove</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="KPushButton" name="buttonUp">
+        <property name="toolTip">
+         <string>Move Up</string>
+        </property>
+        <property name="statusTip">
+         <string>Moves variable up one position</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="KPushButton" name="buttonDown">
+        <property name="toolTip">
+         <string>Move Down</string>
+        </property>
+        <property name="statusTip">
+         <string>Moves variable down one position</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>
@@ -359,6 +342,12 @@ Examples:
   <tabstop>cbRelation</tabstop>
   <tabstop>cbObject</tabstop>
   <tabstop>cbType</tabstop>
+  <tabstop>listVars</tabstop>
+  <tabstop>buttonAddToOutput</tabstop>
+  <tabstop>buttonRemoveFromOutput</tabstop>
+  <tabstop>listOutputs</tabstop>
+  <tabstop>buttonUp</tabstop>
+  <tabstop>buttonDown</tabstop>
  </tabstops>
  <resources/>
  <connections/>

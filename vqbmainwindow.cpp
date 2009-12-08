@@ -34,6 +34,7 @@ VqbMainWindow::VqbMainWindow(QWidget *parent) :
 
     connect(m_ui->dockWidget, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
     //FIXME: resize dock widget correctly
+    m_ui->dockWidget->resize(751, 221);
 
     initMainForm();
 }
@@ -59,19 +60,6 @@ void VqbMainWindow::queryChanged(QString query)
     m_ui->queryViewer->setText(VqbGlobal::addPrefixes(query));
     //FIXME: convert all URIs to prefixes
 }
-
-/*void VqbMainWindow::refreshQuery()
-{
-    QString query = "SELECT DISTINCT ";
-    foreach(QListWidgetItem *item, m_ui->outputList->findItems(QString(), Qt::MatchContains)) {
-        query.append(item->text() + " ");
-    }
-    query.append(" \n WHERE { \n");
-    query.append(m_queryPart);
-    query.append("}\n");
-    m_ui->queryViewer->setText(VqbGlobal::addPrefixes(query));
-}
-*/
 
 void VqbMainWindow::dockTopLevelChanged(bool topLevel)
 {
@@ -110,6 +98,12 @@ void VqbMainWindow::tabChanged(int index)
         QString result = QString(script.readAllStandardOutput().data()) + (QString) script.readAllStandardError().data();
         m_ui->queryResults->setText(result);
     }
+}
+
+void VqbMainWindow::postErrorMessage(QString message)
+{
+    kDebug() << "We're in!";
+    m_ui->statusBar->showMessage(message);
 }
 
 /***************************** Menu actions ********************************/
@@ -162,7 +156,6 @@ void VqbMainWindow::showStartupMenu(bool exitOnCancel)
         m_mainForm->deleteLater();
     }
 
-    //FIXME: use Ok/Exit buttons
     QString choice = KInputDialog::getItem("Please choose interface mode", "VQB Startup", QStringList() << "S_S" << "S_C" << "I_S" << "I_C", 0, false);
         
     if(choice == "S_S") {
@@ -231,4 +224,15 @@ void VqbMainWindow::readKIOData(KIO::Job *job, const QByteArray &data)
     }
 
     m_pastebinData.append(data);
+}
+
+void VqbMainWindow::on_dockWidget_topLevelChanged(bool topLevel)
+{
+    if(topLevel) {
+        kDebug() << "Toplevel";
+        resize(size()-QSize(0, m_ui->dockWidget->size().height()));
+    }
+    else {
+        resize(size()+QSize(0, m_ui->dockWidget->size().height()));
+    }
 }

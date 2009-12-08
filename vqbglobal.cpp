@@ -51,14 +51,6 @@ QString VqbGlobal::constructObject(bool filterOn, QString relation, QString expr
     if( type == "URI" || type == "var" || type == "Literal") {
         finalForm += expression;
     }
-    /*else if ( type == "var" || type =) {
-        finalForm += expression;
-    }
-    else if ( type == "Literal" ) {
-        //FIXME: handle quotes within strings - find some formatting function
-        finalForm += "\"" + expression + "\"";
-    }
-    */
     else if ( type == "string" ) {
         //FIXME: needs to be escaped
         finalForm += "\"" + expression + "\"^^xsd:string" ;

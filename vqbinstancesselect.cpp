@@ -210,7 +210,6 @@ void VqbInstancesSelect::colorLineEdits()
 {
     //FIXME: display an informative message about the error (something like "0 results found");
     int hasResults = QueryThread::countQueryResults("SELECT * WHERE { " + m_currentTriple + " } LIMIT 1");
-    //FIXME: use BGP
 
     QRegExp rx(VqbGlobal::typeRegExp("var"));
 
@@ -221,7 +220,13 @@ void VqbInstancesSelect::colorLineEdits()
 
     //init the coloring Palettes
     QPalette palette( lO->palette() );//palette adjusted to given color
-    palette.setColor( QPalette::Base, hasResults ? Qt::white : Qt::red );
+    if(hasResults) {
+        palette.setColor( QPalette::Base, Qt::white );
+    }
+    else  {
+        palette.setColor( QPalette::Base, Qt::red );
+        ((VqbMainWindow*)parent())->postErrorMessage("No results found!");
+    }
 
     //perform the coloring
     lS->setPalette(palette);
@@ -234,7 +239,11 @@ void VqbInstancesSelect::colorLineEdits()
 
 void VqbInstancesSelect::init()
 {
+    m_ui->buttonUp->setIcon(KIcon("arrow-up"));
+    m_ui->buttonDown->setIcon(KIcon("arrow-down"));
+
     //query threads
+    //FIXME: remove query threads
     m_queryThreads.append(new QueryThread(this));
     m_queryThreads.append(new QueryThread(this));
     m_queryThreads.append(new QueryThread(this));
@@ -323,7 +332,35 @@ void VqbInstancesSelect::on_listBoxConditions_changed()
     updateVars();
     //FIXME: make sure outputs vars are removed too, and this is reflected in the query
 }
+
+
+
+void VqbInstancesSelect::on_buttonUp_clicked()
+{
+    QListWidget* lw = m_ui->listOutputs;
+    int i = lw->currentRow();
+    if(i > 0) {
+        QListWidgetItem *item = lw->takeItem(i);
+        lw->insertItem(i-1, item);
+        lw->setCurrentRow(i-1);
+    }
+}
+
+
+void VqbInstancesSelect::on_buttonDown_clicked()
+{
+    QListWidget* lw = m_ui->listOutputs;
+    int i = lw->currentRow();
+    if(i < lw->count()-1) {
+        QListWidgetItem *item = lw->takeItem(i);
+        lw->insertItem(i+1, item);
+        lw->setCurrentRow(i+1);
+    }
+}
+
+
 #include "vqbinstancesselect.moc"
+
 
 
 

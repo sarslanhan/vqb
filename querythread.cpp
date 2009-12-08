@@ -27,6 +27,8 @@ QueryThread::QueryThread(QObject *parent)
 void QueryThread::run()
 {
     if(m_queryMode == QueryThread::SingleQuery) {
+        m_query = VqbGlobal::addPrefixes(m_query);
+        kDebug() << m_query;
         singleQuery();
     }
     else if(m_queryMode == QueryThread::IncrementalQuery) {

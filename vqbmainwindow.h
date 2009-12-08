@@ -22,6 +22,7 @@ public:
 
 public slots:
     void queryChanged(QString queryPart);
+    void postErrorMessage(QString message);//writes an error message to the status bar
 
 private:
     void initMainForm();
@@ -35,6 +36,7 @@ private:
     QByteArray m_pastebinData;;
 
 private slots:
+    void on_dockWidget_topLevelChanged(bool topLevel);
     void on_action_Return_to_Startup_triggered();
     void on_actionSave_triggered();
     void on_actionExit_triggered();

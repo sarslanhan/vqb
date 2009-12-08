@@ -27,7 +27,7 @@ public slots:
     void queryTreeChanged(int index, QString constraint);
     void queryTreeDeleted(int treeNumber);
     void addQueryTree();
-    void populateOutputLists();
+    void populateOutputLists();//populates the lists for constructing the output
     void updateTriple();
 
 private:
