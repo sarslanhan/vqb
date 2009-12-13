@@ -42,7 +42,6 @@ private slots:
     void on_actionExit_triggered();
     void on_actionPostToPastebin_triggered();
     void tabChanged(int index);
-    void dockTopLevelChanged (bool topLevel);
 
     void initStartupMenu();
     void showStartupMenu(bool exitOnCancel);

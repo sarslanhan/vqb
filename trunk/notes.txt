@@ -2,17 +2,10 @@
 
 VqbMainWindow:
 - queryChanged: remove outputs not in the query
-- apply prefixing on resulting query
 
 VqbFormSchema:
-- add colors to restrictionLayouts (like Kate colors the open files), to better highlight membership
 - fix CB size problems
 - introduce variables
-- ? color comboboxes that have been added to the output? (setStyleSheet)
-- use prefix form for the QStringPair results
-
-VqbFormInstances:
-- clarify URI/Literal/String in the case of string values, e.g. "tag"
 
 
 
@@ -36,10 +29,6 @@ Advantages
 
 
 
-
-
-
-
 ---------- FOAF INFERENCING ----------------------
 
 name:
@@ -51,36 +40,3 @@ Person:
             pim:Person (not subclass of owl:Thing)
             geo:SpatiaThing (not subclass of owl:Thing)
 
-
-
-
----------------------- BACKUP -------------------------
-
-void VqbForm::addConstraint( bool isAttached, QString parentVarName, QString parentClass )
-{
-    //QVBoxLayout *layout = dynamic_cast<QVBoxLayout*>( this->layout() );
-    if( d->topLayout ) {
-        Constraint *c = new Constraint( d->constraintStrings.count(), this, isAttached, parentVarName, parentClass );
-        d->topLayout->addWidget( c  );
-        d->constraintStrings.append("");
-
-        connect( this, SIGNAL(refresh()),
-                 c, SLOT(returnConstraint()) );
-
-        connect( c, SIGNAL( constraintChanged(int,QString) ),
-                 this, SLOT( constraintChanged(int,QString) ));
-
-        /*connect( c, SIGNAL(attachConstraint(int,QString,QString)),
-                 this, SLOT(attachConstraint(int,QString,QString)) );
-                 */
-    }
-}
-
-void VqbForm::constraintChanged( int index, QString constraint )
-{
-    kDebug() << "Constraint " << index << " has changed:" << constraint;
-    if( index < d->constraintStrings.count() ) {
-        d->constraintStrings[index] = constraint;
-    }
-    refreshQuery();
-}

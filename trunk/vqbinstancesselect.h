@@ -16,6 +16,9 @@ public:
     explicit VqbInstancesSelect(VqbMainWindow *parent = 0);
     virtual ~VqbInstancesSelect();
 
+signals:
+    void errorMessage(QString);
+
 private slots:
     void on_buttonDown_clicked();
     void on_buttonUp_clicked();

@@ -21,6 +21,7 @@ VqbInstancesConstruct::VqbInstancesConstruct(VqbMainWindow *parent) :
 {
     m_ui->setupUi(this);
     init();
+    connect(this, SIGNAL(errorMessage(QString)), parent, SLOT(postErrorMessage(QString)));
 }
 
 
@@ -106,16 +107,54 @@ void VqbInstancesConstruct::updateTypesO()
     m_ui->cbTypeOutputs->insertItems(-1, types);
 }
 
+void VqbInstancesConstruct::updateVars()
+{
+    //FIXME?: add to completers
+    //update m_varList;
+    QRegExp rx(VqbGlobal::typeRegExp("var"));
+
+    m_varList.clear();
+    QString var;
+
+    int pos = 0;
+    while ((pos = rx.indexIn( m_queryPart, pos )) != -1) {
+        var = rx.cap(1);
+        if(!m_varList.contains(var) ) {
+            m_varList.append(var);
+        }
+        pos += rx.matchedLength();
+    }
+
+    kDebug() << m_varList << m_queryPart;
+    //add vars to combo boxes
+    m_ui->cbSubjectOutputs->clear();
+    m_ui->cbPredicateOutputs->clear();
+    m_ui->cbObjectOutputs->clear();
+    m_ui->cbSubjectOutputs->addItems(m_varList);
+    m_ui->cbPredicateOutputs->addItems(m_varList);
+    m_ui->cbObjectOutputs->addItems(m_varList);
+
+    m_ui->cbSubjectConditions->clear();
+    m_ui->cbPredicateConditions->clear();
+    m_ui->cbObjectConditions->clear();
+    m_ui->cbSubjectConditions->addItems(m_varList);
+    m_ui->cbPredicateConditions->addItems(m_varList);
+    m_ui->cbObjectConditions->addItems(m_varList);
+
+    //FIXME: remove nonexistent vars from output list
+}
+
 void VqbInstancesConstruct::on_listBoxConditions_changed()
 {
     emitQueryChanged();
+    updateVars();
 }
 
 
 void VqbInstancesConstruct::on_listBoxOutputs_changed()
 {
     emitQueryChanged();
-
+    updateVars();
 }
 
 void VqbInstancesConstruct::emitQueryChanged()
@@ -322,8 +361,16 @@ void VqbInstancesConstruct::colorLineEditsC()
     QLineEdit *lO = m_ui->cbObjectConditions->lineEdit();
 
     //init the coloring Palettes
+    //init the coloring Palettes
     QPalette palette( lO->palette() );//palette adjusted to given color
-    palette.setColor( QPalette::Base, hasResults ? Qt::white : Qt::red );
+    if(hasResults) {
+        palette.setColor( QPalette::Base, Qt::white );
+    }
+    else  {
+        palette.setColor( QPalette::Base, Qt::red );
+        emit errorMessage("No results found!");
+    }
+
 
     //perform the coloring
     lS->setPalette(palette);
@@ -437,6 +484,7 @@ void VqbInstancesConstruct::init()
     updateTypesO();
     updateCurrentTripleC();
     updateCurrentTripleO();
+
 }
 
 

@@ -21,6 +21,8 @@ VqbInstancesSelect::VqbInstancesSelect(VqbMainWindow *parent) :
 {
     m_ui->setupUi(this);
     init();
+
+    connect(this, SIGNAL(errorMessage(QString)), parent, SLOT(postErrorMessage(QString)));
     //FIXME: input hints
 }
 
@@ -90,7 +92,7 @@ void VqbInstancesSelect::updateQuery()
 
 void VqbInstancesSelect::updateVars()
 {
-    //FIXME: add to comboboxes and completers
+    //FIXME: add to completers
     //update m_varList;
     QRegExp rx(VqbGlobal::typeRegExp("var"));
 
@@ -109,6 +111,12 @@ void VqbInstancesSelect::updateVars()
     //add vars to list
     m_ui->listVars->clear();
     m_ui->listVars->addItems(m_varList);
+    m_ui->cbSubject->clear();
+    m_ui->cbPredicate->clear();
+    m_ui->cbObject->clear();
+    m_ui->cbSubject->addItems(m_varList);
+    m_ui->cbPredicate->addItems(m_varList);
+    m_ui->cbObject->addItems(m_varList);
 
     //FIXME: remove nonexistent vars from output list
 }
@@ -208,30 +216,24 @@ QString VqbInstancesSelect::constructCompletionQuery(QString text, int slotNumbe
 
 void VqbInstancesSelect::colorLineEdits()
 {
-    //FIXME: display an informative message about the error (something like "0 results found");
+    //FIXME: coloring doesn't work
     int hasResults = QueryThread::countQueryResults("SELECT * WHERE { " + m_currentTriple + " } LIMIT 1");
 
-    QRegExp rx(VqbGlobal::typeRegExp("var"));
-
-    //init the three LineEdits
-    QLineEdit *lS = m_ui->cbSubject->lineEdit();
-    QLineEdit *lP = m_ui->cbPredicate->lineEdit();
-    QLineEdit *lO = m_ui->cbObject->lineEdit();
-
-    //init the coloring Palettes
-    QPalette palette( lO->palette() );//palette adjusted to given color
+    QPalette palette( m_ui->cbSubject->lineEdit()->palette() );//palette adjusted to given color
     if(hasResults) {
         palette.setColor( QPalette::Base, Qt::white );
+        palette.setColor( QPalette::Window, Qt::white );
     }
     else  {
         palette.setColor( QPalette::Base, Qt::red );
-        ((VqbMainWindow*)parent())->postErrorMessage("No results found!");
+        palette.setColor( QPalette::Window, Qt::red );
+        emit errorMessage("No results found!");
     }
 
     //perform the coloring
-    lS->setPalette(palette);
-    lP->setPalette(palette);
-    lO->setPalette(palette);
+    m_ui->cbSubject->lineEdit()->setPalette(palette);
+    m_ui->cbPredicate->lineEdit()->setPalette(palette);
+    m_ui->cbObject->lineEdit()->setPalette(palette);
 }
 
 /********** Initialization *************/
@@ -330,6 +332,10 @@ void VqbInstancesSelect::on_listBoxConditions_changed()
 {
     updateQuery();
     updateVars();
+    m_ui->cbSubject->lineEdit()->setText("?s");
+    m_ui->cbPredicate->lineEdit()->setText("?p");
+    m_ui->checkBoxFilter->setChecked(false);
+    m_ui->cbObject->lineEdit()->setText("?o");
     //FIXME: make sure outputs vars are removed too, and this is reflected in the query
 }
 
