@@ -50,7 +50,7 @@ void SubjectTree::updateQueryTree(QString queryTree)
 void SubjectTree::setTreeNumber(int treeNumber)
 {
     m_treeNumber = treeNumber;
-    setTitle("Subject " + QString::number(m_treeNumber + 1));
+    setTitle("Query Tree " + QString::number(m_treeNumber + 1));
 }
 
 void SubjectTree::close()

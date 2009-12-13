@@ -34,7 +34,7 @@
          <x>0</x>
          <y>0</y>
          <width>757</width>
-         <height>486</height>
+         <height>454</height>
         </rect>
        </property>
       </widget>
@@ -149,6 +149,9 @@
    <property name="text">
     <string>&amp;Save</string>
    </property>
+   <property name="statusTip">
+    <string>Saves the query to a file</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
    </property>
@@ -157,9 +160,15 @@
    <property name="text">
     <string>E&amp;xit</string>
    </property>
+   <property name="statusTip">
+    <string>Exits the Application</string>
+   </property>
   </action>
   <action name="actionPostToPastebin">
    <property name="text">
+    <string>Post to pastebin.com</string>
+   </property>
+   <property name="statusTip">
     <string>Post to pastebin.com</string>
    </property>
    <property name="shortcut">
@@ -169,6 +178,9 @@
   <action name="action_Return_to_Startup">
    <property name="text">
     <string>&amp;Return to Startup</string>
+   </property>
+   <property name="statusTip">
+    <string>Returns to the query bulding mode selection</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>

@@ -14,7 +14,7 @@
 #include <KDebug>
 #include <KRandom>
 
-static const QSize GlobalSize(100, 20);//global size for most screen elements
+static const QSize GlobalSize(120, 20);//global size for some screen elements
 static const int IndentSize = 40;
 static const QStringList RelationList( QStringList() << "contains" << "equals" );
 
@@ -43,11 +43,11 @@ public:
     ComboBox *objectCB;
     KPushButton *addBtn;
     KPushButton *removeBtn;
-    QHBoxLayout *subjectLayout;
+    QHBoxLayout *subjectLayout;//layout of the current subject
 
     QList<QueryNode*> restrictions;
     QWidget *restrictionContainer;
-    QVBoxLayout *restrictionLayout;
+    QVBoxLayout *restrictionLayout;//layout of the restrictions
 
     QString parentClass;//URI of parent predicate
     int level;//level in the query tree
@@ -71,10 +71,11 @@ void QueryNode::init()
     }
     else { //child node
         d->predicateCB = new QComboBox();
+        d->predicateCB->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
         d->predicateCB->resize( GlobalSize );
-        d->predicateCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        d->predicateCB->setMinimumSize(GlobalSize);
         d->predicateCB->setStatusTip("Predicate of the RDF triple");
-        findPredicates();//FIXME: get predicates from parent
+        findPredicates();
 
         d->subjectLayout->addWidget( d->predicateCB );
         connect(d->predicateCB, SIGNAL(currentIndexChanged(int)), this, SLOT(addObjectToLayout()));
@@ -95,6 +96,7 @@ void QueryNode::init()
     //((QFrame*)d->restrictionContainer)->setFrameStyle(QFrame::Box);
 
     QPalette palette( d->restrictionContainer->palette() );
+    //FIXME: use theme's default Window color
     palette.setColor( QPalette::Window, d->level % 2 ? QColor(232, 231, 230) : Qt::lightGray );
     d->restrictionContainer->setPalette(palette);
     d->restrictionContainer->setLayout(d->restrictionLayout);
@@ -158,6 +160,35 @@ void QueryNode::findPredicates()
 
 /**** INTERFACE AND TREE MANIPULATIONS ******/
 
+
+void QueryNode::addObjectToLayout()
+{
+    //add the objectCB to the layout
+    //FIXME: sometimes one of the CBs is longer
+    if(d->objectCB == 0) {
+        d->objectCB = new ComboBox();
+        d->objectCB->setStatusTip("Object field of the RDF triple");
+        d->objectCB->resize( GlobalSize );
+        d->objectCB->setMinimumSize(GlobalSize);
+        d->objectCB->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+        //d->objectCB->setEditable(true);
+
+        connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(updateQueryPart()));
+        connect(d->objectCB, SIGNAL(editTextChanged(QString)), this, SLOT(updateQueryPart()));
+        connect(d->objectCB, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
+        connect(d->objectCB, SIGNAL(removeVarFromOutput(QString)), this, SIGNAL(removeVarFromOutput(QString)));
+        connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(removeAllRestrictions()));
+
+        findObjects();
+
+        d->subjectLayout->addWidget(d->objectCB);
+    }
+    else {
+        findObjects();
+    }
+}
+
+
 void QueryNode::addSubjects(QList<QStringPair> subjects)
 {
     //cleanup
@@ -172,6 +203,8 @@ void QueryNode::addSubjects(QList<QStringPair> subjects)
     for(int i=0; i<subjects.count(); i++) {
         sp = subjects[i];
         d->objectCB->addItem(sp.first, sp.second);  //add s2 as the data associated to the item
+        d->objectCB->setItemData(d->objectCB->count()-1, sp.second, Qt::StatusTipRole);
+        d->objectCB->setItemData(d->objectCB->count()-1, sp.second, Qt::ToolTipRole);
         //kDebug() << "++**++ Added item" << sp.first << sp.second;
     }
 
@@ -243,36 +276,12 @@ void QueryNode::addPredicates(QList<QStringPair > predicates)
     for(int i=0; i<predicates.count(); i++) {
         sp = predicates[i];
         d->predicateCB->addItem(sp.first.isEmpty() ? sp.second : sp.first, sp.second);  //add s2 as the data associated to the item
+        d->predicateCB->setItemData(d->predicateCB->count()-1, sp.second, Qt::StatusTipRole);
+        d->predicateCB->setItemData(d->predicateCB->count()-1, sp.second, Qt::ToolTipRole);
         //kDebug() << sp;
     }
     d->predicateCB->setCurrentIndex(-1);  //insertItem( 0, "?p" );
     d->predicateCB->blockSignals(false);
-}
-
-void QueryNode::addObjectToLayout()
-{
-    //add the objectCB to the layout
-    //FIXME: sometimes one of the CBs is longer
-    if(d->objectCB == 0) {
-        d->objectCB = new ComboBox();
-        d->objectCB->setStatusTip("Object of the RDF triple");
-        d->objectCB->resize( GlobalSize );
-        d->objectCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-        //d->objectCB->setEditable(true);
-
-        connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(updateQueryPart()));
-        connect(d->objectCB, SIGNAL(editTextChanged(QString)), this, SLOT(updateQueryPart()));
-        connect(d->objectCB, SIGNAL(addVarToOutput(QString)), this, SIGNAL(addVarToOutput(QString)));
-        connect(d->objectCB, SIGNAL(removeVarFromOutput(QString)), this, SIGNAL(removeVarFromOutput(QString)));
-        connect(d->objectCB, SIGNAL(currentIndexChanged(int)), this, SLOT(removeAllRestrictions()));
-
-        findObjects();
-
-        d->subjectLayout->addWidget(d->objectCB);
-    }
-    else {
-        findObjects();
-    }
 }
 
 void QueryNode::addRestriction()

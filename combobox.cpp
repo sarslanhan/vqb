@@ -18,6 +18,7 @@ ComboBox::ComboBox(QWidget* parent)
     m_varName = VqbGlobal::randomVarName();//QString("?v" +  QString::number(KRandom::random() % 80 + 20)) ;
 
     setToolTip(m_varName);
+    setStatusTip(m_varName);
 
     //FIXME: don't add actions for CONSTRUCT vqb
     QAction *add = KStandardAction::findNext(this, SLOT(addToOutput()), this);

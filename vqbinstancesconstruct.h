@@ -17,6 +17,9 @@ public:
     explicit VqbInstancesConstruct(VqbMainWindow *parent = 0);
     virtual ~VqbInstancesConstruct();
 
+signals:
+    void errorMessage(QString);
+
 private slots:
     void on_listBoxOutputs_changed();
     void on_listBoxConditions_changed();
@@ -26,7 +29,7 @@ private slots:
     void updateCurrentTripleO();
     void updateTypesC();
     void updateTypesO();
-    //void updateCompleters();
+    void updateVars();
     void emitQueryChanged();
 
     void updateCompletersSubjectC(QString text);

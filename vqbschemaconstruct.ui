@@ -40,11 +40,9 @@
            <x>0</x>
            <y>0</y>
            <width>680</width>
-           <height>157</height>
+           <height>162</height>
           </rect>
          </property>
-         <zorder>groupBoxOutput</zorder>
-         <zorder>groupBoxOutput</zorder>
         </widget>
        </widget>
       </item>
@@ -88,6 +86,9 @@
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="KLineEdit" name="lineEditFilterSubject">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="statusTip">
             <string>Filters Subjects</string>
            </property>
@@ -105,6 +106,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="cbShowAllSubject">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="statusTip">
             <string>Show All Subjects from System (with a limited number)</string>
            </property>
@@ -135,6 +139,9 @@
         <layout class="QVBoxLayout" name="verticalLayout_4">
          <item>
           <widget class="KLineEdit" name="lineEditFilterPredicate">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="statusTip">
             <string>Filters Predicates</string>
            </property>
@@ -152,6 +159,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="cbShowAllPredicate">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="statusTip">
             <string>Show All Predicates from System (with a limited number)</string>
            </property>
@@ -182,6 +192,9 @@
         <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
           <widget class="KLineEdit" name="lineEditFilterObject">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="statusTip">
             <string>Filter Objects</string>
            </property>
@@ -205,6 +218,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="cbShowAllObject">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="statusTip">
             <string>Show All Objects from System (with a limited number)</string>
            </property>
@@ -217,7 +233,6 @@
         <zorder>listObject</zorder>
         <zorder>lineEditFilterObject</zorder>
         <zorder>cbShowAllObject</zorder>
-        <zorder>groupBoxPredicate</zorder>
        </widget>
       </item>
       <item>

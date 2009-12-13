@@ -24,7 +24,7 @@
 
 
 VqbMainWindow::VqbMainWindow(QWidget *parent) :
-    QMainWindow(parent), m_mainForm(0), m_ui(new Ui::VqbMainWindow), m_pastebinApiKey("6bqWgxxnkOQpahdgoD3vuG05aNwazhan")
+    QMainWindow(parent), m_mainForm(0), m_ui(new Ui::VqbMainWindow), m_pastebinApiKey("c4bnx61QpMPA6gxK8BCh0qR3og4utbPQ")
 {
     showStartupMenu(true);
     m_ui->setupUi(this);
@@ -32,9 +32,7 @@ VqbMainWindow::VqbMainWindow(QWidget *parent) :
     new SparqlHighlighter(m_ui->queryViewer);
     connect(m_ui->tabWidget, SIGNAL(currentChanged(int)), this, SLOT(tabChanged(int)));
 
-    connect(m_ui->dockWidget, SIGNAL(topLevelChanged(bool)), this, SLOT(dockTopLevelChanged(bool)));
-    //FIXME: resize dock widget correctly
-    m_ui->dockWidget->resize(751, 221);
+    //m_ui->dockWidget->resize(751, 221);
 
     initMainForm();
 }
@@ -59,14 +57,6 @@ void VqbMainWindow::queryChanged(QString query)
 {
     m_ui->queryViewer->setText(VqbGlobal::addPrefixes(query));
     //FIXME: convert all URIs to prefixes
-}
-
-void VqbMainWindow::dockTopLevelChanged(bool topLevel)
-{
-    //FIXME: resize correctly
-    if(topLevel) {
-
-    }
 }
 
 void VqbMainWindow::tabChanged(int index)
@@ -102,7 +92,6 @@ void VqbMainWindow::tabChanged(int index)
 
 void VqbMainWindow::postErrorMessage(QString message)
 {
-    kDebug() << "We're in!";
     m_ui->statusBar->showMessage(message);
 }
 
@@ -156,18 +145,20 @@ void VqbMainWindow::showStartupMenu(bool exitOnCancel)
         m_mainForm->deleteLater();
     }
 
-    QString choice = KInputDialog::getItem("Please choose interface mode", "VQB Startup", QStringList() << "S_S" << "S_C" << "I_S" << "I_C", 0, false);
+    QStringList options;
+    options << "Schema-based SELECT" << "Schema-based CONSTRUCT" << "Instance-based SELECT" << "Instance-based CONSTRUCT";
+    QString choice = KInputDialog::getItem("Please choose query building mode", "VQB Startup", options , 0, false);
         
-    if(choice == "S_S") {
+    if(choice == options[0]) {
         m_mainForm = new VqbSchemaSelect(this);
     }
-    else if (choice == "S_C") {
+    else if (choice == options[1]) {
         m_mainForm = new VqbSchemaConstruct(this);
     }    
-    else if (choice == "I_S") {
+    else if (choice == options[2]) {
         m_mainForm = new VqbInstancesSelect(this);
     }
-    else if (choice == "I_C") {
+    else if (choice == options[3]) {
         m_mainForm = new VqbInstancesConstruct(this);
     }
     else {
