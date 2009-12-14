@@ -127,12 +127,12 @@ void QueryNode::findObjects()
         QString predicate = d->predicateCB->itemData( d->predicateCB->currentIndex() ).toString();
         query = QString("SELECT DISTINCT ?label ?class WHERE {"
                             "%1 rdfs:range ?class ."
-                            "OPTIONAL { ?class rdfs:label ?label } }")
+                            "OPTIONAL { ?class rdfs:label ?label } } ORDER BY ?label")
                     .arg(predicate);
     }
     else { //root node
     query = "SELECT DISTINCT ?label ?class WHERE"
-                    "{ ?resource a ?class .  ?class rdfs:label ?label }";
+                    "{ ?resource a ?class .  ?class rdfs:label ?label } ORDER BY ?label";
     }
 
     qt->setQuery(query);
@@ -152,7 +152,7 @@ void QueryNode::findPredicates()
                             " ?instance a %1 . "
                             " ?instance ?property ?object "
                             " OPTIONAL { ?property rdfs:label ?label } "
-                            " } } "
+                            " } } ORDER BY ?label"
                             ).arg(d->parentClass);
     qt->setQuery( query );
     qt->start();
