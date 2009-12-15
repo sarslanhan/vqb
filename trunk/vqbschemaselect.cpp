@@ -98,7 +98,7 @@ void VqbSchemaSelect::queryTreeDeleted(int treeNumber)
         d->queryTreeStrings[i] = d->queryTreeStrings[i+1];
     }
 
-    kDebug() << i << ", " << d->queryTrees.size();
+    //kDebug() << i << ", " << d->queryTrees.size();
 
     if (i < d->queryTrees.size()) {
         d->queryTrees.removeAt(i);

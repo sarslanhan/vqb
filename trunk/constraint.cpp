@@ -127,7 +127,7 @@ QString Constraint::getQueryConstraint()
         } else if (rel == "contains") {
             filterStr = QString(" FILTER regex(" + varS + ", '" + o + "', 'i') .\n") ;
         }
-        kDebug() << " *** filter string: " << filterStr;
+        //kDebug() << " *** filter string: " << filterStr;
         q.append(filterStr);
 
     }
@@ -169,7 +169,7 @@ void Constraint::predicateSelected(int index)
 
 void Constraint::threadTerminated()
 {
-    kDebug() << "Thread is terminated.";
+    //kDebug() << "Thread is terminated.";
 }
 
 void Constraint::unblockPredicate()

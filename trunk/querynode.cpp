@@ -123,7 +123,7 @@ void QueryNode::findObjects()
     QString query;
 
     if(!d->parentClass.isEmpty()) { //if not root node
-        kDebug() << (int) d->predicateCB;
+        //kDebug() << (int) d->predicateCB;
         QString predicate = d->predicateCB->itemData( d->predicateCB->currentIndex() ).toString();
         query = QString("SELECT DISTINCT ?label ?class WHERE {"
                             "%1 rdfs:range ?class ."
@@ -306,7 +306,7 @@ void QueryNode::removeAllRestrictions()
 
 void QueryNode::removeRestriction(QueryNode *qn)
 {
-    kDebug() << "Removing Restriction...";
+    //kDebug() << "Removing Restriction...";
     d->restrictionLayout->removeItem(qn);
     d->restrictions.removeAt(d->restrictions.indexOf(qn));
     qn->deleteLater();
@@ -316,7 +316,7 @@ void QueryNode::removeRestriction(QueryNode *qn)
 
 void QueryNode::emitRemove()
 {
-    kDebug() << "Emitting remove";
+    //kDebug() << "Emitting remove";
     emit removeClicked(this);
 }
 
