@@ -125,7 +125,7 @@ void VqbInstancesConstruct::updateVars()
         pos += rx.matchedLength();
     }
 
-    kDebug() << m_varList << m_queryPart;
+    //kDebug() << m_varList << m_queryPart;
     //add vars to combo boxes
     m_ui->cbSubjectOutputs->clear();
     m_ui->cbPredicateOutputs->clear();
@@ -204,7 +204,7 @@ void VqbInstancesConstruct::updateCompletersPredicateC(QString text)
     disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
     connect(m_queryThread, SIGNAL(resultFound(QString)),
             (CompleterLineEdit*)m_ui->cbPredicateConditions->lineEdit(), SLOT(addItem(QString)));
-    kDebug() << query;
+    //kDebug() << query;
     m_queryThread->start();
 }
 
@@ -221,7 +221,7 @@ void VqbInstancesConstruct::updateCompletersObjectC(QString text)
     disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
     connect(m_queryThread, SIGNAL(resultFound(QString)),
             (CompleterLineEdit*)m_ui->cbObjectConditions->lineEdit(), SLOT(addItem(QString)));
-    kDebug() << query;
+    //kDebug() << query;
 
     m_queryThread->start();
 }

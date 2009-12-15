@@ -72,6 +72,6 @@ void ComboBox::removeFromOutput()
     m_isOutput = false;
     repaint();
     emit(removeVarFromOutput(m_varName));
-    kDebug() << "Emitting removeVarFromOutput";
+    //kDebug() << "Emitting removeVarFromOutput";
     removeAction(m_removeAction);
 }

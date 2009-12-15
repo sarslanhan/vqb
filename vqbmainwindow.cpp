@@ -75,16 +75,16 @@ void VqbMainWindow::tabChanged(int index)
         script.start(cmd);
 
         if (!script.waitForStarted()) {
-            kDebug() << "Query could not be started.";
+            //kDebug() << "Query could not be started.";
             //return;
         }
 
         if (!script.waitForFinished()) {
-            kDebug() << "Query could not be finished.";
+            //kDebug() << "Query could not be finished.";
             //return;
         }
 
-        kDebug() << "Ran query: " << q;
+        //kDebug() << "Ran query: " << q;
         QString result = QString(script.readAllStandardOutput().data()) + (QString) script.readAllStandardError().data();
         m_ui->queryResults->setText(result);
     }
@@ -220,7 +220,7 @@ void VqbMainWindow::readKIOData(KIO::Job *job, const QByteArray &data)
 void VqbMainWindow::on_dockWidget_topLevelChanged(bool topLevel)
 {
     if(topLevel) {
-        kDebug() << "Toplevel";
+        //kDebug() << "Toplevel";
         resize(size()-QSize(0, m_ui->dockWidget->size().height()));
     }
     else {
