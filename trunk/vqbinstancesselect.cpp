@@ -152,7 +152,7 @@ void VqbInstancesSelect::updateCompletersPredicate(QString text)
     disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
     connect(m_queryThread, SIGNAL(resultFound(QString)),
             (CompleterLineEdit*)m_ui->cbPredicate->lineEdit(), SLOT(addItem(QString)));
-    kDebug() << query;
+    //kDebug() << query;
     m_queryThread->start();
 }
 
@@ -169,7 +169,7 @@ void VqbInstancesSelect::updateCompletersObject(QString text)
     disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
     connect(m_queryThread, SIGNAL(resultFound(QString)),
             (CompleterLineEdit*)m_ui->cbObject->lineEdit(), SLOT(addItem(QString)));
-    kDebug() << query;
+    //kDebug() << query;
 
     m_queryThread->start();
 }
@@ -205,10 +205,10 @@ QString VqbInstancesSelect::constructCompletionQuery(QString text, int slotNumbe
 
     foreach(QString triple, m_ui->listBoxConditions->items()) {
         query.append(triple + " . ");
-        kDebug() << triple;
+        //kDebug() << triple;
     }
 
-    kDebug() << "Returning: " << query;
+    //kDebug() << "Returning: " << query;
     return query;
 }
 
