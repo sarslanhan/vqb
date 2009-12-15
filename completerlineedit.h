@@ -1,7 +1,7 @@
 #ifndef COMPLETERLINEEDIT_H
 #define COMPLETERLINEEDIT_H
 
-#include </home/kde-devel/kde/include/klineedit.h>
+#include <klineedit.h>
 
 class CompleterLineEdit : public KLineEdit
 {

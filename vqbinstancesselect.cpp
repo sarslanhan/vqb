@@ -5,12 +5,12 @@
 #include "querythread.h"
 #include "completerlineedit.h"
 
-#include </home/kde-devel/kde/include/kcombobox.h>
-#include </home/kde-devel/kde/include/klineedit.h>
-#include </home/kde-devel/kde/include/keditlistbox.h>
-#include </home/kde-devel/kde/include/krandom.h>
-#include </home/kde-devel/kde/include/kdebug.h>
-#include </home/kde-devel/kde/include/kcompletion.h>
+#include <kcombobox.h>
+#include <klineedit.h>
+#include <keditlistbox.h>
+#include <krandom.h>
+#include <kdebug.h>
+#include <kcompletion.h>
 
 #include <QRegExp>
 #include <QTimer>
