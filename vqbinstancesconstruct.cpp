@@ -9,6 +9,7 @@
 #include <klineedit.h>
 #include <keditlistbox.h>
 #include <krandom.h>
+
 #include <kdebug.h>
 #include <kcompletion.h>
 
@@ -109,7 +110,6 @@ void VqbInstancesConstruct::updateTypesO()
 
 void VqbInstancesConstruct::updateVars()
 {
-    //FIXME?: add to completers
     //update m_varList;
     QRegExp rx(VqbGlobal::typeRegExp("var"));
 
@@ -148,6 +148,10 @@ void VqbInstancesConstruct::on_listBoxConditions_changed()
 {
     emitQueryChanged();
     updateVars();
+    m_ui->cbSubjectConditions->lineEdit()->setText("?s");
+    m_ui->cbPredicateConditions->lineEdit()->setText("?p");
+    m_ui->checkBoxFilterConditions->setChecked(false);
+    m_ui->cbObjectConditions->lineEdit()->setText("?o");
 }
 
 
@@ -155,12 +159,15 @@ void VqbInstancesConstruct::on_listBoxOutputs_changed()
 {
     emitQueryChanged();
     updateVars();
+    m_ui->cbSubjectOutputs->lineEdit()->setText("?s");
+    m_ui->cbPredicateOutputs->lineEdit()->setText("?p");
+    m_ui->cbObjectOutputs->lineEdit()->setText("?o");
 }
 
 void VqbInstancesConstruct::emitQueryChanged()
 {
     //update query part
-    QString m_queryPart = "CONSTRUCT { ";
+    m_queryPart = "CONSTRUCT { ";
     foreach(QString triple, m_ui->listBoxOutputs->items()) {
         m_queryPart.append(triple + " ");
     }
