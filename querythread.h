@@ -53,6 +53,8 @@ private:
     void singleQuery();//fires results at the end
     void incrementalQuery();//fires each result item in turn
     static Soprano::Model* nepomukMainModel();
+    static bool caseInsensitiveLessThan(const QStringPair &s1, const QStringPair &s2);
+
 
     QString m_query;
     QString m_varName;

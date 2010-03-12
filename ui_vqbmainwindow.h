@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'vqbmainwindow.ui'
 **
-** Created: Sun Dec 13 14:10:18 2009
-**      by: Qt User Interface Compiler version 4.6.0
+** Created: Fri Mar 12 17:00:47 2010
+**      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -82,7 +82,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 757, 454));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 757, 464));
         scrollArea->setWidget(scrollAreaWidgetContents);
 
         verticalLayout->addWidget(scrollArea);
@@ -90,7 +90,7 @@ public:
         VqbMainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(VqbMainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 779, 28));
+        menuBar->setGeometry(QRect(0, 0, 779, 22));
         menu_File = new QMenu(menuBar);
         menu_File->setObjectName(QString::fromUtf8("menu_File"));
         menuWeb = new QMenu(menuBar);
@@ -122,6 +122,7 @@ public:
         queryViewer = new QTextEdit(tabQuery);
         queryViewer->setObjectName(QString::fromUtf8("queryViewer"));
         queryViewer->setFont(font);
+        queryViewer->setLineWrapMode(QTextEdit::NoWrap);
 
         verticalLayout_3->addWidget(queryViewer);
 
@@ -134,6 +135,7 @@ public:
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         queryResults = new QTextEdit(tabResults);
         queryResults->setObjectName(QString::fromUtf8("queryResults"));
+        queryResults->setLineWrapMode(QTextEdit::NoWrap);
 
         verticalLayout_4->addWidget(queryResults);
 
