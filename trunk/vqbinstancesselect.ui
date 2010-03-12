@@ -36,6 +36,12 @@
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
        <widget class="QLabel" name="labelS">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="layoutDirection">
          <enum>Qt::RightToLeft</enum>
         </property>
@@ -44,16 +50,6 @@
         </property>
         <property name="buddy">
          <cstring>cbSubject</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="KComboBox" name="cbSubject">
-        <property name="statusTip">
-         <string>Subject Field</string>
-        </property>
-        <property name="editable">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -144,6 +140,22 @@ Examples:
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="KComboBox" name="cbSubject">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>2</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="statusTip">
+         <string>Subject Field</string>
+        </property>
+        <property name="editable">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -262,7 +274,7 @@ Examples:
        <widget class="QListWidget" name="listOutputs">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
+          <horstretch>1</horstretch>
           <verstretch>3</verstretch>
          </sizepolicy>
         </property>
@@ -283,7 +295,7 @@ Examples:
        <widget class="QListWidget" name="listVars">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
+          <horstretch>2</horstretch>
           <verstretch>3</verstretch>
          </sizepolicy>
         </property>
@@ -297,6 +309,12 @@ Examples:
       </item>
       <item row="2" column="1">
        <widget class="KPushButton" name="buttonAddToOutput">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="font">
          <font>
           <pointsize>9</pointsize>

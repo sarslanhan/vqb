@@ -4,6 +4,7 @@
 #include "vqbform.h"
 class VqbMainWindow;
 class QueryThread;
+class QModelIndex;
 
 namespace Ui {
     class VqbInstancesSelect;
@@ -20,6 +21,9 @@ signals:
     void errorMessage(QString);
 
 private slots:
+    void on_listBoxConditions_removed(QString text);
+    void on_listBoxConditions_added(QString text);
+    void on_listVars_doubleClicked(QModelIndex index);
     void on_buttonDown_clicked();
     void on_buttonUp_clicked();
     void on_buttonRemoveFromOutput_clicked();

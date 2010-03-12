@@ -141,6 +141,15 @@ void VqbInstancesConstruct::updateVars()
     m_ui->cbPredicateConditions->addItems(m_varList);
     m_ui->cbObjectConditions->addItems(m_varList);
 
+    //reset fields
+    m_ui->cbSubjectConditions->lineEdit()->setText("?s");
+    m_ui->cbPredicateConditions->lineEdit()->setText("?p");
+    m_ui->checkBoxFilterConditions->setChecked(false);
+    m_ui->cbObjectConditions->lineEdit()->setText("?o");
+    m_ui->cbSubjectOutputs->lineEdit()->setText("?s");
+    m_ui->cbPredicateOutputs->lineEdit()->setText("?p");
+    m_ui->cbObjectOutputs->lineEdit()->setText("?o");
+
     //FIXME: remove nonexistent vars from output list
 }
 
@@ -148,10 +157,6 @@ void VqbInstancesConstruct::on_listBoxConditions_changed()
 {
     emitQueryChanged();
     updateVars();
-    m_ui->cbSubjectConditions->lineEdit()->setText("?s");
-    m_ui->cbPredicateConditions->lineEdit()->setText("?p");
-    m_ui->checkBoxFilterConditions->setChecked(false);
-    m_ui->cbObjectConditions->lineEdit()->setText("?o");
 }
 
 
@@ -159,9 +164,6 @@ void VqbInstancesConstruct::on_listBoxOutputs_changed()
 {
     emitQueryChanged();
     updateVars();
-    m_ui->cbSubjectOutputs->lineEdit()->setText("?s");
-    m_ui->cbPredicateOutputs->lineEdit()->setText("?p");
-    m_ui->cbObjectOutputs->lineEdit()->setText("?o");
 }
 
 void VqbInstancesConstruct::emitQueryChanged()
@@ -173,7 +175,7 @@ void VqbInstancesConstruct::emitQueryChanged()
     }
     m_queryPart.append(" } \n WHERE { \n");
     foreach(QString triple, m_ui->listBoxConditions->items()) {
-        m_queryPart.append(triple + " .\n");
+        m_queryPart.append(triple + "\n");
     }
     m_queryPart.append("}\n");
 
@@ -335,16 +337,19 @@ QString VqbInstancesConstruct::constructCompletionQuery(QString text, int slotNu
         //building query
         switch(slotNumber) {
             case 1:
-                query = predicate +  " rdfs:domain " + slotVar + " . " + predicate + " rdfs:range " + object + " . ";
+                //query = predicate +  " rdfs:domain " + slotVar + " . " + predicate + " rdfs:range " + object + " . ";
+                query = slotVar + " " + predicate + " " + object + " . ";
                 break;
             case 2:
-                query = slotVar +  " rdfs:domain " + subject + " . " + slotVar + " rdfs:range " + object + " . ";
+                //query = slotVar +  " rdfs:domain " + subject + " . " + slotVar + " rdfs:range " + object + " . ";
+                query = subject + " " + slotVar + " " + object + " . ";
                 break;
             case 3:
-                query = predicate +  " rdfs:domain " + subject + " . " + predicate + " rdfs:range " + slotVar + " . ";
+                //query = predicate +  " rdfs:domain " + subject + " . " + predicate + " rdfs:range " + slotVar + " . ";
+                query = subject + " " + predicate + " " + slotVar + " . ";
                 break;
         }
-        query += " FILTER regex( str(" + slotVar + "), '" + text + "', 'i') . ";
+        //query += " FILTER regex( str(" + slotVar + "), '" + text + "', 'i') . ";
 
         //No BGP for outputs
     }    

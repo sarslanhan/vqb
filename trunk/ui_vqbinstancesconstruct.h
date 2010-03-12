@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'vqbinstancesconstruct.ui'
 **
-** Created: Sun Dec 13 14:10:18 2009
-**      by: Qt User Interface Compiler version 4.6.0
+** Created: Fri Mar 12 17:00:47 2010
+**      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -64,7 +64,7 @@ public:
     {
         if (VqbInstancesConstruct->objectName().isEmpty())
             VqbInstancesConstruct->setObjectName(QString::fromUtf8("VqbInstancesConstruct"));
-        VqbInstancesConstruct->resize(720, 480);
+        VqbInstancesConstruct->resize(720, 526);
         verticalLayout = new QVBoxLayout(VqbInstancesConstruct);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         groupBoxOutputs = new QGroupBox(VqbInstancesConstruct);
@@ -185,12 +185,16 @@ public:
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         labelSConditions = new QLabel(groupBoxCTriples);
         labelSConditions->setObjectName(QString::fromUtf8("labelSConditions"));
+        sizePolicy2.setHeightForWidth(labelSConditions->sizePolicy().hasHeightForWidth());
+        labelSConditions->setSizePolicy(sizePolicy2);
         labelSConditions->setLayoutDirection(Qt::RightToLeft);
 
         gridLayout->addWidget(labelSConditions, 0, 0, 1, 1);
 
         cbSubjectConditions = new KComboBox(groupBoxCTriples);
         cbSubjectConditions->setObjectName(QString::fromUtf8("cbSubjectConditions"));
+        sizePolicy3.setHeightForWidth(cbSubjectConditions->sizePolicy().hasHeightForWidth());
+        cbSubjectConditions->setSizePolicy(sizePolicy3);
         cbSubjectConditions->setEditable(true);
 
         gridLayout->addWidget(cbSubjectConditions, 0, 1, 1, 2);

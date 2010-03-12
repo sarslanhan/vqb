@@ -65,6 +65,8 @@ QString VqbGlobal::constructObject(bool filterOn, QString relation, QString expr
         finalForm += "\"" + expression + "\"^^xsd:decimal" ;
     }
 
+    finalForm += " . ";
+
     return finalForm;
 }
 
@@ -137,6 +139,11 @@ QMap<QString, QString>  VqbGlobal::prefixes()
     prefixList.insert("nid3","http://www.semanticdesktop.org/ontologies/2007/05/10/nid3#");
     prefixList.insert("ncal","http://www.semanticdesktop.org/ontologies/2007/04/02/ncal#");
     prefixList.insert("pimo","http://www.semanticdesktop.org/ontologies/2007/11/01/pimo#");
+
+    prefixList.insert("tmo","http://www.semanticdesktop.org/ontologies/2008/05/20/tmo#");
+    prefixList.insert("virtrdf","http://www.openlinksw.com/schemas/virtrdf#");
+    prefixList.insert("virtrdf-data-formats","http://www.openlinksw.com/virtrdf-data-formats#");
+
     }
 
     return prefixList;

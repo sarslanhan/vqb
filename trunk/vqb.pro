@@ -42,3 +42,4 @@ CONFIG += qt \
     link_pkgconfig
 PKGCONFIG += soprano
 INCLUDEPATH = /home/kde-devel/kde/include
+LIBS += -lkdeui

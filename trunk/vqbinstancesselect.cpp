@@ -15,6 +15,7 @@
 #include <QRegExp>
 #include <QTimer>
 #include <QCompleter>
+#include <QModelIndex>
 
 VqbInstancesSelect::VqbInstancesSelect(VqbMainWindow *parent) :
     VqbForm(parent),m_ui(new Ui::VqbInstancesSelect),  m_queryThread(new QueryThread(this))
@@ -82,7 +83,7 @@ void VqbInstancesSelect::updateQuery()
     }
     query.append(" \n WHERE { \n");
     foreach(QString triple, m_ui->listBoxConditions->items()) {
-        query.append(triple + " .\n");
+        query.append(triple + "\n");
     }
     query.append("}\n");
 
@@ -204,7 +205,7 @@ QString VqbInstancesSelect::constructCompletionQuery(QString text, int slotNumbe
     query += " FILTER regex( str(" + slotVar + "), '" + text + "', 'i') . ";
 
     foreach(QString triple, m_ui->listBoxConditions->items()) {
-        query.append(triple + " . ");
+        query.append(triple);
         //kDebug() << triple;
     }
 
@@ -322,6 +323,16 @@ void VqbInstancesSelect::on_buttonAddToOutput_clicked()
     updateQuery();
 }
 
+void VqbInstancesSelect::on_listVars_doubleClicked(QModelIndex index)
+{
+    Q_UNUSED(index);
+    if(m_ui->listVars->currentItem()) {
+        m_ui->listOutputs->addItem(m_ui->listVars->currentItem()->text());
+    }
+    updateQuery();
+}
+
+
 void VqbInstancesSelect::on_buttonRemoveFromOutput_clicked()
 {
     m_ui->listOutputs->takeItem(m_ui->listOutputs->currentRow());
@@ -330,13 +341,23 @@ void VqbInstancesSelect::on_buttonRemoveFromOutput_clicked()
 
 void VqbInstancesSelect::on_listBoxConditions_changed()
 {
+    kDebug() << "Conditions changeeeeeeeeeeeeeeeeeeeeeeeeed";
+}
+
+void VqbInstancesSelect::on_listBoxConditions_added(QString text)
+{
+    Q_UNUSED(text);
     updateQuery();
     updateVars();
     m_ui->cbSubject->lineEdit()->setText("?s");
     m_ui->cbPredicate->lineEdit()->setText("?p");
     m_ui->checkBoxFilter->setChecked(false);
     m_ui->cbObject->lineEdit()->setText("?o");
-    //FIXME: make sure outputs vars are removed too, and this is reflected in the query
+}
+
+void VqbInstancesSelect::on_listBoxConditions_removed(QString text)
+{
+    on_listBoxConditions_added(text);
 }
 
 
@@ -366,7 +387,5 @@ void VqbInstancesSelect::on_buttonDown_clicked()
 
 
 #include "vqbinstancesselect.moc"
-
-
 
 

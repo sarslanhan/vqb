@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QSet>
 #include <QPair>
+#include <QtAlgorithms>
 
 #include <Soprano/Soprano>
 #include <Soprano/Model>
@@ -69,18 +70,22 @@ void QueryThread::singleQuery()
             //kDebug() << "__||__ Datatype: " << n.dataType();
         }
 
-        //kDebug() << "Found: " << val.s1 << val.s2;
+        //kDebug() << "Found: " << val.first << val.second;
         res.append(val);
     }
 
     //kDebug() << "\n\n ===> Results: " << ": \n";
+    //FIXME: try to find a more efficient solution (that doesn't create the whole list again)
+
+    qSort(res.begin(), res.end(), QueryThread::caseInsensitiveLessThan);
+
     emit queryDone(res);
 }
 
 void QueryThread::incrementalQuery()
 {
-    //NOTE: for fast results, just select DISTINCT with LIMIT 100
-    QString s = "SELECT DISTINCT " + this->m_varName + " WHERE { " + this->m_query + " } LIMIT 50";
+    //NOTE: for fast results, just select DISTINCT with LIMIT 300
+    QString s = "SELECT DISTINCT " + this->m_varName + " WHERE { " + this->m_query + " } LIMIT 300";
     //add prefixes
     s = VqbGlobal::addPrefixes( s );
     //kDebug() << "---000--- Running query: " << s;
@@ -149,7 +154,7 @@ Soprano::Model* QueryThread::nepomukMainModel()
 
 QStringList QueryThread::queryResults( QString query, QString freeVar )
 {
-    QString s = "SELECT DISTINCT " + freeVar + " WHERE { " + query + " } LIMIT 100";//"SELECT * WHERE {" + query + "} LIMIT 1";
+    QString s = "SELECT DISTINCT " + freeVar + " WHERE { " + query + " } LIMIT 300";//"SELECT * WHERE {" + query + "} LIMIT 1";
     //add prefixes
     s = VqbGlobal::addPrefixes( s );
     //kDebug() << "--- Running query: " << s;
@@ -181,6 +186,13 @@ int QueryThread::countQueryResults( QString query )
     query = VqbGlobal::addPrefixes(query);
     Soprano::QueryResultIterator it = QueryThread::nepomukMainModel()->executeQuery( query, Soprano::Query::QueryLanguageSparql );
     return it.allBindings().count();
+}
+
+bool QueryThread::caseInsensitiveLessThan(const QStringPair &s1, const QStringPair &s2)
+{
+    return (s1.first.toLower() == s2.first.toLower() ?
+            s1.second.toLower() < s2.second.toLower() :
+            s1.first.toLower() < s2.first.toLower());
 }
 
 

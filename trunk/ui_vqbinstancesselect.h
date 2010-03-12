@@ -1,8 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'vqbinstancesselect.ui'
 **
-** Created: Sun Dec 13 14:10:18 2009
-**      by: Qt User Interface Compiler version 4.6.0
+** Created: Fri Mar 12 17:00:47 2010
+**      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -34,7 +34,6 @@ public:
     QGroupBox *groupBox;
     QGridLayout *gridLayout_2;
     QLabel *labelS;
-    KComboBox *cbSubject;
     QLabel *labelP;
     KComboBox *cbPredicate;
     QCheckBox *checkBoxFilter;
@@ -43,6 +42,7 @@ public:
     KComboBox *cbObject;
     KComboBox *cbType;
     QLabel *label_2;
+    KComboBox *cbSubject;
     KEditListBox *listBoxConditions;
     QGroupBox *groupBox1;
     QGridLayout *gridLayout_3;
@@ -54,6 +54,7 @@ public:
     QListWidget *listOutputs;
     QListWidget *listVars;
     KPushButton *buttonAddToOutput;
+    KEditListBox *keditlistbox;
 
     void setupUi(QWidget *VqbInstancesSelect)
     {
@@ -77,15 +78,14 @@ public:
         gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         labelS = new QLabel(groupBox);
         labelS->setObjectName(QString::fromUtf8("labelS"));
+        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy1.setHorizontalStretch(1);
+        sizePolicy1.setVerticalStretch(0);
+        sizePolicy1.setHeightForWidth(labelS->sizePolicy().hasHeightForWidth());
+        labelS->setSizePolicy(sizePolicy1);
         labelS->setLayoutDirection(Qt::RightToLeft);
 
         gridLayout_2->addWidget(labelS, 0, 0, 1, 1);
-
-        cbSubject = new KComboBox(groupBox);
-        cbSubject->setObjectName(QString::fromUtf8("cbSubject"));
-        cbSubject->setEditable(true);
-
-        gridLayout_2->addWidget(cbSubject, 0, 1, 1, 2);
 
         labelP = new QLabel(groupBox);
         labelP->setObjectName(QString::fromUtf8("labelP"));
@@ -132,16 +132,27 @@ public:
 
         gridLayout_2->addWidget(label_2, 4, 1, 1, 1);
 
+        cbSubject = new KComboBox(groupBox);
+        cbSubject->setObjectName(QString::fromUtf8("cbSubject"));
+        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        sizePolicy2.setHorizontalStretch(2);
+        sizePolicy2.setVerticalStretch(0);
+        sizePolicy2.setHeightForWidth(cbSubject->sizePolicy().hasHeightForWidth());
+        cbSubject->setSizePolicy(sizePolicy2);
+        cbSubject->setEditable(true);
+
+        gridLayout_2->addWidget(cbSubject, 0, 1, 1, 2);
+
 
         gridLayout->addWidget(groupBox, 0, 0, 1, 1);
 
         listBoxConditions = new KEditListBox(VqbInstancesSelect);
         listBoxConditions->setObjectName(QString::fromUtf8("listBoxConditions"));
-        QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy1.setHorizontalStretch(3);
-        sizePolicy1.setVerticalStretch(1);
-        sizePolicy1.setHeightForWidth(listBoxConditions->sizePolicy().hasHeightForWidth());
-        listBoxConditions->setSizePolicy(sizePolicy1);
+        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy3.setHorizontalStretch(3);
+        sizePolicy3.setVerticalStretch(1);
+        sizePolicy3.setHeightForWidth(listBoxConditions->sizePolicy().hasHeightForWidth());
+        listBoxConditions->setSizePolicy(sizePolicy3);
         listBoxConditions->setFont(font);
         listBoxConditions->setFlat(false);
 
@@ -149,28 +160,28 @@ public:
 
         groupBox1 = new QGroupBox(VqbInstancesSelect);
         groupBox1->setObjectName(QString::fromUtf8("groupBox1"));
-        sizePolicy1.setHeightForWidth(groupBox1->sizePolicy().hasHeightForWidth());
-        groupBox1->setSizePolicy(sizePolicy1);
+        sizePolicy3.setHeightForWidth(groupBox1->sizePolicy().hasHeightForWidth());
+        groupBox1->setSizePolicy(sizePolicy3);
         groupBox1->setFont(font);
         gridLayout_3 = new QGridLayout(groupBox1);
         gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         label = new QLabel(groupBox1);
         label->setObjectName(QString::fromUtf8("label"));
-        QSizePolicy sizePolicy2(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy2.setHorizontalStretch(0);
-        sizePolicy2.setVerticalStretch(0);
-        sizePolicy2.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
-        label->setSizePolicy(sizePolicy2);
+        QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy4.setHorizontalStretch(0);
+        sizePolicy4.setVerticalStretch(0);
+        sizePolicy4.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
+        label->setSizePolicy(sizePolicy4);
 
         gridLayout_3->addWidget(label, 0, 0, 1, 1);
 
         labelOutputVars = new QLabel(groupBox1);
         labelOutputVars->setObjectName(QString::fromUtf8("labelOutputVars"));
-        QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy3.setHorizontalStretch(0);
-        sizePolicy3.setVerticalStretch(1);
-        sizePolicy3.setHeightForWidth(labelOutputVars->sizePolicy().hasHeightForWidth());
-        labelOutputVars->setSizePolicy(sizePolicy3);
+        QSizePolicy sizePolicy5(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy5.setHorizontalStretch(0);
+        sizePolicy5.setVerticalStretch(1);
+        sizePolicy5.setHeightForWidth(labelOutputVars->sizePolicy().hasHeightForWidth());
+        labelOutputVars->setSizePolicy(sizePolicy5);
 
         gridLayout_3->addWidget(labelOutputVars, 0, 2, 1, 2);
 
@@ -192,11 +203,11 @@ public:
 
         listOutputs = new QListWidget(groupBox1);
         listOutputs->setObjectName(QString::fromUtf8("listOutputs"));
-        QSizePolicy sizePolicy4(QSizePolicy::Preferred, QSizePolicy::Preferred);
-        sizePolicy4.setHorizontalStretch(0);
-        sizePolicy4.setVerticalStretch(3);
-        sizePolicy4.setHeightForWidth(listOutputs->sizePolicy().hasHeightForWidth());
-        listOutputs->setSizePolicy(sizePolicy4);
+        QSizePolicy sizePolicy6(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy6.setHorizontalStretch(1);
+        sizePolicy6.setVerticalStretch(3);
+        sizePolicy6.setHeightForWidth(listOutputs->sizePolicy().hasHeightForWidth());
+        listOutputs->setSizePolicy(sizePolicy6);
         listOutputs->setFont(font);
         listOutputs->setDragDropMode(QAbstractItemView::InternalMove);
         listOutputs->setMovement(QListView::Free);
@@ -205,8 +216,11 @@ public:
 
         listVars = new QListWidget(groupBox1);
         listVars->setObjectName(QString::fromUtf8("listVars"));
-        sizePolicy4.setHeightForWidth(listVars->sizePolicy().hasHeightForWidth());
-        listVars->setSizePolicy(sizePolicy4);
+        QSizePolicy sizePolicy7(QSizePolicy::Preferred, QSizePolicy::Preferred);
+        sizePolicy7.setHorizontalStretch(2);
+        sizePolicy7.setVerticalStretch(3);
+        sizePolicy7.setHeightForWidth(listVars->sizePolicy().hasHeightForWidth());
+        listVars->setSizePolicy(sizePolicy7);
         listVars->setDragDropMode(QAbstractItemView::InternalMove);
         listVars->setMovement(QListView::Free);
 
@@ -214,12 +228,27 @@ public:
 
         buttonAddToOutput = new KPushButton(groupBox1);
         buttonAddToOutput->setObjectName(QString::fromUtf8("buttonAddToOutput"));
+        QSizePolicy sizePolicy8(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        sizePolicy8.setHorizontalStretch(1);
+        sizePolicy8.setVerticalStretch(0);
+        sizePolicy8.setHeightForWidth(buttonAddToOutput->sizePolicy().hasHeightForWidth());
+        buttonAddToOutput->setSizePolicy(sizePolicy8);
         buttonAddToOutput->setFont(font);
 
         gridLayout_3->addWidget(buttonAddToOutput, 2, 1, 1, 1);
 
 
         gridLayout->addWidget(groupBox1, 1, 1, 1, 1);
+
+        keditlistbox = new KEditListBox(VqbInstancesSelect);
+        keditlistbox->setObjectName(QString::fromUtf8("keditlistbox"));
+        QSizePolicy sizePolicy9(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
+        sizePolicy9.setHorizontalStretch(1);
+        sizePolicy9.setVerticalStretch(1);
+        sizePolicy9.setHeightForWidth(keditlistbox->sizePolicy().hasHeightForWidth());
+        keditlistbox->setSizePolicy(sizePolicy9);
+
+        gridLayout->addWidget(keditlistbox, 1, 0, 1, 1);
 
 #ifndef QT_NO_SHORTCUT
         labelS->setBuddy(cbSubject);
@@ -247,9 +276,6 @@ public:
         VqbInstancesSelect->setWindowTitle(QApplication::translate("VqbInstancesSelect", "Form", 0, QApplication::UnicodeUTF8));
         groupBox->setTitle(QApplication::translate("VqbInstancesSelect", "Triple", 0, QApplication::UnicodeUTF8));
         labelS->setText(QApplication::translate("VqbInstancesSelect", "Subject", 0, QApplication::UnicodeUTF8));
-#ifndef QT_NO_STATUSTIP
-        cbSubject->setStatusTip(QApplication::translate("VqbInstancesSelect", "Subject Field", 0, QApplication::UnicodeUTF8));
-#endif // QT_NO_STATUSTIP
         labelP->setText(QApplication::translate("VqbInstancesSelect", "Predicate", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_STATUSTIP
         cbPredicate->setStatusTip(QApplication::translate("VqbInstancesSelect", "Predicate Field", 0, QApplication::UnicodeUTF8));
@@ -279,6 +305,9 @@ public:
         cbType->setStatusTip(QApplication::translate("VqbInstancesSelect", "Object (Literal) Type", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_STATUSTIP
         label_2->setText(QApplication::translate("VqbInstancesSelect", "Type", 0, QApplication::UnicodeUTF8));
+#ifndef QT_NO_STATUSTIP
+        cbSubject->setStatusTip(QApplication::translate("VqbInstancesSelect", "Subject Field", 0, QApplication::UnicodeUTF8));
+#endif // QT_NO_STATUSTIP
 #ifndef QT_NO_TOOLTIP
         listBoxConditions->setToolTip(QApplication::translate("VqbInstancesSelect", "Conditional Triples", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
