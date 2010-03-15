@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'vqbinstancesselect.ui'
 **
-** Created: Fri Mar 12 17:00:47 2010
+** Created: Mon Mar 15 12:22:25 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -54,7 +54,6 @@ public:
     QListWidget *listOutputs;
     QListWidget *listVars;
     KPushButton *buttonAddToOutput;
-    KEditListBox *keditlistbox;
 
     void setupUi(QWidget *VqbInstancesSelect)
     {
@@ -239,16 +238,6 @@ public:
 
 
         gridLayout->addWidget(groupBox1, 1, 1, 1, 1);
-
-        keditlistbox = new KEditListBox(VqbInstancesSelect);
-        keditlistbox->setObjectName(QString::fromUtf8("keditlistbox"));
-        QSizePolicy sizePolicy9(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
-        sizePolicy9.setHorizontalStretch(1);
-        sizePolicy9.setVerticalStretch(1);
-        sizePolicy9.setHeightForWidth(keditlistbox->sizePolicy().hasHeightForWidth());
-        keditlistbox->setSizePolicy(sizePolicy9);
-
-        gridLayout->addWidget(keditlistbox, 1, 0, 1, 1);
 
 #ifndef QT_NO_SHORTCUT
         labelS->setBuddy(cbSubject);

@@ -83,7 +83,7 @@ void VqbInstancesSelect::updateQuery()
     }
     query.append(" \n WHERE { \n");
     foreach(QString triple, m_ui->listBoxConditions->items()) {
-        query.append(triple + "\n");
+        query.append(triple + " .\n");
     }
     query.append("}\n");
 
@@ -118,6 +118,11 @@ void VqbInstancesSelect::updateVars()
     m_ui->cbSubject->addItems(m_varList);
     m_ui->cbPredicate->addItems(m_varList);
     m_ui->cbObject->addItems(m_varList);
+
+    m_ui->cbSubject->lineEdit()->setText("?s");
+    m_ui->cbPredicate->lineEdit()->setText("?p");
+    m_ui->checkBoxFilter->setChecked(false);
+    m_ui->cbObject->lineEdit()->setText("?o");
 
     //FIXME: remove nonexistent vars from output list
 }
@@ -205,7 +210,7 @@ QString VqbInstancesSelect::constructCompletionQuery(QString text, int slotNumbe
     query += " FILTER regex( str(" + slotVar + "), '" + text + "', 'i') . ";
 
     foreach(QString triple, m_ui->listBoxConditions->items()) {
-        query.append(triple);
+        query.append(triple + " . ");
         //kDebug() << triple;
     }
 
@@ -217,7 +222,6 @@ QString VqbInstancesSelect::constructCompletionQuery(QString text, int slotNumbe
 
 void VqbInstancesSelect::colorLineEdits()
 {
-    //FIXME: coloring doesn't work
     int hasResults = QueryThread::countQueryResults("SELECT * WHERE { " + m_currentTriple + " } LIMIT 1");
 
     QPalette palette( m_ui->cbSubject->lineEdit()->palette() );//palette adjusted to given color
@@ -246,7 +250,7 @@ void VqbInstancesSelect::init()
     m_ui->buttonDown->setIcon(KIcon("arrow-down"));
 
     //query threads
-    //FIXME: remove query threads
+    //FIXME: remove query threads (manage them properly)
     m_queryThreads.append(new QueryThread(this));
     m_queryThreads.append(new QueryThread(this));
     m_queryThreads.append(new QueryThread(this));
@@ -342,6 +346,21 @@ void VqbInstancesSelect::on_buttonRemoveFromOutput_clicked()
 void VqbInstancesSelect::on_listBoxConditions_changed()
 {
     kDebug() << "Conditions changeeeeeeeeeeeeeeeeeeeeeeeeed";
+
+    m_ui->cbSubject->blockSignals(true);
+    m_ui->cbPredicate->blockSignals(true);
+    m_ui->cbObject->blockSignals(true);
+    m_ui->cbSubject->lineEdit()->blockSignals(true);
+    m_ui->cbPredicate->lineEdit()->blockSignals(true);
+    m_ui->cbObject->lineEdit()->blockSignals(true);
+    updateQuery();
+    updateVars();
+    m_ui->cbSubject->blockSignals(false);
+    m_ui->cbPredicate->blockSignals(false);
+    m_ui->cbObject->blockSignals(false);
+    m_ui->cbSubject->lineEdit()->blockSignals(false);
+    m_ui->cbPredicate->lineEdit()->blockSignals(false);
+    m_ui->cbObject->lineEdit()->blockSignals(false);
 }
 
 void VqbInstancesSelect::on_listBoxConditions_added(QString text)
@@ -349,10 +368,6 @@ void VqbInstancesSelect::on_listBoxConditions_added(QString text)
     Q_UNUSED(text);
     updateQuery();
     updateVars();
-    m_ui->cbSubject->lineEdit()->setText("?s");
-    m_ui->cbPredicate->lineEdit()->setText("?p");
-    m_ui->checkBoxFilter->setChecked(false);
-    m_ui->cbObject->lineEdit()->setText("?o");
 }
 
 void VqbInstancesSelect::on_listBoxConditions_removed(QString text)
