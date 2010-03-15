@@ -39,10 +39,10 @@ QString VqbGlobal::constructObject(bool filterOn, QString relation, QString expr
     if(filterOn) {//Filter ON
         QString var = VqbGlobal::randomVarName();//QString("?v" +  QString::number(KRandom::random() % 80 + 20)) ;
         if (relation == "contains") {
-            finalForm.append( var + " . FILTER regex(" + var + ", '" + expression + "', 'i') . ") ;
+            finalForm.append( var + " . FILTER regex(" + var + ", '" + expression + "', 'i') ") ;
         }
         else if (relation == "equals") {
-            finalForm.append( var + " . FILTER regex(" + var + ", '^" + expression + "$', 'i') . ");
+            finalForm.append( var + " . FILTER regex(" + var + ", '^" + expression + "$', 'i') ");
         }
         return finalForm;
     }
@@ -65,7 +65,7 @@ QString VqbGlobal::constructObject(bool filterOn, QString relation, QString expr
         finalForm += "\"" + expression + "\"^^xsd:decimal" ;
     }
 
-    finalForm += " . ";
+    //finalForm += " . ";
 
     return finalForm;
 }

@@ -175,7 +175,7 @@ void VqbInstancesConstruct::emitQueryChanged()
     }
     m_queryPart.append(" } \n WHERE { \n");
     foreach(QString triple, m_ui->listBoxConditions->items()) {
-        m_queryPart.append(triple + "\n");
+        m_queryPart.append(triple + " .\n");
     }
     m_queryPart.append("}\n");
 

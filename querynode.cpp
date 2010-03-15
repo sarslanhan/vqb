@@ -348,7 +348,7 @@ QString QueryNode::queryPart()
         foreach(QueryNode *node, d->restrictions) {
             childrenQueryParts.append(var + " " + node->queryPart());
         }
-        return QString(var + " a " + classUri + " . " + childrenQueryParts);
+        return QString(var + " a " + classUri + " . \n" + childrenQueryParts);
     }    
 
     if(d->objectCB->isEditable()) { //Literal node
@@ -364,7 +364,7 @@ QString QueryNode::queryPart()
         } else if (relStr == "contains") {
             filterStr = QString(". FILTER regex(" + var + ", '" + object + "', 'i') . ") ;
         }
-        return QString(predUri + " " + var + filterStr);
+        return QString(predUri + " " + var + filterStr + "\n");
     }
 
     else { //Resource node
@@ -374,9 +374,9 @@ QString QueryNode::queryPart()
         foreach(QueryNode *node, d->restrictions) {
             childrenQueryParts.append(var + " " + node->queryPart());
         }
-        return QString(predUri + var + " . "
+        return QString(predUri + " " + var + " . "
                        + var + " a " + classUri +
-                       + " . " + childrenQueryParts);
+                       + " . \n" + childrenQueryParts);
     }
 }
 
