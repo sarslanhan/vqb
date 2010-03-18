@@ -168,6 +168,8 @@ void VqbMainWindow::showStartupMenu(bool exitOnCancel)
 
     show();
     m_mainForm->show();    
+    m_mainForm->activateWindow();
+    m_mainForm->setFocus(Qt::OtherFocusReason);
 }
 
 void VqbMainWindow::on_actionPostToPastebin_triggered()

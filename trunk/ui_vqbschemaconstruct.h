@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'vqbschemaconstruct.ui'
 **
-** Created: Fri Mar 12 17:00:47 2010
+** Created: Thu Mar 18 13:02:31 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -52,7 +52,7 @@ public:
     KLineEdit *lineEditFilterObject;
     KListWidget *listObject;
     QCheckBox *cbShowAllObject;
-    KEditListBox *listBoxConditions;
+    KEditListBox *listBoxOutputs;
 
     void setupUi(QWidget *VqbSchemaConstruct)
     {
@@ -76,7 +76,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName(QString::fromUtf8("scrollAreaWidgetContents"));
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 680, 162));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 680, 170));
         scrollArea->setWidget(scrollAreaWidgetContents);
 
         verticalLayout->addWidget(scrollArea);
@@ -186,17 +186,17 @@ public:
 
         horizontalLayout->addWidget(groupBoxObject);
 
-        listBoxConditions = new KEditListBox(groupBoxOutput);
-        listBoxConditions->setObjectName(QString::fromUtf8("listBoxConditions"));
+        listBoxOutputs = new KEditListBox(groupBoxOutput);
+        listBoxOutputs->setObjectName(QString::fromUtf8("listBoxOutputs"));
         QSizePolicy sizePolicy3(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy3.setHorizontalStretch(3);
         sizePolicy3.setVerticalStretch(1);
-        sizePolicy3.setHeightForWidth(listBoxConditions->sizePolicy().hasHeightForWidth());
-        listBoxConditions->setSizePolicy(sizePolicy3);
-        listBoxConditions->setFont(font);
-        listBoxConditions->setFlat(false);
+        sizePolicy3.setHeightForWidth(listBoxOutputs->sizePolicy().hasHeightForWidth());
+        listBoxOutputs->setSizePolicy(sizePolicy3);
+        listBoxOutputs->setFont(font);
+        listBoxOutputs->setFlat(false);
 
-        horizontalLayout->addWidget(listBoxConditions);
+        horizontalLayout->addWidget(listBoxOutputs);
 
 
         verticalLayout_2->addWidget(groupBoxOutput);
@@ -258,12 +258,12 @@ public:
 #endif // QT_NO_STATUSTIP
         cbShowAllObject->setText(QApplication::translate("VqbSchemaConstruct", "Show All", 0, QApplication::UnicodeUTF8));
 #ifndef QT_NO_TOOLTIP
-        listBoxConditions->setToolTip(QApplication::translate("VqbSchemaConstruct", "Output Triples", 0, QApplication::UnicodeUTF8));
+        listBoxOutputs->setToolTip(QApplication::translate("VqbSchemaConstruct", "Output Triples", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_STATUSTIP
-        listBoxConditions->setStatusTip(QApplication::translate("VqbSchemaConstruct", "Output Triples", 0, QApplication::UnicodeUTF8));
+        listBoxOutputs->setStatusTip(QApplication::translate("VqbSchemaConstruct", "Output Triples", 0, QApplication::UnicodeUTF8));
 #endif // QT_NO_STATUSTIP
-        listBoxConditions->setTitle(QApplication::translate("VqbSchemaConstruct", "Graph Pattern", 0, QApplication::UnicodeUTF8));
+        listBoxOutputs->setTitle(QApplication::translate("VqbSchemaConstruct", "Graph Pattern", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

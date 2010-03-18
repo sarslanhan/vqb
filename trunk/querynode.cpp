@@ -306,7 +306,20 @@ void QueryNode::removeAllRestrictions()
 
 void QueryNode::removeRestriction(QueryNode *qn)
 {
-    //kDebug() << "Removing Restriction...";
+    //parse query part for vars, and remove them
+    QString query = qn->queryPart();
+    QRegExp rx(VqbGlobal::typeRegExp("var"));
+
+    QString var;
+    int pos = 0;
+    while ((pos = rx.indexIn( query, pos )) != -1) {
+        var = rx.cap(1);
+        pos += rx.matchedLength();
+
+        emit removeVarFromOutput(var);
+    }
+
+    //remove query node
     d->restrictionLayout->removeItem(qn);
     d->restrictions.removeAt(d->restrictions.indexOf(qn));
     qn->deleteLater();

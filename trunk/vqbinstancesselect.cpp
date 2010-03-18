@@ -268,7 +268,7 @@ void VqbInstancesSelect::init()
     m_ui->cbSubject->lineEdit()->setText("?s");
     m_ui->cbPredicate->lineEdit()->setText("?p");
     m_ui->cbObject->lineEdit()->setText("?o");
-    m_ui->cbRelation->insertItems(0, QStringList() << "equals" << "contains");
+    m_ui->cbRelation->insertItems(0, QStringList() << "contains" << "equals" );
 
     //triple updating signals
     connect(m_ui->cbSubject->lineEdit(), SIGNAL(textChanged(QString)),//(editingFinished()),

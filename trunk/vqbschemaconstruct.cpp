@@ -79,6 +79,7 @@ void VqbSchemaConstruct::init()
     connect(d->ui->listSubject, SIGNAL(itemSelectionChanged()), this, SLOT(updateTriple()));
     connect(d->ui->listPredicate, SIGNAL(itemSelectionChanged()), this, SLOT(updateTriple()));
     connect(d->ui->listObject, SIGNAL(itemSelectionChanged()), this, SLOT(updateTriple()));
+    connect(d->ui->listBoxOutputs, SIGNAL(changed()), this, SLOT(emitQueryChanged()));
 }
 
 
@@ -135,7 +136,7 @@ void VqbSchemaConstruct::addQueryTree()
 void VqbSchemaConstruct::emitQueryChanged()
 {
     QString query = "CONSTRUCT { ";
-    foreach(QString s, d->ui->listBoxConditions->items()) {
+    foreach(QString s, d->ui->listBoxOutputs->items()) {
         query.append(s + " ");
     }
     query.append(" } \n WHERE { \n");
@@ -210,8 +211,18 @@ void VqbSchemaConstruct::updateTriple()
                      (d->ui->listPredicate->currentItem() ? d->ui->listPredicate->currentItem()->text() : QString()) + " " +
                      (d->ui->listObject->currentItem() ? d->ui->listObject->currentItem()->text() : QString());
 
-    d->ui->listBoxConditions->lineEdit()->setText(triple);
+    d->ui->listBoxOutputs->lineEdit()->setText(triple);
 }
 
+void VqbSchemaConstruct::addVarToOutput(QString var)
+{    
+    Q_UNUSED(var);
+}
+
+
+void VqbSchemaConstruct::removeVarFromOutput(QString var)
+{
+    Q_UNUSED(var);
+}
 
 #include "vqbschemaconstruct.moc"
