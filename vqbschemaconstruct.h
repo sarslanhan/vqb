@@ -29,10 +29,15 @@ public slots:
     void addQueryTree();
     void populateOutputLists();//populates the lists for constructing the output
     void updateTriple();
+    void addVarToOutput(QString var);//not implemented - for compatibility only
+    void removeVarFromOutput(QString var);//not implemented - for compatibility only
+
+private slots:
+    void emitQueryChanged();
 
 private:
     void init();
-    void emitQueryChanged();
+
 
     class Private;
     Private * const d;

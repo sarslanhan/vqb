@@ -155,15 +155,39 @@ void VqbInstancesConstruct::updateVars()
 
 void VqbInstancesConstruct::on_listBoxConditions_changed()
 {
+    m_ui->cbSubjectConditions->blockSignals(true);
+    m_ui->cbPredicateConditions->blockSignals(true);
+    m_ui->cbObjectConditions->blockSignals(true);
+    m_ui->cbSubjectConditions->lineEdit()->blockSignals(true);
+    m_ui->cbPredicateConditions->lineEdit()->blockSignals(true);
+    m_ui->cbObjectConditions->lineEdit()->blockSignals(true);
     emitQueryChanged();
     updateVars();
+    m_ui->cbSubjectConditions->blockSignals(false);
+    m_ui->cbPredicateConditions->blockSignals(false);
+    m_ui->cbObjectConditions->blockSignals(false);
+    m_ui->cbSubjectConditions->lineEdit()->blockSignals(false);
+    m_ui->cbPredicateConditions->lineEdit()->blockSignals(false);
+    m_ui->cbObjectConditions->lineEdit()->blockSignals(false);
 }
 
 
 void VqbInstancesConstruct::on_listBoxOutputs_changed()
 {
+    m_ui->cbSubjectOutputs->blockSignals(true);
+    m_ui->cbPredicateOutputs->blockSignals(true);
+    m_ui->cbObjectOutputs->blockSignals(true);
+    m_ui->cbSubjectOutputs->lineEdit()->blockSignals(true);
+    m_ui->cbPredicateOutputs->lineEdit()->blockSignals(true);
+    m_ui->cbObjectOutputs->lineEdit()->blockSignals(true);
     emitQueryChanged();
     updateVars();
+    m_ui->cbSubjectOutputs->blockSignals(false);
+    m_ui->cbPredicateOutputs->blockSignals(false);
+    m_ui->cbObjectOutputs->blockSignals(false);
+    m_ui->cbSubjectOutputs->lineEdit()->blockSignals(false);
+    m_ui->cbPredicateOutputs->lineEdit()->blockSignals(false);
+    m_ui->cbObjectOutputs->lineEdit()->blockSignals(false);
 }
 
 void VqbInstancesConstruct::emitQueryChanged()
@@ -416,7 +440,7 @@ void VqbInstancesConstruct::init()
     m_ui->cbSubjectConditions->lineEdit()->setText("?s");
     m_ui->cbPredicateConditions->lineEdit()->setText("?p");
     m_ui->cbObjectConditions->lineEdit()->setText("?o");
-    m_ui->cbRelationConditions->insertItems(0, QStringList() << "equals" << "contains");
+    m_ui->cbRelationConditions->insertItems(0, QStringList() << "contains" << "equals");
     m_ui->cbSubjectOutputs->lineEdit()->setText("?s");
     m_ui->cbPredicateOutputs->lineEdit()->setText("?p");
     m_ui->cbObjectOutputs->lineEdit()->setText("?o");
