@@ -130,11 +130,18 @@ void VqbInstancesSelect::updateVars()
 void VqbInstancesSelect::updateCompletersSubject(QString text)
 {
     //FIXME: stop the previous query
-    //m_ui->cbSubject->completionObject()->clear();
-
     if(text.isEmpty()) { //don't complete empty string
         return;
     }
+
+    ((CompleterLineEdit*) m_ui->cbSubject->lineEdit())->clearItems();
+
+    /*m_queryThread->setQuery(constructCompletionQuery(text, 1),
+                            "?slot", QueryThread::IncrementalQuery);
+    disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
+    connect(m_queryThread, SIGNAL(resultFound(QString)),
+            (CompleterLineEdit*)m_ui->cbSubject->lineEdit(), SLOT(addItem(QString)));
+            */
 
     m_queryThread->setQuery(constructCompletionQuery(text, 1),
                             "?slot", QueryThread::IncrementalQuery);
@@ -151,6 +158,8 @@ void VqbInstancesSelect::updateCompletersPredicate(QString text)
     if(text.isEmpty()) { //don't complete empty string
         return;
     }
+
+    ((CompleterLineEdit*) m_ui->cbPredicate->lineEdit())->clearItems();
 
     QString query = constructCompletionQuery(text, 2);
     m_queryThread->setQuery(query,
@@ -169,13 +178,23 @@ void VqbInstancesSelect::updateCompletersObject(QString text)
         return;
     }
 
+    ((CompleterLineEdit*) m_ui->cbObject->lineEdit())->clearItems();
     QString query = constructCompletionQuery(text, 3);
+
+    /*
     m_queryThread->setQuery(query,
                             "?slot", QueryThread::IncrementalQuery);
     disconnect(m_queryThread, SIGNAL(resultFound(QString)), 0, 0);
     connect(m_queryThread, SIGNAL(resultFound(QString)),
             (CompleterLineEdit*)m_ui->cbObject->lineEdit(), SLOT(addItem(QString)));
-    //kDebug() << query;
+    */
+
+
+    m_queryThread->setQuery(query,
+                            "?slot", QueryThread::SingleQuery);
+    disconnect(m_queryThread, SIGNAL(queryDone(QStringList)), 0, 0);
+    connect(m_queryThread, SIGNAL(queryDone(QStringList)),
+            (CompleterLineEdit*)m_ui->cbObject->lineEdit(), SLOT(addItems(QStringList)));
 
     m_queryThread->start();
 }
@@ -345,8 +364,6 @@ void VqbInstancesSelect::on_buttonRemoveFromOutput_clicked()
 
 void VqbInstancesSelect::on_listBoxConditions_changed()
 {
-    kDebug() << "Conditions changeeeeeeeeeeeeeeeeeeeeeeeeed";
-
     m_ui->cbSubject->blockSignals(true);
     m_ui->cbPredicate->blockSignals(true);
     m_ui->cbObject->blockSignals(true);

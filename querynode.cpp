@@ -126,16 +126,17 @@ void QueryNode::findObjects()
         //kDebug() << (int) d->predicateCB;
         QString predicate = d->predicateCB->itemData( d->predicateCB->currentIndex() ).toString();
         query = QString("SELECT DISTINCT ?label ?class WHERE {"
-                            "%1 rdfs:range ?class ."
-                            "OPTIONAL { ?class rdfs:label ?label } } ORDER BY (?label)")
-                    .arg(predicate);
+                        "{ %1 rdfs:range ?class .}"
+                        "UNION { ?s %1 ?o . ?o a ?class .}"
+                        "OPTIONAL { ?class rdfs:label ?label } } ORDER BY (?label)" )
+                        .arg(predicate);
     }
     else { //root node
     query = "SELECT DISTINCT ?label ?class WHERE"
                     "{ ?resource a ?class .  ?class rdfs:label ?label } ORDER BY (?label)";
     }
 
-    qt->setQuery(query);
+    qt->setQuery(query, QString(), QueryThread::SingleQueryPairs);
     qt->start();
 }
 
@@ -154,7 +155,7 @@ void QueryNode::findPredicates()
                             " OPTIONAL { ?property rdfs:label ?label } "
                             " } } ORDER BY (?label)"
                             ).arg(d->parentClass);
-    qt->setQuery( query );
+    qt->setQuery( query, QString(), QueryThread::SingleQueryPairs );
     qt->start();
 }
 
@@ -215,7 +216,8 @@ void QueryNode::addSubjects(QList<QStringPair> subjects)
     //change interface
     QString object = d->objectCB->itemData( d->objectCB->currentIndex() ).toString();
     if (object == "xsd:string" ||
-        object == "rdfs:Literal") { //Literal
+        object == "rdfs:Literal" ||
+        object.isEmpty()) {
 
         if(d->relationCB == 0) {
             d->relationCB = new QComboBox();

@@ -19,7 +19,7 @@ class QueryThread : public QThread
     Q_OBJECT
 
 public:
-    enum QueryMode{ SingleQuery, IncrementalQuery };
+    enum QueryMode{ SingleQuery, SingleQueryPairs, IncrementalQuery };
 
     QueryThread(QObject *parent);
 
@@ -47,11 +47,14 @@ public:
 
 signals:
     void queryDone(QList<QStringPair>);
+    void queryDone(QStringList);
     void resultFound(QString item);
 
 private:
-    void singleQuery();//fires results at the end
-    void incrementalQuery();//fires each result item in turn
+    void singleQuery();//fires results at the end - you need to have supplied the conditions and the free var to get bindings for
+
+    void singleQueryPairs();//fires pair at the end - you need to have supplied the conditions and the free var to get bindings for
+    void incrementalQuery();//fires each result item in turn - you need to have supplied the conditions and the free var to get bindings for
     static Soprano::Model* nepomukMainModel();
     static bool caseInsensitiveLessThan(const QStringPair &s1, const QStringPair &s2);
 
