@@ -28,16 +28,54 @@ QueryThread::QueryThread(QObject *parent)
 void QueryThread::run()
 {
     if(m_queryMode == QueryThread::SingleQuery) {
-        m_query = VqbGlobal::addPrefixes(m_query);
-        //kDebug() << m_query;
+        //prefixes are not added here, but after the whole query has been built
         singleQuery();
     }
+    else if(m_queryMode == QueryThread::SingleQueryPairs) {
+        m_query = VqbGlobal::addPrefixes(m_query);
+        singleQueryPairs();
+    }
     else if(m_queryMode == QueryThread::IncrementalQuery) {
+        //prefixes are not added here, but after the whole query has been built
         incrementalQuery();
     }
 }
 
+
 void QueryThread::singleQuery()
+{
+    //NOTE: for fast results, just select DISTINCT with LIMIT 300
+    QString s = "SELECT DISTINCT " + this->m_varName + " WHERE { " + this->m_query + " } LIMIT 300";
+    //add prefixes
+    s = VqbGlobal::addPrefixes( s );
+    kDebug() << "---000--- Running query: " << s;
+
+    Soprano::Model* m = QueryThread::nepomukMainModel();
+    Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
+    QSet<QString> results;
+    QList<Soprano::BindingSet> allStatements = it.allBindings();
+
+
+    kDebug() << "---000--- " << allStatements.count();
+    QString val;
+    foreach (Soprano::BindingSet s, allStatements ) {
+              Soprano::Node n = s.value(this->m_varName.replace("?", ""));
+              if ( n.isResource() ) {
+                  val = n.uri().toString();
+                  val = VqbGlobal::prefixForm( val );
+              } else if ( n.isLiteral() ) {
+                  QString dtUri = n.literal().dataTypeUri().toString();
+                  val = "\"" + n.literal().toString() + "\"" + (dtUri.isEmpty() ? "" : "^^<"+ dtUri +">");
+              }
+
+                  //emit(resultFound(val));//notification of a new item
+                  results.insert(val);
+    }
+    kDebug() << "---000--- Query done.";
+    emit queryDone(results.toList());
+}
+
+void QueryThread::singleQueryPairs()
 {
     //kDebug() << "\n\n *** Querying: " << m_query;
     Soprano::Model* m = QueryThread::nepomukMainModel();
@@ -88,11 +126,11 @@ void QueryThread::incrementalQuery()
     QString s = "SELECT DISTINCT " + this->m_varName + " WHERE { " + this->m_query + " } LIMIT 300";
     //add prefixes
     s = VqbGlobal::addPrefixes( s );
-    //kDebug() << "---000--- Running query: " << s;
+    kDebug() << "---000--- Running query: " << s;
 
     Soprano::Model* m = QueryThread::nepomukMainModel();
     Soprano::QueryResultIterator it = m->executeQuery( s, Soprano::Query::QueryLanguageSparql );
-    QSet<QString> results;
+    //QSet<QString> results;
     QList<Soprano::BindingSet> allStatements = it.allBindings();
 
 
@@ -108,13 +146,13 @@ void QueryThread::incrementalQuery()
                   val = "\"" + n.literal().toString() + "\"" + (dtUri.isEmpty() ? "" : "^^<"+ dtUri +">");
               }
 
-              if(!results.contains(val)) {
+              //if(!results.contains(val)) {
                   //kDebug() << "Item found: " << val;
                   emit(resultFound(val));//notification of a new item
-                  results.insert(val);
-              }
+                //  results.insert(val);
+              //}
     }
-    //kDebug() << "---000--- Query done.";
+    kDebug() << "---000--- Query done.";
 }
 
 void QueryThread::setQuery(QString query, QString varName, QueryMode queryMode)

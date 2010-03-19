@@ -125,8 +125,7 @@ QMap<QString, QString>  VqbGlobal::prefixes()
     prefixList.insert("geo","http://www.w3.org/2003/01/geo/wgs84_pos#");
     prefixList.insert("xsd","http://www.w3.org/2001/XMLSchema#");
     prefixList.insert("swrc","http://swrc.ontoware.org/ontology#");
-    prefixList.insert("swc","http://data.semanticweb.org/ns/swc/ontology#");
-
+    prefixList.insert("swc","http://data.semanticweb.org/ns/swc/ontology#");    
 
     prefixList.insert("xesam", "http://freedesktop.org/standards/xesam/1.0/core#");
     prefixList.insert("nrl", "http://www.semanticdesktop.org/ontologies/2007/08/15/nrl#");
